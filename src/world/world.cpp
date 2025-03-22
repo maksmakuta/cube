@@ -1,10 +1,9 @@
+#include "cube/base/generator.hpp"
+#include "cube/generators/generator_flat.hpp"
 #include "cube/world/world.hpp"
 
 #include <memory>
 #include <optional>
-
-#include "cube/base/generator.hpp"
-#include "cube/generators/generator_flat.hpp"
 
 namespace cube {
 

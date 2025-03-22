@@ -3,7 +3,7 @@
 
 #include "cube/base/generator.hpp"
 #include "cube/core/types.hpp"
-#include "chunk.hpp"
+#include "cube/world/chunk.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/vec2.hpp>
