@@ -1,21 +1,14 @@
 #ifndef CHUNK_HPP
 #define CHUNK_HPP
 
+#include "cube/core/block.hpp"
+#include "cube/core/constants.hpp"
+#include "cube/core/types.hpp"
+
 #include <cstdint>
 #include <vector>
 
 namespace cube {
-
-    /** bit  15                  0
-     *        0000 0000 0000 0000
-     *              cbb aaaa aaaa
-     *
-     *  legend:
-     *  a - block id (256 variants - 8bits)
-     *  b - direction of block (4 variants - 2 bits)
-     *  c - upside down bit
-     */
-    using BlockData = uint16_t;
 
     class Chunk {
     public:
@@ -25,7 +18,7 @@ namespace cube {
         void set(uint8_t x, uint8_t y, uint8_t z, const BlockData &data);
 
     private:
-        std::vector<BlockData> m_data;
+        std::vector<BlockData> m_data{CHUNK_SIZE, static_cast<BlockData>(BlockID::Air)};
     };
 
 }
