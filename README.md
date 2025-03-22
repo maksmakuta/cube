@@ -1,8 +1,16 @@
 # Cube
 
- Minecraft-like pet project for demonstrating my C++ skills
- 
+ Minecraft-like pet project for demonstrating my skills in C++, OpenGL and other technologies
 
 ### Features
 
- ..TODO
+ ..In progress
+ 
+### Dependencies
+
+ - C++23
+ - OpenGL (3.3+)
+ - GLM
+ - GLFW
+ - libPNG
+

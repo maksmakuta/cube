@@ -6,14 +6,14 @@
 namespace cube {
 
 
-    /** bit  15                  0
-     *        0000 0000 0000 0000
-     *              cbb aaaa aaaa
+    /** bit: 15                   0
+     *         0000 0cbb aaaa aaaa
      *
      *  legend:
      *  a - block id (256 variants - 8bits)
      *  b - direction of block (4 variants - 2 bits)
      *  c - upside down bit
+     *  0 - empty bits
      */
     using BlockData = uint16_t;
 

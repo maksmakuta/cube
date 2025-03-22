@@ -19,7 +19,10 @@ add_executable(cube src/main.cpp
         include/cube/generators/generator_flat.hpp
         src/generators/generator_flat.cpp
         include/cube/utils/utils.hpp
-        src/utils/utils.cpp)
+        src/utils/utils.cpp
+        include/cube/graphics/shader.hpp
+        include/cube/graphics/texture.hpp
+        include/cube/graphics/vertex.hpp)
 
 target_include_directories(cube PRIVATE
         ${GLM_INCLUDE_DIRS}
