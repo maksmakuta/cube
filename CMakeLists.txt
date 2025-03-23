@@ -36,10 +36,10 @@ add_executable(cube
 target_include_directories(cube PRIVATE
         glm::glm
         OpenGL::OpenGL
-        glfw3
+        glfw
 )
 
 target_link_libraries(cube PRIVATE
         OpenGL::OpenGL
         glm::glm
-        glfw3)
+        glfw)
