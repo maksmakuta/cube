@@ -7,7 +7,6 @@ namespace cube {
 
     class IGenerator {
     public:
-        IGenerator() = default;
         virtual ~IGenerator() = default;
 
         virtual void seed(const Seed&) = 0;

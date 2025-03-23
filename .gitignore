@@ -1,2 +1,6 @@
 .build
 .idea
+# These files can be created by anyone, so they don't need to be in a repo.
+/src/graphics/gl/glad.c
+/include/cube/graphics/gl/glad.h
+/include/cube/graphics/gl/khrplatform.h
