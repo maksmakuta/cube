@@ -19,8 +19,8 @@ namespace cube::graphics {
         [[nodiscard]] glm::ivec2 size() const;
 
     private:
-        uint32_t id{0};
-        glm::uvec2 dimensions{0, 0};
+        uint32_t m_id{0};
+        glm::uvec2 m_dimensions{0, 0};
     };
 
 }

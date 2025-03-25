@@ -41,8 +41,8 @@ namespace cube::graphics {
         png_set_sig_bytes(png, 0);
         png_read_info(png, info);
 
-        dimensions.x = png_get_image_width(png, info);
-        dimensions.y = png_get_image_height(png, info);
+        m_dimensions.x = png_get_image_width(png, info);
+        m_dimensions.y = png_get_image_height(png, info);
         const png_byte color_type = png_get_color_type(png, info);
         const png_byte bit_depth = png_get_bit_depth(png, info);
 
@@ -64,16 +64,16 @@ namespace cube::graphics {
 
         png_read_update_info(png, info);
 
-        std::vector<png_bytep> row_pointers(dimensions.y);
-        for (int y = 0; y < dimensions.y; y++) {
+        std::vector<png_bytep> row_pointers(m_dimensions.y);
+        for (int y = 0; y < m_dimensions.y; y++) {
             row_pointers[y] = static_cast<png_byte *>(malloc(png_get_rowbytes(png, info)));
         }
 
         png_read_image(png, row_pointers.data());
 
-        glGenTextures(1, &id);
-        glBindTexture(GL_TEXTURE_2D, id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<int>(dimensions.x), static_cast<int>(dimensions.y),
+        glGenTextures(1, &m_id);
+        glBindTexture(GL_TEXTURE_2D, m_id);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<int>(m_dimensions.x), static_cast<int>(m_dimensions.y),
             0, GL_RGBA, GL_UNSIGNED_BYTE, row_pointers[0]);
 
         // Set texture parameters
@@ -83,7 +83,7 @@ namespace cube::graphics {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // Free memory
-        for (int y = 0; y < dimensions.y; y++) {
+        for (int y = 0; y < m_dimensions.y; y++) {
             free(row_pointers[y]);
         }
 
@@ -92,20 +92,20 @@ namespace cube::graphics {
     }
 
     void Texture::clear() {
-        glDeleteTextures(1, &id);
-        dimensions.x = dimensions.y = 0;
+        glDeleteTextures(1, &m_id);
+        m_dimensions.x = m_dimensions.y = 0;
     }
 
     bool Texture::isOK() const{
-        return id != 0;
+        return m_id != 0;
     }
 
     uint32_t Texture::handle() const{
-        return id;
+        return m_id;
     }
 
     glm::ivec2 Texture::size() const{
-        return dimensions;
+        return m_dimensions;
     }
 
 }

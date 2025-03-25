@@ -11,7 +11,7 @@ namespace cube::generators {
         //not use
     }
 
-    BlockData GeneratorFlat::at(uint8_t x, uint8_t y, uint8_t z) {
+    BlockData GeneratorFlat::at(const uint8_t x, const uint8_t y, const uint8_t z) {
         if (y == 0) {
             return static_cast<BlockData>(BlockID::Bedrock);
         }

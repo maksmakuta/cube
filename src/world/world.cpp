@@ -23,13 +23,13 @@ namespace cube {
 
     }
 
-    World::World(const Seed& seed) : generator(new generators::GeneratorFlat()) {
-        generator->seed(seed);
+    World::World(const Seed& seed) : m_generator(new generators::GeneratorFlat()) {
+        m_generator->seed(seed);
     }
 
     void World::loadChunk(const int x, const int z) {
         if (!m_chunks.contains(glm::ivec2(x, z))) {
-            m_chunks[glm::ivec2(x, z)] = detail::generate(x, z, generator);
+            m_chunks[glm::ivec2(x, z)] = detail::generate(x, z, m_generator);
         }
     }
 

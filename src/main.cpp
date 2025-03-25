@@ -1,7 +1,9 @@
+#include "cube/game/cube.hpp"
 #include "cube/graphics/gl/glad.h"
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <memory>
 
 int main() {
     if (!glfwInit()) {
@@ -20,15 +22,18 @@ int main() {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-
+    auto time = glfwGetTime();
+    const auto game = std::make_shared<cube::game::Cube>();
+    game->init();
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
-
+        game->draw();
         glfwSwapBuffers(window);
         glfwPollEvents();
+        const auto now = glfwGetTime();
+        game->update(static_cast<float>(now - time));
+        time = now;
     }
+    game->clear();
 
     glfwDestroyWindow(window);
     glfwTerminate();

@@ -4,13 +4,24 @@
 
 ### Features
 
- ..In progress
- 
+ - [X] World Generation
+   - [X] Flat
+   - [ ] Using noise functions
+ - [ ] Chunk-based (almost infinite) world full of blocks
+   - [ ] Mesh generator for chunks
+ - [ ] Efficient rendering system
+   - [ ] Minecraft-like Camera
+ - [ ] ... (in progress)
+
+### Screenshots
+
+ Soon...
+
 ### Dependencies
 
- - C++23
+ - C++23 with STL
  - OpenGL (3.3+)
  - GLM
+ - Freetype
  - GLFW
  - libPNG
-

@@ -30,7 +30,7 @@ namespace cube::graphics {
         void setMat3(const std::string& name,const glm::mat3& value) const;
         void setMat4(const std::string& name,const glm::mat4& value) const;
     private:
-        uint32_t program{0};
+        uint32_t m_program{0};
     };
 }
 

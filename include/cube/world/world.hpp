@@ -26,7 +26,7 @@ namespace cube {
         void setChunk(int x, int z, const Chunk& chunk);
     private:
         std::unordered_map<glm::ivec2, Chunk> m_chunks;
-        std::shared_ptr<IGenerator> generator;
+        std::shared_ptr<IGenerator> m_generator;
     };
 
 }
