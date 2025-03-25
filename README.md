@@ -1,17 +1,25 @@
 # Cube
 
- Minecraft-like pet project for demonstrating my skills in C++, OpenGL and other technologies
+ Voxel rendering engine (like Minecraft).  
+ Written in C++23 and OpenGL 4.6.  
+ In progress...
 
 ### Features
 
- - [X] World Generation
-   - [X] Flat
-   - [ ] Using noise functions
- - [ ] Chunk-based (almost infinite) world full of blocks
-   - [ ] Mesh generator for chunks
- - [ ] Efficient rendering system
-   - [ ] Minecraft-like Camera
- - [ ] ... (in progress)
+ - [ ] World
+   - [ ] Generation
+     - [x] Flat terrain
+     - [ ] Noise generated terrain
+   - [ ] Biomes support
+   - [ ] Structures
+     - [ ] Grass 
+     - [ ] Trees
+ - [ ] Rendering
+   - [x] Minecraft-like camera system
+   - [ ] Mesh creation based on chunk data
+   - [ ] Real-time rendering
+     - [ ] Shadows
+     - [ ] Lighting
 
 ### Screenshots
 
@@ -20,13 +28,13 @@
 ### Dependencies
 
  - C++23 with STL
- - OpenGL (3.3+)
- - GLM
- - Freetype
- - GLFW
+ - OpenGL (4.6+)
  - libPNG
+ - Freetype
+ - GLM
+ - GLFW
 
-### Useful links that I used
+### Useful links
 
  - [LearnOpenGL](https://learnopengl.com)
 
