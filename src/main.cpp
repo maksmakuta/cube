@@ -1,3 +1,4 @@
+#include "cube/graphics/gl/glad.h"
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -15,8 +16,16 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+        std::cerr << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

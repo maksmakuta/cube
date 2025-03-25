@@ -2,15 +2,16 @@
 #define TEXTURE_HPP
 
 #include <cstdint>
+#include <string>
 #include <glm/vec2.hpp>
 
 namespace cube::graphics {
 
     class Texture {
     public:
-        Texture();
+        Texture() = default;
 
-        void load();
+        void load(const std::string& path);
         void clear();
 
         [[nodiscard]] bool isOK() const;

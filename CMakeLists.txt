@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(PNG REQUIRED)
 
 include_directories(include)
 
@@ -27,6 +28,8 @@ add_executable(cube
 
         src/generators/generator_flat.cpp
         src/graphics/gl/glad.c
+        src/graphics/shader.cpp
+        src/graphics/texture.cpp
         src/utils/utils.cpp
         src/world/chunk.cpp
         src/world/world.cpp
@@ -36,10 +39,12 @@ add_executable(cube
 target_include_directories(cube PRIVATE
         glm::glm
         OpenGL::OpenGL
+        PNG::PNG
         glfw
 )
 
 target_link_libraries(cube PRIVATE
         OpenGL::OpenGL
         glm::glm
+        PNG::PNG
         glfw)
