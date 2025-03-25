@@ -13,7 +13,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace cube {
+namespace cube::world {
 
     class World {
     public:

@@ -9,4 +9,11 @@ namespace cube::utils {
         return glm::floor(glm::vec2(pos.x, pos.z) / glm::vec2(CHUNK_WIDTH, CHUNK_DEPTH));
     }
 
+    void setBit(uint8_t &value, uint8_t mask, bool action) {
+        if (action) {
+            value |= mask;
+        }else {
+            value &= ~mask;
+        }
+    }
 }

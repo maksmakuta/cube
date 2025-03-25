@@ -25,3 +25,12 @@
  - Freetype
  - GLFW
  - libPNG
+
+### Useful links that I used
+
+ - [LearnOpenGL](https://learnopengl.com)
+
+### Author
+ Maks Makuta (c) 2025  
+ MIT License
+ 

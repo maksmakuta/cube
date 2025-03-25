@@ -51,6 +51,7 @@ int main() {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     const auto game = std::make_shared<cube::game::Cube>();
 
     glfwSetWindowUserPointer(window,game.get());

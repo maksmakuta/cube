@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace cube {
+namespace cube::world {
 
     class Chunk {
     public:

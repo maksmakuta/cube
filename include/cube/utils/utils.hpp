@@ -7,6 +7,7 @@
 namespace cube::utils {
 
     glm::ivec2 toChunkPos(const glm::vec3 &pos);
+    void setBit(uint8_t& value, uint8_t mask, bool action);
 
 }
 

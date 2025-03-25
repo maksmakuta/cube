@@ -5,7 +5,7 @@
 #include <memory>
 #include <optional>
 
-namespace cube {
+namespace cube::world {
 
     namespace detail {
 

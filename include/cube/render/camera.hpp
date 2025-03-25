@@ -36,6 +36,10 @@ namespace cube::render {
         void rotate(const glm::vec2& delta);
     private:
         glm::vec3 m_position;
+        glm::vec3 m_front;
+        glm::vec3 m_up;
+        glm::vec3 m_right;
+        glm::vec2 m_rotation;
     };
 
 }
