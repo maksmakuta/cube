@@ -5,6 +5,11 @@
 
 namespace cube::graphics {
 
+    /*
+     *  bits: 32                                       0
+     *          0000 0000 0000 0000 0000 0000 0000 0000
+     *
+     */
     using Vertex = uint32_t;
 
 }

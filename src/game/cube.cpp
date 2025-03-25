@@ -1,5 +1,4 @@
 #include "cube/game/cube.hpp"
-
 #include "cube/graphics/gl/glad.h"
 
 namespace cube::game {
