@@ -3,6 +3,7 @@
 
 #include "cube/base/game.hpp"
 #include "cube/graphics/shader.hpp"
+#include "cube/graphics/texture.hpp"
 #include "cube/render/camera.hpp"
 
 namespace cube::game {
@@ -28,6 +29,7 @@ namespace cube::game {
         uint8_t m_direction{0};
 
         graphics::Shader m_shader;
+        graphics::Texture m_texture;
         uint VAO{0}, VBO{0};
     };
 

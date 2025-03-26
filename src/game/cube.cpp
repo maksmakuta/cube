@@ -15,20 +15,59 @@ namespace cube::game {
     };
 
     void Cube::init(){
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
 
         m_shader.loadFilePair("../assets/shaders/","block");
+        m_texture.load("../assets/textures/bricks.png");
 
-        const cubeVertex cubeVertices[] = {
+        constexpr cubeVertex cubeVertices[] = {
             {{0,0,0},{0,0}},
             {{0,0,1},{0,1}},
             {{0,1,1},{1,1}},
             {{0,0,0},{0,0}},
             {{0,1,1},{1,1}},
             {{0,1,0},{1,0}},
+
+            {{0,0,0},{0,0}},
+            {{0,0,1},{0,1}},
+            {{1,0,1},{1,1}},
+            {{0,0,0},{0,0}},
+            {{1,0,1},{1,1}},
+            {{1,0,0},{1,0}},
+
+            {{0,0,0},{0,0}},
+            {{0,1,0},{0,1}},
+            {{1,1,0},{1,1}},
+            {{0,0,0},{0,0}},
+            {{1,1,0},{1,1}},
+            {{1,0,0},{1,0}},
+
+
+{{1,0,0},{0,0}},
+{{1,0,1},{0,1}},
+{{1,1,1},{1,1}},
+{{1,0,0},{0,0}},
+{{1,1,1},{1,1}},
+{{1,1,0},{1,0}},
+
+{{0,1,0},{0,0}},
+{{0,1,1},{0,1}},
+{{1,1,1},{1,1}},
+{{0,1,0},{0,0}},
+{{1,1,1},{1,1}},
+{{1,1,0},{1,0}},
+
+{{0,0,1},{0,0}},
+{{0,1,1},{0,1}},
+{{1,1,1},{1,1}},
+{{0,0,1},{0,0}},
+{{1,1,1},{1,1}},
+{{1,0,1},{1,0}},
+
+
         };
 
         glGenVertexArrays(1, &VAO);
@@ -54,15 +93,18 @@ namespace cube::game {
     void Cube::draw(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,m_texture.handle());
+
         glUseProgram(m_shader.handle());
 
         m_shader.setMat4("proj",m_proj);
         m_shader.setMat4("model",glm::mat4(1.0f));
         m_shader.setMat4("view",m_camera.getMatrix());
+        m_shader.setInt("atlas",0);
 
-        glLineWidth(5.f);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
     void Cube::update(const float delta){

@@ -8,6 +8,7 @@ namespace cube::render {
 
     Camera::Camera(const glm::vec3& position,const glm::vec3& up,const glm::vec3& front ) : m_position(position),
         m_up(up), m_right(), m_rotation(), m_front(front) {
+        rotate({});
     }
 
     void Camera::setPosition(const glm::vec3& position){

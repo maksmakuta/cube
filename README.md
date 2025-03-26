@@ -23,7 +23,8 @@
 
 ### Screenshots
 
- Soon...
+ ![](./screenshots/v0.3.1.png)
+ v. 0.3.1
 
 ### Dependencies
 
