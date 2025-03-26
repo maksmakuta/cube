@@ -43,12 +43,11 @@ namespace cube::graphics {
         }
 
         const uint v = detail::toShader(vert,GL_VERTEX_SHADER);
-        const uint f = detail::toShader(vert,GL_FRAGMENT_SHADER);
+        const uint f = detail::toShader(frag,GL_FRAGMENT_SHADER);
         m_program = glCreateProgram();
         glAttachShader(m_program, v);
         glAttachShader(m_program, f);
         glLinkProgram(m_program);
-        glValidateProgram(m_program);
         glDeleteShader(v);
         glDeleteShader(f);
 

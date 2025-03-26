@@ -1,62 +1,101 @@
 #include "cube/game/cube.hpp"
+
+#include "cube/graphics/vertex.hpp"
 #include "cube/graphics/gl/glad.h"
 #include "cube/utils/utils.hpp"
 
-#include <iostream>
 #include <GLFW/glfw3.h>
+#include <glm/ext/matrix_clip_space.hpp>
 
 namespace cube::game {
 
+    struct cubeVertex {
+        glm::vec3 pos;
+        glm::vec2 tex;
+    };
+
     void Cube::init(){
-        glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
+        m_shader.loadFilePair("../assets/shaders/","block");
+
+        const cubeVertex cubeVertices[] = {
+            {{0,0,0},{0,0}},
+            {{0,0,1},{0,1}},
+            {{0,1,1},{1,1}},
+            {{0,0,0},{0,0}},
+            {{0,1,1},{1,1}},
+            {{0,1,0},{1,0}},
+        };
+
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cubeVertex), static_cast<void *>(nullptr));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(cubeVertex), reinterpret_cast<void*>(offsetof(cubeVertex,tex)));
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
     }
 
     void Cube::clear(){
-
+        m_shader.clear();
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
     }
 
     void Cube::draw(){
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        const auto pos = m_camera.getPosition();
-        const auto rot = m_camera.getRotation();
+        glUseProgram(m_shader.handle());
 
-        std::cout << std::format("pos : [{:3.2f},{:3.2f},{:3.2f}] rot : [{:3.2f},{:2.2f}]",pos.x,pos.y,pos.z,rot.x,rot.y) << std::endl;
+        m_shader.setMat4("proj",m_proj);
+        m_shader.setMat4("model",glm::mat4(1.0f));
+        m_shader.setMat4("view",m_camera.getMatrix());
+
+        glLineWidth(5.f);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     void Cube::update(const float delta){
-        m_camera.update(direction,delta);
+        m_camera.update(m_direction,delta);
     }
 
     void Cube::onResize(const int w, const int h){
-
+        glViewport(0, 0, w, h);
+        const float aspect = static_cast<float>(w) / static_cast<float>(h);
+        m_proj = glm::perspective(glm::radians(45.f),aspect,0.1f,100.f);
     }
 
     void Cube::onCursor(const float x, const float y){
         const auto curr = glm::vec2(x,-y);
-        m_camera.rotate(curr - last);
-        last = curr;
+        m_camera.rotate(curr - m_last);
+        m_last = curr;
     }
 
     void Cube::onKey(const int key, const int action, const int mods){
-        if (key == GLFW_KEY_W) {
-            utils::setBit(direction,render::CameraDirection::FORWARD,action != GLFW_RELEASE);
-        }
-        if (key == GLFW_KEY_S) {
-            utils::setBit(direction,render::CameraDirection::BACKWARD,action != GLFW_RELEASE);
-        }
-        if (key == GLFW_KEY_A) {
-            utils::setBit(direction,render::CameraDirection::LEFT,action != GLFW_RELEASE);
-        }
-        if (key == GLFW_KEY_D) {
-            utils::setBit(direction,render::CameraDirection::RIGHT,action != GLFW_RELEASE);
-        }
-        if (key == GLFW_KEY_SPACE) {
-            utils::setBit(direction,render::CameraDirection::UP,action != GLFW_RELEASE);
-        }
-        if (key == GLFW_KEY_LEFT_SHIFT) {
-            utils::setBit(direction,render::CameraDirection::DOWN,action != GLFW_RELEASE);
+        if (const auto d = getDir(key); d != 0) {
+            utils::setBit(m_direction,d,action != GLFW_RELEASE);
         }
     }
 
+    int Cube::getDir(const int key) {
+        switch (key) {
+            case GLFW_KEY_W: return render::CameraDirection::FORWARD;
+            case GLFW_KEY_S: return render::CameraDirection::BACKWARD;
+            case GLFW_KEY_A: return render::CameraDirection::LEFT;
+            case GLFW_KEY_D: return render::CameraDirection::RIGHT;
+            case GLFW_KEY_SPACE: return render::CameraDirection::UP;
+            case GLFW_KEY_LEFT_SHIFT: return render::CameraDirection::DOWN;
+            default: return 0;
+        }
+    }
 }

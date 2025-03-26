@@ -53,7 +53,6 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     const auto game = std::make_shared<cube::game::Cube>();
-
     glfwSetWindowUserPointer(window,game.get());
 
     glfwSetWindowSizeCallback(window, onResize);
@@ -65,6 +64,7 @@ int main() {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    game->onResize(800, 600);
     game->init();
 
     auto time = glfwGetTime();

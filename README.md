@@ -1,7 +1,7 @@
 # Cube
 
  Voxel rendering engine (like Minecraft).  
- Written in C++23 and OpenGL 4.6.  
+ Written in C++ and OpenGL.  
  In progress...
 
 ### Features
@@ -28,7 +28,7 @@
 ### Dependencies
 
  - C++23 with STL
- - OpenGL (4.6+)
+ - OpenGL 4.6
  - libPNG
  - Freetype
  - GLM
