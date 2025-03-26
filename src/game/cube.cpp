@@ -23,51 +23,48 @@ namespace cube::game {
         m_shader.loadFilePair("../assets/shaders/","block");
         m_texture.load("../assets/textures/bricks.png");
 
-        constexpr cubeVertex cubeVertices[] = {
-            {{0,0,0},{0,0}},
-            {{0,0,1},{0,1}},
-            {{0,1,1},{1,1}},
-            {{0,0,0},{0,0}},
-            {{0,1,1},{1,1}},
-            {{0,1,0},{1,0}},
+        const graphics::Vertex cubeVertices[] = {
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({0,0,1},{0,1}),
+            graphics::pack({0,1,1},{1,1}),
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({0,1,1},{1,1}),
+            graphics::pack({0,1,0},{1,0}),
 
-            {{0,0,0},{0,0}},
-            {{0,0,1},{0,1}},
-            {{1,0,1},{1,1}},
-            {{0,0,0},{0,0}},
-            {{1,0,1},{1,1}},
-            {{1,0,0},{1,0}},
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({0,0,1},{0,1}),
+            graphics::pack({1,0,1},{1,1}),
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({1,0,1},{1,1}),
+            graphics::pack({1,0,0},{1,0}),
 
-            {{0,0,0},{0,0}},
-            {{0,1,0},{0,1}},
-            {{1,1,0},{1,1}},
-            {{0,0,0},{0,0}},
-            {{1,1,0},{1,1}},
-            {{1,0,0},{1,0}},
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({0,1,0},{0,1}),
+            graphics::pack({1,1,0},{1,1}),
+            graphics::pack({0,0,0},{0,0}),
+            graphics::pack({1,1,0},{1,1}),
+            graphics::pack({1,0,0},{1,0}),
 
+            graphics::pack({1,0,0},{0,0}),
+            graphics::pack({1,0,1},{0,1}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({1,0,0},{0,0}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({1,1,0},{1,0}),
 
-{{1,0,0},{0,0}},
-{{1,0,1},{0,1}},
-{{1,1,1},{1,1}},
-{{1,0,0},{0,0}},
-{{1,1,1},{1,1}},
-{{1,1,0},{1,0}},
+            graphics::pack({0,1,0},{0,0}),
+            graphics::pack({0,1,1},{0,1}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({0,1,0},{0,0}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({1,1,0},{1,0}),
 
-{{0,1,0},{0,0}},
-{{0,1,1},{0,1}},
-{{1,1,1},{1,1}},
-{{0,1,0},{0,0}},
-{{1,1,1},{1,1}},
-{{1,1,0},{1,0}},
-
-{{0,0,1},{0,0}},
-{{0,1,1},{0,1}},
-{{1,1,1},{1,1}},
-{{0,0,1},{0,0}},
-{{1,1,1},{1,1}},
-{{1,0,1},{1,0}},
-
-
+            graphics::pack({0,0,1},{0,0}),
+            graphics::pack({0,1,1},{0,1}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({0,0,1},{0,0}),
+            graphics::pack({1,1,1},{1,1}),
+            graphics::pack({1,0,1},{1,0}),
         };
 
         glGenVertexArrays(1, &VAO);
@@ -75,10 +72,8 @@ namespace cube::game {
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cubeVertex), static_cast<void *>(nullptr));
+        glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(graphics::Vertex), static_cast<void *>(nullptr));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(cubeVertex), reinterpret_cast<void*>(offsetof(cubeVertex,tex)));
-        glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 

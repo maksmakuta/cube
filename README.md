@@ -21,10 +21,12 @@
      - [ ] Shadows
      - [ ] Lighting
 
-### Screenshots
+### Screenshot (0.3.1)
+
+ You can see screenshots from older versions in `screenshots` directory  
+ Below screenshot from latest build/version
 
  ![](./screenshots/v0.3.1.png)
- v. 0.3.1
 
 ### Dependencies
 
