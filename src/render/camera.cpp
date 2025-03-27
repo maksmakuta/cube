@@ -1,7 +1,5 @@
 #include "cube/render/camera.hpp"
-
 #include "cube/core/constants.hpp"
-
 #include <glm/ext/matrix_transform.hpp>
 
 namespace cube::render {
@@ -39,10 +37,10 @@ namespace cube::render {
         const auto velocity = CAMERA_SPEED * delta;
 
         if (direction & FORWARD) {
-            m_position += m_front * velocity;
+            m_position += glm::vec3(m_front.x,0,m_front.z) * velocity;
         }
         if (direction & BACKWARD) {
-            m_position -= m_front * velocity;
+            m_position -= glm::vec3(m_front.x,0,m_front.z) * velocity;
         }
         if (direction & RIGHT) {
             m_position += m_right * velocity;

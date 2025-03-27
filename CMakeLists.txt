@@ -39,6 +39,7 @@ add_executable(cube
         src/world/chunk.cpp
         src/world/world.cpp
         src/main.cpp
+        include/cube/graphics/font.hpp
 )
 
 target_include_directories(cube PRIVATE
