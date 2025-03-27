@@ -21,7 +21,7 @@ namespace cube::game {
         glDepthFunc(GL_LESS);
 
         m_shader.loadFilePair("../assets/shaders/","block");
-        m_texture.load("../assets/textures/bricks.png");
+        m_texture.load("../assets/textures/dirt.png");
 
         const graphics::Vertex cubeVertices[] = {
             graphics::pack({0,0,0},{0,0}),
@@ -76,7 +76,6 @@ namespace cube::game {
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-
     }
 
     void Cube::clear(){

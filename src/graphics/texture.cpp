@@ -88,6 +88,11 @@ namespace cube::graphics {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
+    void Texture::load(const uint32_t id, const glm::ivec2 &size) {
+        m_dimensions = size;
+        m_id = id;
+    }
+
     void Texture::clear() {
         glDeleteTextures(1, &m_id);
         m_dimensions.x = m_dimensions.y = 0;

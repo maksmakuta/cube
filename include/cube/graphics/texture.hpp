@@ -12,6 +12,7 @@ namespace cube::graphics {
         Texture() = default;
 
         void load(const std::string& path);
+        void load(uint32_t id, const glm::ivec2& size);
         void clear();
 
         [[nodiscard]] bool isOK() const;

@@ -1,10 +1,7 @@
 #ifndef VERTEX_HPP
 #define VERTEX_HPP
 
-#include <bitset>
 #include <cstdint>
-#include <iostream>
-#include <ostream>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -16,7 +13,7 @@ namespace cube::graphics {
      */
     using Vertex = uint32_t;
 
-    inline void unpack(const Vertex& vertex) {
+    inline void unpack(const Vertex& vertex) { //used for tests, maybe removed in future
         const auto px = static_cast<float>( vertex & 0x000Fu);
         const auto pz = static_cast<float>((vertex >> 4) & 0x000Fu);
         const auto py = static_cast<float>((vertex >> 8) & 0x00FFu);
@@ -32,7 +29,6 @@ namespace cube::graphics {
         result |= (static_cast<uint32_t>(pos.y) & 0xFF) << 8;
         result |= (static_cast<uint32_t>(uv.x * 15.f) & 0xF ) << 16;
         result |= (static_cast<uint32_t>(uv.y * 15.f) & 0xF ) << 20;
-        unpack(result);
         return result;
     }
 
