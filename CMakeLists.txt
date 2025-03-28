@@ -7,6 +7,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(PNG REQUIRED)
+find_package(Freetype REQUIRED)
 
 include_directories(include)
 
@@ -21,6 +22,7 @@ add_executable(cube
         include/cube/generators/generator_flat.hpp
         include/cube/graphics/gl/glad.h
         include/cube/graphics/gl/khrplatform.h
+        include/cube/graphics/font.hpp
         include/cube/graphics/shader.hpp
         include/cube/graphics/texture.hpp
         include/cube/graphics/vertex.hpp
@@ -32,6 +34,7 @@ add_executable(cube
         src/game/cube.cpp
         src/generators/generator_flat.cpp
         src/graphics/gl/glad.c
+        src/graphics/font.cpp
         src/graphics/shader.cpp
         src/graphics/texture.cpp
         src/render/camera.cpp
@@ -39,18 +42,20 @@ add_executable(cube
         src/world/chunk.cpp
         src/world/world.cpp
         src/main.cpp
-        include/cube/graphics/font.hpp
 )
 
 target_include_directories(cube PRIVATE
-        glm::glm
+        Freetype::Freetype
         OpenGL::OpenGL
+        glm::glm
         PNG::PNG
         glfw
 )
 
 target_link_libraries(cube PRIVATE
+        Freetype::Freetype
         OpenGL::OpenGL
         glm::glm
         PNG::PNG
-        glfw)
+        glfw
+)

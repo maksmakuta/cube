@@ -27,7 +27,7 @@ namespace cube::graphics {
          *
          */
         uint32_t data;
-        glm::vec4 uv;
+        glm::vec4 uv{};
 
         Glyph(const glm::u8vec2& size,const glm::u8vec2& offset, uint8_t advance,const glm::vec2& uv_a,const glm::vec2& uv_b);
 
@@ -45,7 +45,7 @@ namespace cube::graphics {
         void load(const std::string &path);
         void clear();
 
-        std::optional<Glyph> get(GlyphID);
+        [[nodiscard]] std::optional<Glyph> get(GlyphID) const;
         [[nodiscard]] uint32_t getTexture() const;
         [[nodiscard]] glm::ivec2 getSize() const;
 

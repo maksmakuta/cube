@@ -21,6 +21,13 @@
      - [ ] Shadows
      - [ ] Lighting
 
+### Controls
+
+ WASD to move  
+ Space/Left Shift to move up/down respectively  
+ Use mouse to rotate camera  
+ F1 to show debug information  
+
 ### Screenshot (0.3.1)
 
  You can see screenshots from older versions in `screenshots` directory  
@@ -43,5 +50,9 @@
 
 ### Author
  Maks Makuta (c) 2025  
- MIT License
+
+ Licensed content:
+ - Source code - MIT License  
+ - [Font](assets/fonts/nihonium113.ttf) - Open Font License   
+ - [Textures](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/resource-packs/1243771-alvorias-sanity-1-12-2-no-longer-updating-sorry) - [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
  

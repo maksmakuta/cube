@@ -19,6 +19,7 @@ namespace cube::game {
         void onResize(int w, int h) override;
         void onCursor(float x, float y) override;
         void onKey(int key, int action, int mods) override;
+
     protected:
         static int getDir(int key);
 
