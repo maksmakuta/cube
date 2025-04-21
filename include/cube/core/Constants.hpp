@@ -3,11 +3,11 @@
 
 namespace cube {
 
-    constexpr auto CHUNK_WIDTH = 32;
-    constexpr auto CHUNK_DEPTH = 32;
-    constexpr auto CHUNK_HEIGHT = 256;
+    constexpr auto TITLE = "Cube";
 
-
+    constexpr auto CHUNK_WIDTH = 16;
+    constexpr auto CHUNK_DEPTH = 16;
+    constexpr auto CHUNK_HEIGHT = 32;
 
 }
 
