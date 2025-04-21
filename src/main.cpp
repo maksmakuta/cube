@@ -3,6 +3,42 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+#include "cube/Cube.hpp"
+
+cube::ICallbacks* getCallbacks(GLFWwindow* w) {
+    return static_cast<cube::ICallbacks *>(glfwGetWindowUserPointer(w));
+}
+
+void onResize(GLFWwindow* window, const int w, const int h) {
+    if (const auto c = getCallbacks(window); c != nullptr) {
+        c->onResize(w,h);
+    }
+}
+
+void onKey(GLFWwindow * window, const int key, int, const int action, const int mods) {
+    if (const auto c = getCallbacks(window); c != nullptr) {
+        c->onKey(key,action,mods);
+    }
+}
+
+void onButton(GLFWwindow * window, const int button, const int action, const int mods) {
+    if (const auto c = getCallbacks(window); c != nullptr) {
+        c->onKey(button,action,mods);
+    }
+}
+
+void onScroll(GLFWwindow * window, const double xoffset, const double yoffset) {
+    if (const auto c = getCallbacks(window); c != nullptr) {
+        c->onScroll(static_cast<float>(xoffset),static_cast<float>(yoffset));
+    }
+}
+
+void onCursor(GLFWwindow * window, const double xpos, const double ypos) {
+    if (const auto c = getCallbacks(window); c != nullptr) {
+        c->onCursor(static_cast<float>(xpos),static_cast<float>(ypos));
+    }
+}
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
@@ -22,17 +58,24 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
-    //glfwSetKeyCallback(window, keyCallback);
+    glfwSwapInterval(1);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD\n";
         return -1;
     }
 
-    while (!glfwWindowShouldClose(window)) {
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+    cube::Cube game;
+    glfwSetWindowUserPointer(window,&game);
 
+    glfwSetKeyCallback(window, onKey);
+    glfwSetMouseButtonCallback(window, onButton);
+    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetScrollCallback(window, onScroll);
+    glfwSetCursorPosCallback(window,onCursor);
+
+    while (!glfwWindowShouldClose(window)) {
+        game.onDraw();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
