@@ -1,11 +1,15 @@
 #include "cube/Cube.hpp"
 
+#include "glad/gl.h"
+
 namespace cube {
 
-    Cube::Cube() = default;
+    Cube::Cube() {
+        glClearColor(.25f,.25f,.25f,1.f);
+    }
 
     void Cube::onDraw() {
-
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     void Cube::onResize(int w, int h){

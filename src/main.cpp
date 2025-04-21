@@ -65,21 +65,24 @@ int main() {
         return -1;
     }
 
-    cube::Cube game;
-    glfwSetWindowUserPointer(window,&game);
+    {
+        cube::Cube game;
+        glfwSetWindowUserPointer(window, &game);
 
-    glfwSetKeyCallback(window, onKey);
-    glfwSetMouseButtonCallback(window, onButton);
-    glfwSetFramebufferSizeCallback(window, onResize);
-    glfwSetScrollCallback(window, onScroll);
-    glfwSetCursorPosCallback(window,onCursor);
+        glfwSetKeyCallback(window, onKey);
+        glfwSetMouseButtonCallback(window, onButton);
+        glfwSetFramebufferSizeCallback(window, onResize);
+        glfwSetScrollCallback(window, onScroll);
+        glfwSetCursorPosCallback(window, onCursor);
 
-    while (!glfwWindowShouldClose(window)) {
-        game.onDraw();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        while (!glfwWindowShouldClose(window)) {
+            game.onDraw();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
     }
 
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
