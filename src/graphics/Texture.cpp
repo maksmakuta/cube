@@ -1,9 +1,12 @@
 
 #include "cube/graphics/Texture.hpp"
 
+#include <iostream>
+#include <vector>
 #include <glm/vec4.hpp>
 
 #include "glad/gl.h"
+#include "lodePNG/lodepng.h"
 
 namespace cube {
     namespace internal {
@@ -61,8 +64,14 @@ namespace cube {
     }
     
     Texture::Texture(const std::string &path) {
-            
-    }
+        std::vector<unsigned char> image;
+        unsigned width, height;
+        if(const unsigned error = lodepng::decode(image, width, height, path); error != 0) {
+            std::cout << "Loading image error " << error << ": " << lodepng_error_text(error) << std::endl;
+            return;
+        }
+        alloc(static_cast<int>(width),static_cast<int>(height),TextureFormat::RGBA,image.data());
+   }
 
     Texture::~Texture() {
         glDeleteTextures(1,&m_handle);

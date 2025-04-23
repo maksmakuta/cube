@@ -9,10 +9,13 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 add_subdirectory(libs/glad)
+add_subdirectory(libs/LodePNG)
 
 add_executable(cube
         src/Cube.cpp
+        src/graphics/Shader.cpp
+        src/graphics/Texture.cpp
 
         src/main.cpp)
 target_include_directories(cube PUBLIC include)
-target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD)
+target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD LodePNG)
