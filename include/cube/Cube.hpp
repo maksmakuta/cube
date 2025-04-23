@@ -2,6 +2,7 @@
 #define CUBE_HPP
 
 #include "core/ICallbacks.hpp"
+#include "graphics/Renderer.hpp"
 
 namespace cube {
 
@@ -15,6 +16,8 @@ namespace cube {
         void onKey(int k, int a, int m) override;
         void onCursor(float x, float y) override;
         void onScroll(float dx, float dy) override;
+    private:
+        Renderer m_renderer;
     };
 
 }

@@ -16,6 +16,9 @@ add_executable(cube
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
 
-        src/main.cpp)
+        src/main.cpp
+        include/cube/utils/AssetsUtils.hpp
+        src/utils/AssetsUtils.cpp)
 target_include_directories(cube PUBLIC include)
 target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD LodePNG)
+target_compile_definitions(cube PRIVATE CUBE_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
