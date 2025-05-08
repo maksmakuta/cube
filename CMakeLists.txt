@@ -12,13 +12,14 @@ add_subdirectory(libs/glad)
 add_subdirectory(libs/LodePNG)
 
 add_executable(cube
-        src/Cube.cpp
+        src/graphics/Renderer.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
-
+        src/utils/AssetsUtils.cpp
+        src/utils/ColorUtils.cpp
+        src/Cube.cpp
         src/main.cpp
-        include/cube/utils/AssetsUtils.hpp
-        src/utils/AssetsUtils.cpp)
+)
 target_include_directories(cube PUBLIC include)
 target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD LodePNG)
 target_compile_definitions(cube PRIVATE CUBE_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")

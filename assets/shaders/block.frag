@@ -7,5 +7,5 @@ uniform sampler2D u_atlas;
 out vec4 o_color;
 
 void main() {
-    o_color = texture2D(u_atlas,f_tex);
+    o_color = texture(u_atlas,f_tex);
 }
