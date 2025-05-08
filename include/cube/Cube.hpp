@@ -12,6 +12,8 @@ namespace cube {
     public:
         Cube();
 
+        void onCreate();
+        void onClear();
         void onDraw();
 
         void onUpdate(float dt) override;

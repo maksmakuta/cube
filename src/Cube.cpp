@@ -4,6 +4,16 @@ namespace cube {
 
     Cube::Cube() = default;
 
+    void Cube::onCreate() {
+        m_renderer.onCreate();
+        m_voxel.onCreate();
+    }
+
+    void Cube::onClear() {
+        m_renderer.onClear();
+        m_voxel.onClear();
+    }
+
     void Cube::onDraw() {
 
     }

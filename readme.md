@@ -7,11 +7,14 @@
 
  - C++20
  - OpenGL 4.6 Core
- - GLAD
  - GLFW
  - GLM
  - Freetype
- - LodePNG
+
+ Included libs (in /libs)
+ - GLAD 
+ - LodePNG 
+ - Polyline2D 
 
  CMake used as primary configurator tool
 
