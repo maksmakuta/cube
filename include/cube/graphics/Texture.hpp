@@ -35,8 +35,8 @@ namespace cube {
     public:
         Texture() = default;
 
-        explicit Texture(const std::string& path);
-        ~Texture();
+        void load(const std::string& path);
+        void unload();
 
         void alloc(int w, int h, TextureFormat format,const void* buffer = nullptr);
         void subdata(int x, int y,int w, int h, TextureFormat format, const void* buffer) const;

@@ -62,8 +62,8 @@ namespace cube {
         }
 
     }
-    
-    Texture::Texture(const std::string &path) {
+
+    void Texture::load(const std::string& path) {
         std::vector<unsigned char> image;
         unsigned width, height;
         if(const unsigned error = lodepng::decode(image, width, height, path); error != 0) {
@@ -71,9 +71,9 @@ namespace cube {
             return;
         }
         alloc(static_cast<int>(width),static_cast<int>(height),TextureFormat::RGBA,image.data());
-   }
+    }
 
-    Texture::~Texture() {
+    void Texture::unload() {
         glDeleteTextures(1,&m_handle);
         m_size = {0,0};
     }

@@ -34,7 +34,7 @@ namespace cube {
         }
     }
 
-    Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
+    void Shader::load(const std::string &vertexPath, const std::string &fragmentPath) {
         std::string vertexCode = internal::readAll(vertexPath);
         std::string fragmentCode = internal::readAll(fragmentPath);
 
@@ -58,8 +58,9 @@ namespace cube {
         glDeleteShader(fragment);
     }
 
-    Shader::~Shader() {
+    void Shader::unload() {
         glDeleteProgram(programID);
+        programID = 0;
     }
 
     void Shader::use() const {

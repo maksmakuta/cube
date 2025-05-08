@@ -12,13 +12,17 @@ add_subdirectory(libs/glad)
 add_subdirectory(libs/LodePNG)
 
 add_executable(cube
-        src/graphics/Renderer.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
         src/utils/AssetsUtils.cpp
         src/utils/ColorUtils.cpp
         src/Cube.cpp
         src/main.cpp
+        include/cube/core/IGenerator.hpp
+        include/cube/graphics/renderer/Renderer.hpp
+        include/cube/graphics/renderer/VoxelRenderer.hpp
+        src/graphics/renderer/Renderer.cpp
+        src/graphics/renderer/VoxelRenderer.cpp
 )
 target_include_directories(cube PUBLIC include)
 target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD LodePNG)

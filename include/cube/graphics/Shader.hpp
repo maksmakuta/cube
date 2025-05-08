@@ -8,11 +8,14 @@ namespace cube {
 
     class Shader {
     public:
-        Shader(const std::string &vertexPath, const std::string &fragmentPath);
-        ~Shader();
+        Shader() = default;
+        ~Shader() = default;
+
+        void load(const std::string &vertexPath, const std::string &fragmentPath);
+        void unload();
 
         void use() const;
-        glm::uint getID() const;
+        [[nodiscard]] glm::uint getID() const;
 
         void setBool(const std::string& name, bool value) const;
         void setInt(const std::string& name, int value) const;
@@ -24,7 +27,7 @@ namespace cube {
         void setMat4(const std::string& name, const glm::mat4& value) const;
 
     private:
-        glm::uint programID;
+        glm::uint programID{0};
     };
 
 }

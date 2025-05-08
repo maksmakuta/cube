@@ -1,14 +1,17 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
+#define constval constexpr auto
+
 namespace cube {
 
-    constexpr auto TITLE = "Cube";
+    constval TITLE = "Cube";
 
-    constexpr auto CHUNK_WIDTH = 16;
-    constexpr auto CHUNK_DEPTH = 16;
-    constexpr auto CHUNK_HEIGHT = 32;
+    constval CHUNK_WIDTH = 32;
+    constval CHUNK_DEPTH = 32;
+    constval CHUNK_HEIGHT = 256;
 
+    constval TILE_SIZE = 16;
 }
 
 #endif //CONSTANTS_HPP
