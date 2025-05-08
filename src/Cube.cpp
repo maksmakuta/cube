@@ -8,6 +8,10 @@ namespace cube {
 
     }
 
+    void Cube::onUpdate(float dt) {
+
+    }
+
     void Cube::onResize(int w, int h){
 
     }

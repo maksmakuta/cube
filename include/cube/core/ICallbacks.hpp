@@ -7,6 +7,7 @@ namespace cube {
     public:
         virtual ~ICallbacks() = default;
 
+        virtual void onUpdate(float dt) = 0;
         virtual void onResize(int w, int h) = 0;
         virtual void onKey(int k, int a, int m) = 0;
         virtual void onCursor(float x, float y) = 0;

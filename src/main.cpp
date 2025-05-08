@@ -74,10 +74,15 @@ int main() {
         glfwSetFramebufferSizeCallback(window, onResize);
         glfwSetScrollCallback(window, onScroll);
         glfwSetCursorPosCallback(window, onCursor);
-
+        auto last = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
+
             game.onDraw();
             glfwSwapBuffers(window);
+
+            const auto now = glfwGetTime();
+            game.onUpdate(static_cast<float>(now - last));
+            last = now;
             glfwPollEvents();
         }
     }
