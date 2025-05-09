@@ -15,7 +15,7 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-
+        m_renderer.draw();
     }
 
     void Cube::onUpdate(float dt) {
