@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.30)
 project(Polyline2D VERSION 0.0.1)
 
 include(GNUInstallDirs)

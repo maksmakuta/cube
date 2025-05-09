@@ -65,30 +65,28 @@ int main() {
         return -1;
     }
 
-    {
-        cube::Cube game;
-        glfwSetWindowUserPointer(window, &game);
-        game.onCreate();
+    cube::Cube game;
+    glfwSetWindowUserPointer(window, &game);
+    game.onCreate();
+    game.onResize(800, 600);
 
-        glfwSetKeyCallback(window, onKey);
-        glfwSetMouseButtonCallback(window, onButton);
-        glfwSetFramebufferSizeCallback(window, onResize);
-        glfwSetScrollCallback(window, onScroll);
-        glfwSetCursorPosCallback(window, onCursor);
+    glfwSetKeyCallback(window, onKey);
+    glfwSetMouseButtonCallback(window, onButton);
+    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetScrollCallback(window, onScroll);
+    glfwSetCursorPosCallback(window, onCursor);
 
-        auto last = glfwGetTime();
-        while (!glfwWindowShouldClose(window)) {
-            game.onDraw();
+    auto last = glfwGetTime();
+    while (!glfwWindowShouldClose(window)) {
+        const auto now = glfwGetTime();
+        game.onUpdate(static_cast<float>(now - last));
+        last = now;
+        glfwPollEvents();
 
-            const auto now = glfwGetTime();
-            game.onUpdate(static_cast<float>(now - last));
-            last = now;
-
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-        }
-        game.onClear();
+        game.onDraw();
+        glfwSwapBuffers(window);
     }
+    game.onClear();
 
     glfwDestroyWindow(window);
     glfwTerminate();
