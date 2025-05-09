@@ -112,11 +112,11 @@ namespace cube {
     }
 
     void Shader::setMat3(const std::string& name, const glm::mat3& value) const{
-        glUniformMatrix3fv(glGetUniformLocation(programID,name.c_str()),GL_FALSE,1,&value[0][0]);
+        glUniformMatrix3fv(glGetUniformLocation(programID,name.c_str()),1,GL_FALSE,&value[0][0]);
     }
 
     void Shader::setMat4(const std::string& name, const glm::mat4& value) const{
-        glUniformMatrix4fv(glGetUniformLocation(programID,name.c_str()),GL_FALSE,1,&value[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(programID,name.c_str()),1,GL_FALSE,&value[0][0]);
     }
 
 }

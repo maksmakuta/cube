@@ -3,6 +3,12 @@
 
 namespace cube {
 
+    enum class Align {
+        Start,
+        Center,
+        End
+    };
+
     class Font {
 
     };

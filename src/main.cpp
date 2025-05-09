@@ -45,10 +45,10 @@ int main() {
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     const auto window = glfwCreateWindow(800, 600, "Cube", nullptr, nullptr);
     if (!window) {
@@ -72,7 +72,7 @@ int main() {
 
     glfwSetKeyCallback(window, onKey);
     glfwSetMouseButtonCallback(window, onButton);
-    glfwSetFramebufferSizeCallback(window, onResize);
+    glfwSetWindowSizeCallback(window, onResize);
     glfwSetScrollCallback(window, onScroll);
     glfwSetCursorPosCallback(window, onCursor);
 
