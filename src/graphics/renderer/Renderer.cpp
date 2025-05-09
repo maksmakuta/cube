@@ -80,30 +80,61 @@ namespace cube {
         m_paint = TextPaint(t,c,align);
     }
 
-    void Renderer::line(const glm::vec2& a,const glm::vec2& b) {
+    void Renderer::lines(const std::vector<glm::vec2> &path) {
         if (std::holds_alternative<StrokePaint>(m_paint)) {
 
         }
     }
 
-    void Renderer::lines(const std::vector<glm::vec2> &path) {
-
+    void Renderer::line(const glm::vec2& a,const glm::vec2& b) {
+        if (std::holds_alternative<StrokePaint>(m_paint)) {
+            lines({a, b});
+        }
     }
 
     void Renderer::bezier(const glm::vec2& a,const glm::vec2& b,const glm::vec2& c) {
-
+        if (std::holds_alternative<StrokePaint>(m_paint)) {
+            auto path = std::vector<glm::vec2>();
+            path.push_back(a);
+            float t = 0.1f;
+            while (t < 1.f) {
+                const auto t1 = mix(a,b,t);
+                const auto t2 = mix(b,c,t);
+                path.push_back(mix(t1,t2,t));
+                t += 0.1f;
+            }
+            path.push_back(c);
+            lines(path);
+        }
     }
 
     void Renderer::bezier(const glm::vec2& a,const glm::vec2& b,const glm::vec2& c,const glm::vec2& d) {
+        if (std::holds_alternative<StrokePaint>(m_paint)) {
+            auto path = std::vector<glm::vec2>();
+            path.push_back(a);
+            float t = 0.1f;
+            while (t < 1.f) {
+                const auto t1 = mix(a,b,t);
+                const auto t2 = mix(b,c,t);
+                const auto t3 = mix(c,d,t);
 
+                const auto r1 = mix(t1,t2,t);
+                const auto r2 = mix(t2,t3,t);
+
+                path.push_back(mix(r1,r2,t));
+                t += 0.1f;
+            }
+            path.push_back(d);
+            lines(path);
+        }
     }
 
     void Renderer::triangle(const glm::vec2& a,const glm::vec2& b,const glm::vec2& c) {
-
+        process({a,b,c});
     }
 
     void Renderer::quad(const glm::vec2& a,const glm::vec2& b,const glm::vec2& c,const glm::vec2& d) {
-
+        process({a,b,c,d});
     }
 
     void Renderer::line(float x1,float y1,float x2,float y2) {
@@ -139,27 +170,54 @@ namespace cube {
 
     }
 
-    void Renderer::circle(float x, float y,float r) {
-
+    void Renderer::circle(const float x, const float y, const float r) {
+        ellipse(x,y,r,r);
     }
 
-    void Renderer::ellipse(float x, float y,float rx,float ry) {
-
+    void Renderer::ellipse(const float x, const float y, const float rx, const float ry) {
+        arc(x,y,rx,ry,0, glm::two_pi<float>());
     }
 
-    void Renderer::arc(float x, float y,float rx,float ry, float angle_a, float angle_b, bool ccw) {
+    void Renderer::arc(const float x, const float y, const float rx, const float ry, const float angle_a, const float angle_b, bool ccw) {
+        auto path = std::vector<glm::vec2>();
+        const auto center = glm::vec2{x,y};
+        const auto r = glm::vec2{rx,ry};
+        float t = angle_a;
+        while (t <= angle_b) {
+            const auto unit = glm::vec2{cosf(t),sinf(t)};
+            path.push_back(center + unit * r);
 
+            t += glm::radians(5.f);
+            if (t > angle_b) {
+                t = angle_b;
+            }
+        }
+        process(path);
     }
 
-    void Renderer::segment(float x, float y,float rx,float ry, float angle_a, float angle_b, bool ccw) {
+    void Renderer::segment(const float x, const float y, const float rx, const float ry, const float angle_a, const float angle_b, bool ccw) {
+        auto path = std::vector<glm::vec2>();
+        const auto center = glm::vec2{x,y};
+        const auto r = glm::vec2{rx,ry};
+        path.push_back(center);
+        float t = angle_a;
+        while (t <= angle_b) {
+            const auto unit = glm::vec2{cosf(t),sinf(t)};
+            path.push_back(center + unit * r);
 
+            t += glm::radians(5.f);
+            if (t > angle_b) {
+                t = angle_b;
+            }
+        }
+        process(path);
     }
 
     void Renderer::print(const glm::vec2& pos,const std::string& text) {
 
     }
 
-    void Renderer::process(const std::vector<glm::vec2> &) {
+    void Renderer::process(const std::vector<glm::vec2>& path) {
 
     }
 }
