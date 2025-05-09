@@ -12,12 +12,20 @@ namespace cube {
 
         std::string readAll(const std::string& path) {
             std::ifstream file(path);
+            if (!file.is_open()) {
+                std::cerr << "Cannot open file: " << path << std::endl;
+                return "";
+            }
             std::stringstream buffer;
             buffer << file.rdbuf();
             return buffer.str();
         }
 
         GLuint compileShader(const GLenum type, const std::string& source) {
+            if (source.empty()) {
+                std::cerr << "No sources provided" << std::endl;
+                return 0;
+            }
             const GLuint shader = glCreateShader(type);
             const char* src = source.c_str();
             glShaderSource(shader, 1, &src, nullptr);
@@ -35,11 +43,19 @@ namespace cube {
     }
 
     void Shader::load(const std::string &vertexPath, const std::string &fragmentPath) {
-        std::string vertexCode = internal::readAll(vertexPath);
-        std::string fragmentCode = internal::readAll(fragmentPath);
+        const std::string vertexCode = internal::readAll(vertexPath);
+        const std::string fragmentCode = internal::readAll(fragmentPath);
+
+        if (vertexCode.empty() || fragmentCode.empty()) {
+            return;
+        }
 
         const GLuint vertex = internal::compileShader(GL_VERTEX_SHADER, vertexCode);
         const GLuint fragment = internal::compileShader(GL_FRAGMENT_SHADER, fragmentCode);
+
+        if (vertex == 0 || fragment == 0) {
+            return;
+        }
 
         programID = glCreateProgram();
         glAttachShader(programID, vertex);

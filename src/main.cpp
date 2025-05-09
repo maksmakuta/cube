@@ -68,23 +68,26 @@ int main() {
     {
         cube::Cube game;
         glfwSetWindowUserPointer(window, &game);
+        game.onCreate();
 
         glfwSetKeyCallback(window, onKey);
         glfwSetMouseButtonCallback(window, onButton);
         glfwSetFramebufferSizeCallback(window, onResize);
         glfwSetScrollCallback(window, onScroll);
         glfwSetCursorPosCallback(window, onCursor);
+
         auto last = glfwGetTime();
         while (!glfwWindowShouldClose(window)) {
-
             game.onDraw();
-            glfwSwapBuffers(window);
 
             const auto now = glfwGetTime();
             game.onUpdate(static_cast<float>(now - last));
             last = now;
+
+            glfwSwapBuffers(window);
             glfwPollEvents();
         }
+        game.onClear();
     }
 
     glfwDestroyWindow(window);

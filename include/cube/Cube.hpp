@@ -1,10 +1,11 @@
 #ifndef CUBE_HPP
 #define CUBE_HPP
 
-#include "core/ICallbacks.hpp"
-#include "graphics/renderer/Renderer.hpp"
-#include "graphics/renderer/VoxelRenderer.hpp"
-#include "world/World.hpp"
+#include "cube/core/ICallbacks.hpp"
+#include "cube/entities/Player.hpp"
+#include "cube/graphics/renderer/Renderer.hpp"
+#include "cube/graphics/renderer/VoxelRenderer.hpp"
+#include "cube/world/World.hpp"
 
 namespace cube {
 
@@ -21,10 +22,12 @@ namespace cube {
         void onKey(int k, int a, int m) override;
         void onCursor(float x, float y) override;
         void onScroll(float dx, float dy) override;
+
     private:
         Renderer m_renderer;
         VoxelRenderer m_voxel;
         World m_world;
+        Player m_player;
     };
 
 }

@@ -16,6 +16,7 @@ add_executable(cube
         include/cube/core/Constants.hpp
         include/cube/core/ICallbacks.hpp
         include/cube/core/IGenerator.hpp
+        include/cube/entities/Player.hpp
         include/cube/graphics/renderer/Renderer.hpp
         include/cube/graphics/renderer/VoxelRenderer.hpp
         include/cube/graphics/Font.hpp
@@ -27,6 +28,7 @@ add_executable(cube
         include/cube/world/World.hpp
         include/cube/Cube.hpp
 
+        src/entities/Player.cpp
         src/graphics/renderer/Renderer.cpp
         src/graphics/renderer/VoxelRenderer.cpp
         src/graphics/Shader.cpp
@@ -35,6 +37,8 @@ add_executable(cube
         src/utils/ColorUtils.cpp
         src/Cube.cpp
         src/main.cpp
+        include/cube/graphics/Camera.hpp
+        src/graphics/Camera.cpp
 )
 
 target_include_directories(cube PUBLIC include)
