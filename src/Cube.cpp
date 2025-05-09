@@ -15,7 +15,9 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-
+        clear(0xFF202020);
+        m_renderer.stroke(0xFF00FF00,5,LineCap::Butt,LineJoint::Miter);
+        m_renderer.rect(mouse.x - 50,mouse.y - 50, 100,100);
     }
 
     void Cube::onUpdate(float dt) {
@@ -31,7 +33,7 @@ namespace cube {
     }
 
     void Cube::onCursor(float x, float y){
-
+        mouse = {x,y};
     }
 
     void Cube::onScroll(float dx, float dy){

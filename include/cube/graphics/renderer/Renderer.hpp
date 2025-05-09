@@ -88,19 +88,19 @@ namespace cube {
         void segment(float x, float y,float rx,float ry, float angle_a, float angle_b, bool ccw = false);
 
         void print(const glm::vec2& pos, const std::string& text);
-    private:
 
+    private:
         void process(const std::vector<glm::vec2>&);
 
         glm::mat4 m_proj{1.f};
         std::vector<Vertex2D> vertices;
-        std::vector<uint> indices;
         Paint m_paint = 0xFFFFFFFF;
         Shader m_shader;
         uint m_vao{0};
         uint m_vbo{0};
-        uint m_ebo{0};
     };
+
+    void clear(const Color&);
 
 }
 

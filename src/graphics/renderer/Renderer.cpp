@@ -2,10 +2,19 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Polyline2D.h"
 #include "cube/utils/AssetsUtils.hpp"
 #include "glad/gl.h"
 
+using namespace crushedpixel;
+
 namespace cube {
+
+    void clear(const Color& c) {
+        const auto v = toVec4(c);
+        glClearColor(v.r,v.g,v.b,v.a);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     Renderer::Renderer() = default;
     Renderer::~Renderer() = default;
@@ -13,20 +22,17 @@ namespace cube {
     void Renderer::onCreate() {
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vbo);
-        glGenBuffers(1, &m_ebo);
 
         glBindVertexArray(m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, 256 * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 1024 * sizeof(uint), nullptr, GL_DYNAMIC_DRAW);
 
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), static_cast<void *>(nullptr));
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, tex)));
-        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, col)));
-        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -40,7 +46,6 @@ namespace cube {
     void Renderer::onClear() {
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
-        glDeleteBuffers(1, &m_ebo);
         m_shader.unload();
     }
 
@@ -51,17 +56,16 @@ namespace cube {
 
     void Renderer::flush() {
         m_shader.use();
+        m_shader.setMat4("proj",m_proj);
+        m_shader.setInt("type",1);
+        m_shader.setInt("image",0);
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, static_cast<int>(vertices.size() * sizeof(Vertex2D)), vertices.data(), GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<int>(indices.size() * sizeof(uint)), indices.data(), GL_DYNAMIC_DRAW);
-
-        glDrawElements(GL_TRIANGLES, static_cast<int>(indices.size()), GL_UNSIGNED_INT, nullptr);
+        glDrawArrays(GL_TRIANGLES, 0,static_cast<int>(vertices.size()));
 
         vertices.clear();
-        indices.clear();
     }
 
     void Renderer::fill(const Color& c) {
@@ -81,8 +85,18 @@ namespace cube {
     }
 
     void Renderer::lines(const std::vector<glm::vec2> &path) {
-        if (std::holds_alternative<StrokePaint>(m_paint)) {
-
+        if (const auto s_paint = std::get_if<StrokePaint>(&m_paint)) {
+            const auto mesh = Polyline2D::create(
+                path,
+                s_paint->width,
+                Polyline2D::JointStyle::BEVEL,
+                Polyline2D::EndCapStyle::JOINT
+            );
+            const auto c = toVec4(s_paint->color);
+            for (const auto& i : mesh) {
+                vertices.emplace_back(i,glm::vec2{0,0},c);
+            }
+            flush();
         }
     }
 
@@ -183,7 +197,7 @@ namespace cube {
         const auto center = glm::vec2{x,y};
         const auto r = glm::vec2{rx,ry};
         float t = angle_a;
-        while (t <= angle_b) {
+        while (t < angle_b) {
             const auto unit = glm::vec2{cosf(t),sinf(t)};
             path.push_back(center + unit * r);
 
@@ -218,6 +232,8 @@ namespace cube {
     }
 
     void Renderer::process(const std::vector<glm::vec2>& path) {
-
+        if (std::holds_alternative<StrokePaint>(m_paint)) {
+            lines(path);
+        }
     }
 }
