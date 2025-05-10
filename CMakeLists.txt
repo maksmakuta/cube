@@ -12,6 +12,7 @@ find_package(Freetype REQUIRED)
 add_subdirectory(libs/glad)
 add_subdirectory(libs/LodePNG)
 add_subdirectory(libs/Polyline2D)
+add_subdirectory(libs/thread_pool)
 
 add_executable(cube
         include/cube/core/Constants.hpp
@@ -45,5 +46,5 @@ add_executable(cube
 )
 
 target_include_directories(cube PUBLIC include)
-target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm Freetype::Freetype GLAD LodePNG Polyline2D)
+target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm Freetype::Freetype GLAD LodePNG Polyline2D BS_thread_pool)
 target_compile_definitions(cube PRIVATE CUBE_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")

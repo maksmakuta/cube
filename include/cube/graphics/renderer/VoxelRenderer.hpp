@@ -6,6 +6,11 @@
 
 namespace cube {
 
+    struct Vertex3D {
+        glm::vec3 pos;
+        glm::vec2 tex;
+    };
+
     class VoxelRenderer {
     public:
         VoxelRenderer();
@@ -20,7 +25,7 @@ namespace cube {
     private:
         glm::mat4 m_projection{1.f};
         Shader m_shader;
-        glm::uint m_vao{0}, m_vbo{0}, m_ebo{0};
+        glm::uint m_vao{0}, m_vbo{0};
 
     };
 

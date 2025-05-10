@@ -7,6 +7,8 @@
 #include "cube/graphics/renderer/VoxelRenderer.hpp"
 #include "cube/world/World.hpp"
 
+#include "BS_thread_pool.hpp"
+
 namespace cube {
 
     class Cube final : public ICallbacks{
@@ -24,6 +26,7 @@ namespace cube {
         void onScroll(float dx, float dy) override;
 
     private:
+        BS::thread_pool<> pool;
         Renderer m_renderer;
         VoxelRenderer m_voxel;
         World m_world;

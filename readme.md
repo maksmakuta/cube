@@ -15,6 +15,7 @@
  - GLAD 
  - LodePNG 
  - Polyline2D 
+ - [BS_thread_pool](https://github.com/bshoshany/thread-pool)
 
  CMake used as primary configurator tool
 

@@ -54,7 +54,7 @@ namespace cube {
     }
 
     void Renderer::onResize(const int w, const int h) {
-        glViewport(0,0,w,h);
+
         m_proj = glm::ortho(0.f,static_cast<float>(w),static_cast<float>(h),0.f, 1.f, -1.f);
     }
 

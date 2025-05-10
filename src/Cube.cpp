@@ -1,5 +1,6 @@
 #include "cube/Cube.hpp"
-#include "cube/utils/AssetsUtils.hpp"
+
+#include "glad/gl.h"
 
 namespace cube {
 
@@ -24,7 +25,9 @@ namespace cube {
     }
 
     void Cube::onResize(const int w, const int h){
+        glViewport(0,0,w,h);
         m_renderer.onResize(w,h);
+        m_voxel.onResize(w,h);
     }
 
     void Cube::onKey(int k, int a, int m){
