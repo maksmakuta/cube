@@ -238,7 +238,38 @@ namespace cube {
     }
 
     void Renderer::print(const glm::vec2& pos,const std::string& text, const Align& align) {
+        if (const auto text_style = std::get_if<TextPaint>(&m_paint)) {
+            glm::vec2 p = pos;
+            if (align == Align::Center) {
+                p.x -= static_cast<float>(text_style->font.width(text)) / 2.f;
+            }
+            if (align == Align::End) {
+                p.x -= static_cast<float>(text_style->font.width(text));
+            }
 
+            for(const auto& c : text) {
+                if (const auto g = text_style->font.at(c); g.has_value()) {
+
+                    const float x = p.x + static_cast<float>(g->offset.x);
+                    const float y = p.y - static_cast<float>(g->offset.y);
+                    const float w = g->size.x;
+                    const float h = g->size.y;
+
+                    vertices.insert(vertices.end(),{
+                        Vertex2D(glm::vec2{x  ,y  },{g->uv_a.x,g->uv_a.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x+w,y  },{g->uv_b.x,g->uv_a.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x+w,y+h},{g->uv_b.x,g->uv_b.y}, toVec4(text_style->color)),
+
+                        Vertex2D(glm::vec2{x  ,y  },{g->uv_a.x,g->uv_a.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x+w,y+h},{g->uv_b.x,g->uv_b.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x  ,y+h},{g->uv_a.x,g->uv_b.y}, toVec4(text_style->color)),
+                    });
+
+                    p.x += static_cast<float>(g->advance);
+                }
+            }
+            process({});
+        }
     }
 
     void Renderer::process(const std::vector<glm::vec2>& path) {
@@ -286,7 +317,8 @@ namespace cube {
                 image.image.bind(0);
                 flush();
             },
-            [this](const TextPaint&) {
+            [this](const TextPaint& text) {
+                text.font.getTexture().bind(0);
                 flush();
             }
         }, m_paint);

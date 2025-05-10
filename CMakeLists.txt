@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(Freetype REQUIRED)
 
 add_subdirectory(libs/glad)
 add_subdirectory(libs/LodePNG)
@@ -40,8 +41,9 @@ add_executable(cube
         include/cube/graphics/Camera.hpp
         src/graphics/Camera.cpp
         include/cube/utils/Utils.hpp
+        src/graphics/Font.cpp
 )
 
 target_include_directories(cube PUBLIC include)
-target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm GLAD LodePNG Polyline2D)
+target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm Freetype::Freetype GLAD LodePNG Polyline2D)
 target_compile_definitions(cube PRIVATE CUBE_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")

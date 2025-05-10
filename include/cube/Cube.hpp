@@ -28,9 +28,6 @@ namespace cube {
         VoxelRenderer m_voxel;
         World m_world;
         Player m_player;
-
-        glm::vec2 mouse{};
-        Texture atlas;
     };
 
 }
