@@ -30,6 +30,7 @@ namespace cube {
         Player m_player;
 
         glm::vec2 mouse{};
+        Texture atlas;
     };
 
 }

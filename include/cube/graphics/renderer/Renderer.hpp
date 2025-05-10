@@ -40,7 +40,6 @@ namespace cube {
     struct TextPaint {
         Font font;
         Color color;
-        Align align;
     };
 
     using Paint = std::variant<Color,StrokePaint,ImagePaint,TextPaint>;
@@ -63,9 +62,9 @@ namespace cube {
         void flush();
 
         void fill(const Color&);
-        void stroke(const Color&, float w, LineCap cap, LineJoint joint);
+        void stroke(const Color&, float w, LineCap cap = LineCap::Butt, LineJoint joint = LineJoint::Miter);
         void image(const Texture& t, const glm::vec2& uv_a = {0,0},const glm::vec2& uv_b = {1,1});
-        void text(const Font& t, const Color& c, const Align& align = Align::Start);
+        void text(const Font& t, const Color& c);
 
         void line(const glm::vec2& a,const glm::vec2& b);
         void lines(const std::vector<glm::vec2>& path);
@@ -87,7 +86,7 @@ namespace cube {
         void arc(float x, float y,float rx,float ry, float angle_a, float angle_b, bool ccw = false);
         void segment(float x, float y,float rx,float ry, float angle_a, float angle_b, bool ccw = false);
 
-        void print(const glm::vec2& pos, const std::string& text);
+        void print(const glm::vec2& pos, const std::string& text, const Align& align = Align::Start);
 
     private:
         void process(const std::vector<glm::vec2>&);

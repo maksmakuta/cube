@@ -39,6 +39,7 @@ add_executable(cube
         src/main.cpp
         include/cube/graphics/Camera.hpp
         src/graphics/Camera.cpp
+        include/cube/utils/Utils.hpp
 )
 
 target_include_directories(cube PUBLIC include)

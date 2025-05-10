@@ -4,6 +4,7 @@
 
 #include "Polyline2D.h"
 #include "cube/utils/AssetsUtils.hpp"
+#include "cube/utils/Utils.hpp"
 #include "glad/gl.h"
 
 using namespace crushedpixel;
@@ -41,6 +42,9 @@ namespace cube {
             getAsset("/shaders/canvas.vert"),
             getAsset("/shaders/canvas.frag")
         );
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void Renderer::onClear() {
@@ -55,9 +59,25 @@ namespace cube {
     }
 
     void Renderer::flush() {
+        int type = 0;
+        std::visit(overloaded{
+            [&type](const Color&) {
+                type = 1;
+            },
+            [&type](const StrokePaint&) {
+                type = 1;
+            },
+            [&type](const ImagePaint&) {
+                type = 2;
+            },
+            [&type](const TextPaint&) {
+                type = 3;
+            }
+        }, m_paint);
+
         m_shader.use();
         m_shader.setMat4("proj",m_proj);
-        m_shader.setInt("type",1);
+        m_shader.setInt("type",type);
         m_shader.setInt("image",0);
         glBindVertexArray(m_vao);
 
@@ -80,23 +100,13 @@ namespace cube {
         m_paint = ImagePaint(t,uv_a, uv_b);
     }
 
-    void Renderer::text(const Font &t, const Color& c, const Align &align) {
-        m_paint = TextPaint(t,c,align);
+    void Renderer::text(const Font &t, const Color& c) {
+        m_paint = TextPaint(t,c);
     }
 
     void Renderer::lines(const std::vector<glm::vec2> &path) {
-        if (const auto s_paint = std::get_if<StrokePaint>(&m_paint)) {
-            const auto mesh = Polyline2D::create(
-                path,
-                s_paint->width,
-                Polyline2D::JointStyle::BEVEL,
-                Polyline2D::EndCapStyle::JOINT
-            );
-            const auto c = toVec4(s_paint->color);
-            for (const auto& i : mesh) {
-                vertices.emplace_back(i,glm::vec2{0,0},c);
-            }
-            flush();
+        if (std::holds_alternative<StrokePaint>(m_paint)) {
+            process(path);
         }
     }
 
@@ -227,13 +237,58 @@ namespace cube {
         process(path);
     }
 
-    void Renderer::print(const glm::vec2& pos,const std::string& text) {
+    void Renderer::print(const glm::vec2& pos,const std::string& text, const Align& align) {
 
     }
 
     void Renderer::process(const std::vector<glm::vec2>& path) {
-        if (std::holds_alternative<StrokePaint>(m_paint)) {
-            lines(path);
-        }
+        std::visit(overloaded{
+            [this, &path](const Color& fill) {
+                const auto c = toVec4(fill);
+                for (auto i = 1; i + 1 < path.size(); ++i) {
+                    vertices.emplace_back(path[0],glm::vec2{0,0},c);
+                    vertices.emplace_back(path[i],glm::vec2{0,0},c);
+                    vertices.emplace_back(path[i+1],glm::vec2{0,0},c);
+                }
+                flush();
+            },
+            [this, &path](const StrokePaint& stroke) {
+                const auto mesh = Polyline2D::create(
+                    path,
+                    stroke.width,
+                    static_cast<Polyline2D::JointStyle>(stroke.joint),
+                    static_cast<Polyline2D::EndCapStyle>(stroke.cap)
+                );
+                const auto c = toVec4(stroke.color);
+                for (const auto& i : mesh) {
+                    vertices.emplace_back(i,glm::vec2{0,0},c);
+                }
+                flush();
+            },
+            [this, &path](const ImagePaint& image) {
+                auto min = glm::vec2(std::numeric_limits<float>::max());
+                auto max = glm::vec2(std::numeric_limits<float>::min());
+
+                for (const auto& p : path) {
+                    min.x = std::min(min.x, p.x);
+                    min.y = std::min(min.y, p.y);
+                    max.x = std::max(max.x, p.x);
+                    max.y = std::max(max.y, p.y);
+                }
+
+                const auto size = max - min;
+
+                for (auto i = 1; i + 1 < path.size(); ++i) {
+                    vertices.emplace_back(path[0],mix(image.uv_min,image.uv_max,(path[0] - min) / size),glm::vec4{1.f});
+                    vertices.emplace_back(path[i],mix(image.uv_min,image.uv_max,(path[i] - min) / size),glm::vec4{1.f});
+                    vertices.emplace_back(path[i+1],mix(image.uv_min,image.uv_max,(path[i+1] - min) / size),glm::vec4{1.f});
+                }
+                image.image.bind(0);
+                flush();
+            },
+            [this](const TextPaint&) {
+                flush();
+            }
+        }, m_paint);
     }
 }
