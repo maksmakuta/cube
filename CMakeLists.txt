@@ -43,6 +43,11 @@ add_executable(cube
         src/graphics/Camera.cpp
         include/cube/utils/Utils.hpp
         src/graphics/Font.cpp
+        src/world/World.cpp
+        src/world/Chunk.cpp
+        include/cube/models/Block.hpp
+        include/cube/generators/GeneratorFlat.hpp
+        src/generators/GeneratorFlat.cpp
 )
 
 target_include_directories(cube PUBLIC include)

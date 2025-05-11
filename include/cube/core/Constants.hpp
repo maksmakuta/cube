@@ -9,9 +9,10 @@ namespace cube {
 
     constval TITLE = "Cube";
 
-    constval CHUNK_WIDTH = 32;
-    constval CHUNK_DEPTH = 32;
-    constval CHUNK_HEIGHT = 256;
+    constval CHUNK_WIDTH = 8;
+    constval CHUNK_DEPTH = 8;
+    constval CHUNK_HEIGHT = 64;
+    constval CHUNK_SIZE = CHUNK_DEPTH * CHUNK_HEIGHT * CHUNK_WIDTH;
 
     constval TILE_SIZE = 16;
 
