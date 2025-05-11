@@ -45,7 +45,7 @@ namespace cube {
 
     void VoxelRenderer::onResize(const int w, const int h){
         const auto aspect = static_cast<float>(w) / static_cast<float>(h);
-        m_projection = glm::perspective(glm::radians(70.f),aspect, 0.f, CHUNK_DEPTH * 8.f);
+        m_projection = glm::perspective(glm::radians(90.f),aspect, 0.f, CHUNK_DEPTH * 8.f);
     }
 
     void VoxelRenderer::draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const {

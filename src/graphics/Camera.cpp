@@ -39,16 +39,24 @@ namespace cube {
             m_position += m_right * (CAMERA_SPEED * dt);
         }
         if (dir & Up) {
-            m_position += m_up * (CAMERA_SPEED * dt);
+            m_position += CAMERA_WORLD_UP * (CAMERA_SPEED * dt);
         }
         if (dir & Down) {
-            m_position -= m_up * (CAMERA_SPEED * dt);
+            m_position -= CAMERA_WORLD_UP * (CAMERA_SPEED * dt);
         }
     }
 
     void Camera::rotate(const float dx, const float dy) {
-        m_rotation += glm::vec2{dx,dy} * CAMERA_SENSITIVITY;
-        m_rotation.y = glm::clamp(m_rotation.y , -89.0f, 89.0f);
+
+        glm::vec2 offset;
+        offset.x = dx - m_last.x;
+        offset.y = m_last.y - dy;
+
+        m_rotation += offset * CAMERA_SENSITIVITY;
+
+        m_last = {dx,dy};
+
+        m_rotation.y = glm::clamp(m_rotation.y, -89.f,89.f);
         update();
     }
 

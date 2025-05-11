@@ -35,6 +35,7 @@ namespace cube {
         glm::vec3 m_position{0};
         glm::vec3 m_front{0}, m_right{0}, m_up{0};
         glm::vec2 m_rotation{0};
+        glm::vec2 m_last{0};
     };
 
 }

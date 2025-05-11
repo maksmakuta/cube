@@ -62,7 +62,7 @@ namespace cube {
     }
 
     void Cube::onCursor(const float x, const float y){
-        m_player.rotate(x,-y);
+        m_player.rotate(x,y);
     }
 
     void Cube::onScroll(const float dx, const float dy){
