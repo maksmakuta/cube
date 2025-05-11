@@ -31,6 +31,8 @@ namespace cube {
         VoxelRenderer m_voxel;
         World m_world;
         Player m_player;
+        uint m_direction{0};
+        bool m_move_player{false};
     };
 
 }

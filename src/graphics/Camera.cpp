@@ -46,7 +46,7 @@ namespace cube {
         }
     }
 
-    void Camera::rotate(float dx, float dy) {
+    void Camera::rotate(const float dx, const float dy) {
         m_rotation += glm::vec2{dx,dy} * CAMERA_SENSITIVITY;
         m_rotation.y = glm::clamp(m_rotation.y , -89.0f, 89.0f);
         update();
