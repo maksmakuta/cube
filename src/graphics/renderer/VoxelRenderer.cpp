@@ -3,9 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "cube/core/Constants.hpp"
+#include "cube/graphics/renderer/Vertex.hpp"
 #include "cube/utils/AssetsUtils.hpp"
 #include "glad/gl.h"
-
 
 namespace cube {
 
@@ -13,6 +13,8 @@ namespace cube {
     VoxelRenderer::~VoxelRenderer() = default;
 
     void VoxelRenderer::onCreate(){
+        m_atlas.load(getAsset("/textures/atlas.png"));
+
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vbo);
 
@@ -38,6 +40,7 @@ namespace cube {
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
         m_shader.unload();
+        m_atlas.unload();
     }
 
     void VoxelRenderer::onResize(const int w, const int h){
@@ -45,11 +48,21 @@ namespace cube {
         m_projection = glm::perspective(glm::radians(70.f),aspect, 0.f, CHUNK_DEPTH * 8.f);
     }
 
-    void VoxelRenderer::drawCube() {
+    void VoxelRenderer::draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const {
+        glEnable(GL_DEPTH);
 
-    }
+        m_atlas.bind(0);
 
-    void VoxelRenderer::drawChunk(const Chunk&, const glm::vec2&) {
+        m_shader.use();
+        m_shader.setMat4("proj",m_projection);
+        m_shader.setMat4("view",view);
+        m_shader.setMat4("model",glm::translate(glm::mat4{1.f},glm::vec3{pos.x * CHUNK_WIDTH, 0 , pos.y * CHUNK_DEPTH}));
+        m_shader.setInt("atlas",0);
+        glBindVertexArray(m_vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<int>(mesh.size() * sizeof(Vertex3D)), mesh.data(), GL_DYNAMIC_DRAW);
+        glDrawArrays(GL_TRIANGLES, 0,static_cast<int>(mesh.size()));
 
     }
 

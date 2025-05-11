@@ -3,11 +3,8 @@
 
 #include "cube/core/ICallbacks.hpp"
 #include "cube/entities/Player.hpp"
-#include "cube/graphics/renderer/Renderer.hpp"
 #include "cube/graphics/renderer/VoxelRenderer.hpp"
-#include "cube/world/World.hpp"
-
-#include "BS_thread_pool.hpp"
+#include "cube/graphics/Mesh.hpp"
 
 namespace cube {
 
@@ -26,13 +23,11 @@ namespace cube {
         void onScroll(float dx, float dy) override;
 
     private:
-        BS::thread_pool<> pool;
-        Renderer m_renderer;
         VoxelRenderer m_voxel;
-        World m_world;
+        Chunk m_chunk;
+        ChunkMesh m_chunk_mesh;
         Player m_player;
-        uint m_direction{0};
-        bool m_move_player{false};
+        uint8_t m_direction{0};
     };
 
 }

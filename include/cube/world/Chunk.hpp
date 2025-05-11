@@ -13,11 +13,11 @@ namespace cube {
         Chunk();
         ~Chunk();
 
-        BlockID get(const glm::ivec3& pos) const;
-        void set(const glm::ivec3& pos,BlockID);
+        BlockID& at(const glm::ivec3& pos);
+        [[nodiscard]] bool is(const glm::ivec3& pos, BlockID) const;
 
     private:
-        std::vector<BlockID> m_blocks;
+        std::vector<BlockID> m_blocks{CHUNK_SIZE,BlockID::Air};
     };
 
 }

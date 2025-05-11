@@ -48,6 +48,9 @@ add_executable(cube
         include/cube/models/Block.hpp
         include/cube/generators/GeneratorFlat.hpp
         src/generators/GeneratorFlat.cpp
+        include/cube/graphics/renderer/Vertex.hpp
+        include/cube/graphics/Mesh.hpp
+        src/graphics/Mesh.cpp
 )
 
 target_include_directories(cube PUBLIC include)

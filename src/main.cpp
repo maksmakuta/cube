@@ -59,6 +59,7 @@ int main() {
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
+    glfwSetInputMode(window, GLFW_CURSOR,GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD\n";

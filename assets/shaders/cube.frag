@@ -2,10 +2,10 @@
 
 in vec2 f_tex;
 
-uniform sampler2D image;
+uniform sampler2D atlas;
 
 out vec4 f_color;
 
 void main() {
-    f_color = texture(image,f_tex);
+    f_color = texture(atlas,f_tex);
 }

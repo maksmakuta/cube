@@ -4,6 +4,7 @@
 #include <vector>
 #include <variant>
 
+#include "Vertex.hpp"
 #include "cube/graphics/Font.hpp"
 #include "cube/graphics/Shader.hpp"
 #include "cube/graphics/Texture.hpp"
@@ -43,12 +44,6 @@ namespace cube {
     };
 
     using Paint = std::variant<Color,StrokePaint,ImagePaint,TextPaint>;
-
-    struct Vertex2D {
-        glm::vec2 pos;
-        glm::vec2 tex;
-        glm::vec4 col;
-    };
 
     class Renderer {
     public:

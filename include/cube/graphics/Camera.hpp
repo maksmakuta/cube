@@ -5,7 +5,7 @@
 
 namespace cube {
 
-    enum MoveDirection {
+    enum MoveDirection : uint8_t{
         Forward     = 1 << 1,
         Backward    = 1 << 2,
         Left        = 1 << 3,

@@ -17,7 +17,7 @@ namespace cube {
     constval TILE_SIZE = 16;
 
     constval CAMERA_SPEED = 16.f;
-    constval CAMERA_SENSITIVITY = 0.16f;
+    constval CAMERA_SENSITIVITY = 0.1f;
     constval CAMERA_WORLD_UP = glm::vec3{0,1,0};
 }
 

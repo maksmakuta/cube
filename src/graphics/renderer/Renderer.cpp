@@ -2,10 +2,11 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Polyline2D.h"
 #include "cube/utils/AssetsUtils.hpp"
 #include "cube/utils/Utils.hpp"
+
 #include "glad/gl.h"
+#include "Polyline2D.h"
 
 using namespace crushedpixel;
 
@@ -14,7 +15,7 @@ namespace cube {
     void clear(const Color& c) {
         const auto v = toVec4(c);
         glClearColor(v.r,v.g,v.b,v.a);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     Renderer::Renderer() = default;
