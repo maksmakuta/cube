@@ -35,7 +35,7 @@ namespace cube {
             case BlockID::Leaves:
                 return toUV({3, 0});
             case BlockID::HardStone:
-                return toUV({0, 0});
+                return toUV({9, 1});
             default:
                 return glm::vec4{0};
         }
