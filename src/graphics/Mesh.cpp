@@ -34,8 +34,7 @@ namespace cube {
     }
 
     ChunkMesh Mesh::toMesh(Chunk& c) {
-        ChunkMesh mesh{};
-
+        auto mesh = ChunkMesh();
         for (int x = 0; x < CHUNK_WIDTH; ++x){
             for (int y = 0; y < CHUNK_HEIGHT; ++y) {
                 for (int z = 0; z < CHUNK_DEPTH; ++z) {
@@ -48,6 +47,7 @@ namespace cube {
                             for (const auto i : std::vector{0,2,3,0,1,2}) {
                                 Vertex3D v{};
                                 v.pos = glm::ivec3(x, y, z) + faceVertexOffsets[face][i];
+                                v.norm = faceNormals[face];
                                 v.tex = mix(block,faceUVs[i],face);
                                 mesh.push_back(v);
                             }

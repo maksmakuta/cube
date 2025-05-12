@@ -1,25 +1,17 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
-#include <unordered_map>
-
-#include "cube/world/Chunk.hpp"
+#include "cube/core/IGenerator.hpp"
+#include "cube/generators/GeneratorFlat.hpp"
 
 namespace cube {
 
     class World {
     public:
-        World();
+        explicit World(const std::shared_ptr<IGenerator>& = std::make_shared<GeneratorFlat>());
         ~World();
-
-        Chunk getChunk(const glm::ivec2& pos);
-        void setChunk(const glm::ivec2& pos, const Chunk& c);
-        void removeChunk(const glm::ivec2& pos);
-
     private:
-        std::unordered_map<glm::ivec2, Chunk> m_chunks{};
+        std::shared_ptr<IGenerator> m_generator;
     };
 
 }

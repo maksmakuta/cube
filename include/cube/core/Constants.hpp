@@ -9,6 +9,7 @@
 namespace cube {
 
     constval TITLE = "Cube";
+    constval RENDER_DIST = 4.f;
 
     constval CHUNK_WIDTH = 8;
     constval CHUNK_DEPTH = 8;
@@ -22,6 +23,8 @@ namespace cube {
     constval CAMERA_SPEED = 16.f;
     constval CAMERA_SENSITIVITY = 0.1f;
     constval CAMERA_WORLD_UP = glm::vec3{0,1,0};
+
+    constval TICK = 1.f / 5.f;
 }
 
 #endif //CONSTANTS_HPP

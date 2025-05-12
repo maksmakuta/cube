@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "cube/Cube.hpp"
+#include "cube/core/Constants.hpp"
 
 cube::ICallbacks* getCallbacks(GLFWwindow* w) {
     return static_cast<cube::ICallbacks *>(glfwGetWindowUserPointer(w));
@@ -51,7 +52,7 @@ int main() {
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_DEPTH_BITS,24);
 
-    const auto window = glfwCreateWindow(800, 600, "Cube", nullptr, nullptr);
+    const auto window = glfwCreateWindow(800, 600, cube::TITLE, nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();

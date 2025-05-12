@@ -15,7 +15,7 @@ namespace cube {
         Mesh();
         ~Mesh();
 
-        ChunkMesh toMesh(Chunk&);
+        static ChunkMesh toMesh(Chunk&);
     };
 
 }

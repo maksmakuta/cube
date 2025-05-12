@@ -1,12 +1,22 @@
 #ifndef CUBE_HPP
 #define CUBE_HPP
 
+#include <unordered_map>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
 #include "cube/core/ICallbacks.hpp"
 #include "cube/entities/Player.hpp"
 #include "cube/graphics/renderer/VoxelRenderer.hpp"
-#include "cube/graphics/Mesh.hpp"
+#include "cube/world/World.hpp"
+#include "graphics/Mesh.hpp"
 
 namespace cube {
+
+    struct FiniteWorld {
+        std::unordered_map<glm::ivec2, ChunkMesh> meshes;
+    };
 
     class Cube final : public ICallbacks{
     public:
@@ -23,10 +33,10 @@ namespace cube {
         void onScroll(float dx, float dy) override;
 
     private:
+        FiniteWorld m_world{};
         VoxelRenderer m_voxel;
-        Chunk m_chunk;
-        ChunkMesh m_chunk_mesh;
         Player m_player;
+        float last_tick = 0.0;
         uint8_t m_direction{0};
     };
 

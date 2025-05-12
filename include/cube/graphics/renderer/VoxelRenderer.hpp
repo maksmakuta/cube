@@ -19,6 +19,10 @@ namespace cube {
         void onResize(int w, int h);
 
         void draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const;
+
+        void setLigth(const glm::vec3& vec);
+
+
     private:
         glm::mat4 m_projection{1.f};
         Shader m_shader;

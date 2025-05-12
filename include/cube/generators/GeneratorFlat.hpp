@@ -10,7 +10,7 @@ namespace cube {
         GeneratorFlat();
         ~GeneratorFlat() override;
 
-        Chunk generateAt(const glm::vec2 &pos) override;
+        std::shared_ptr<Chunk> generateAt(const glm::vec2 &pos) override;
 
     };
 

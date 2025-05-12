@@ -23,12 +23,14 @@ namespace cube {
 
         glBindVertexArray(m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, 256 * sizeof(Vertex3D), nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 16384 * sizeof(Vertex3D), nullptr, GL_DYNAMIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), static_cast<void *>(nullptr));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, norm)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
+        glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -40,6 +42,9 @@ namespace cube {
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
     }
 
     void VoxelRenderer::onClear(){
@@ -51,10 +56,13 @@ namespace cube {
 
     void VoxelRenderer::onResize(const int w, const int h){
         const auto aspect = static_cast<float>(w) / static_cast<float>(h);
-        m_projection = glm::perspective(glm::radians(90.f),aspect, 0.01f, CHUNK_DEPTH * 8.f);
+        m_projection = glm::perspective(glm::radians(90.f),aspect, 0.01f, CHUNK_DEPTH * RENDER_DIST * 1.75f);
     }
 
     void VoxelRenderer::draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const {
+        if (mesh.empty())
+            return;
+
         m_atlas.bind(0);
 
         m_shader.use();
@@ -70,4 +78,8 @@ namespace cube {
 
     }
 
+    void VoxelRenderer::setLigth(const glm::vec3 &vec) {
+        m_shader.use();
+        m_shader.setVec3("lightPos",vec);
+    }
 }
