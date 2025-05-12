@@ -20,41 +20,38 @@ add_executable(cube
         include/cube/core/ICallbacks.hpp
         include/cube/core/IGenerator.hpp
         include/cube/entities/Player.hpp
+        include/cube/generators/GeneratorFlat.hpp
+        include/cube/generators/GeneratorHeight.hpp
         include/cube/graphics/renderer/Renderer.hpp
+        include/cube/graphics/renderer/Vertex.hpp
         include/cube/graphics/renderer/VoxelRenderer.hpp
+        include/cube/graphics/Camera.hpp
         include/cube/graphics/Font.hpp
+        include/cube/graphics/Mesh.hpp
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
-        include/cube/utils/AssetsUtils.hpp
-        include/cube/utils/ColorUtils.hpp
+        include/cube/models/Block.hpp
+        include/cube/utils/Utils.hpp
         include/cube/world/Chunk.hpp
         include/cube/world/World.hpp
         include/cube/Cube.hpp
 
         src/entities/Player.cpp
+        src/generators/GeneratorFlat.cpp
+        src/generators/GeneratorHeight.cpp
         src/graphics/renderer/Renderer.cpp
         src/graphics/renderer/VoxelRenderer.cpp
+        src/graphics/Camera.cpp
+        src/graphics/Font.cpp
+        src/graphics/Mesh.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
-        src/utils/AssetsUtils.cpp
-        src/utils/ColorUtils.cpp
+        src/models/Block.cpp
+        src/world/Chunk.cpp
+        src/world/World.cpp
+        src/utils/Utils.cpp
         src/Cube.cpp
         src/main.cpp
-        include/cube/graphics/Camera.hpp
-        src/graphics/Camera.cpp
-        include/cube/utils/Utils.hpp
-        src/graphics/Font.cpp
-        src/world/World.cpp
-        src/world/Chunk.cpp
-        include/cube/models/Block.hpp
-        include/cube/generators/GeneratorFlat.hpp
-        src/generators/GeneratorFlat.cpp
-        include/cube/graphics/renderer/Vertex.hpp
-        include/cube/graphics/Mesh.hpp
-        src/graphics/Mesh.cpp
-        src/models/Block.cpp
-        include/cube/generators/GeneratorHeight.hpp
-        src/generators/GeneratorHeight.cpp
 )
 
 target_include_directories(cube PUBLIC include)

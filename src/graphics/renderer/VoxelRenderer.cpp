@@ -4,7 +4,7 @@
 
 #include "cube/core/Constants.hpp"
 #include "cube/graphics/renderer/Vertex.hpp"
-#include "cube/utils/AssetsUtils.hpp"
+#include "cube/utils/Utils.hpp"
 #include "glad/gl.h"
 
 namespace cube {
@@ -63,6 +63,10 @@ namespace cube {
         if (mesh.empty())
             return;
 
+        const glm::mat4 vp = m_projection * view;
+        if (!isAABBVisible(getChunkAABB(pos), extractFrustum(vp)))
+            return;
+
         m_atlas.bind(0);
 
         m_shader.use();
@@ -75,10 +79,9 @@ namespace cube {
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, static_cast<int>(mesh.size() * sizeof(Vertex3D)), mesh.data(), GL_DYNAMIC_DRAW);
         glDrawArrays(GL_TRIANGLES, 0,static_cast<int>(mesh.size()));
-
     }
 
-    void VoxelRenderer::setLigth(const glm::vec3 &vec) {
+    void VoxelRenderer::setLight(const glm::vec3 &vec) {
         m_shader.use();
         m_shader.setVec3("lightPos",vec);
     }

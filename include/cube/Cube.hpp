@@ -39,6 +39,7 @@ namespace cube {
         Player m_player;
         float last_tick = 0.0;
         uint8_t m_direction{0};
+        bool m_show_debug{false};
     };
 
 }

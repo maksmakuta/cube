@@ -13,24 +13,22 @@ namespace cube {
     Cube::Cube() = default;
 
     void Cube::onCreate() {
-        std::mutex mut;
-        BS::thread_pool<> pool{};
+        //BS::thread_pool<> pool{};
         auto g = GeneratorHeight(static_cast<int>(std::random_device{}()));
         const auto r = static_cast<int>(RENDER_DIST);
         for (int x = -r; x <= r; ++x) {
             for (int y = -r; y <= r; ++y) {
-                //const auto j = pool.submit_task([this, &x, &y, &g, &mut] {
+          //      const auto j = pool.submit_task([this, &x, &y, &g] {
                     const auto c = g.generateAt({x,y});
-                    {
-                        std::lock_guard locker(mut);
-                        m_world.chunks[{x,y}] = c;
-                        m_world.meshes[{x,y}] = Mesh::toMesh(*c);
-                    }
-                //});
+                    //m_world.chunks[{x,y}] = c;
+                    m_world.meshes[{x,y}] = Mesh::toMesh(*c);
+            //    });
             }
         }
         m_voxel.onCreate();
         m_player.setPosition({0, CHUNK_HEIGHT * 0.75f, 0});
+        m_voxel.setLight({0, CHUNK_HEIGHT * 1.75f, 0});
+
     }
 
     void Cube::onClear() {
@@ -42,11 +40,14 @@ namespace cube {
         for (const auto& [offset, mesh] : m_world.meshes) {
             m_voxel.draw(mesh,offset,m_player.getCamera().getView());
         }
+
+        if (m_show_debug) {
+
+        }
     }
 
     void Cube::onUpdate(const float dt) {
         m_player.move(m_direction,dt);
-        m_voxel.setLigth(m_player.getPosition() + glm::vec3(0,CHUNK_HEIGHT,0));
         // last_tick += dt;
         // if (last_tick > TICK) {
         //     last_tick = 0;
@@ -64,6 +65,9 @@ namespace cube {
     }
 
     void Cube::onKey(const int k, const int a, const int m){
+        if (k == GLFW_KEY_F1 && a == GLFW_PRESS) {
+            m_show_debug = !m_show_debug;
+        }
         if (k == GLFW_KEY_W) {
             set(m_direction,Forward,a != GLFW_RELEASE);
         }

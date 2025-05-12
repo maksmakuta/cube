@@ -8,7 +8,7 @@
 #include "cube/graphics/Font.hpp"
 #include "cube/graphics/Shader.hpp"
 #include "cube/graphics/Texture.hpp"
-#include "cube/utils/ColorUtils.hpp"
+#include "cube/utils/Utils.hpp"
 
 namespace cube {
 

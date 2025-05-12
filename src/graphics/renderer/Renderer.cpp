@@ -2,7 +2,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "cube/utils/AssetsUtils.hpp"
 #include "cube/utils/Utils.hpp"
 
 #include "glad/gl.h"

@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+#include "cube/core/Constants.hpp"
+
 namespace cube {
 
     template<class... Ts>
@@ -12,24 +14,25 @@ namespace cube {
     template<class... Ts>
     overloaded(Ts...) -> overloaded<Ts...>;
 
-    inline std::ostream& operator<<(std::ostream& os, const glm::vec4& v) {
-        return os << "vec4(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";
-    }
+    /*
+     * Color in hex format: 0xAARRGGBB
+     */
+    using Color = glm::uint;
 
-    inline std::ostream& operator<<(std::ostream& os, const glm::vec3& v) {
-        return os << "vec3(" << v.x << ", " << v.y << ", " << v.z << ")";
-    }
+    struct AABB {
+        glm::vec3 min;
+        glm::vec3 max;
+    };
 
-    inline std::ostream& operator<<(std::ostream& os, const glm::vec2& v) {
-        return os << "vec2(" << v.x << ", " << v.y << ")";
-    }
+    struct Frustum {
+        glm::vec4 planes[6]; // left, right, bottom, top, near, far
+    };
 
-    inline std::ostream& operator<<(std::ostream& os, const glm::mat4& m) {
-        os << "mat4(\n";
-        for (int i = 0; i < 4; ++i)
-            os << "  [" << m[i][0] << ", " << m[i][1] << ", " << m[i][2] << ", " << m[i][3] << "]\n";
-        return os << ")";
-    }
+    std::string getAsset(const std::string& path);
+    glm::vec4 toVec4(const Color&);
+    AABB getChunkAABB(const glm::ivec2& chunkPos);
+    Frustum extractFrustum(const glm::mat4& vp);
+    bool isAABBVisible(const AABB& box, const Frustum& f);
 
 }
 

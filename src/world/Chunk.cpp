@@ -27,8 +27,8 @@ namespace cube {
 
     bool Chunk::is(const glm::ivec3 &pos, const BlockID b) const {
         const auto i = getIndex(pos);
-        if (i == -1) {
-            return true;
+        if (i == -1 ) {
+            return false;
         }
         return m_blocks[i] == b;
     }
