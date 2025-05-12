@@ -3,6 +3,7 @@
 
 #define constval constexpr auto
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 namespace cube {
@@ -14,7 +15,9 @@ namespace cube {
     constval CHUNK_HEIGHT = 64;
     constval CHUNK_SIZE = CHUNK_DEPTH * CHUNK_HEIGHT * CHUNK_WIDTH;
 
-    constval TILE_SIZE = 16;
+    constval ATLAS_SIZE = glm::vec2{160,256};
+    constval TILE_SIZE = 16.f;
+    constval TILES = ATLAS_SIZE / TILE_SIZE;
 
     constval CAMERA_SPEED = 16.f;
     constval CAMERA_SENSITIVITY = 0.1f;

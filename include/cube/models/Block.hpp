@@ -1,6 +1,8 @@
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
 
+#include <glm/vec4.hpp>
+
 namespace cube {
 
     enum class BlockID {
@@ -12,6 +14,8 @@ namespace cube {
         Leaves,
         HardStone
     };
+
+    glm::vec4 getTile(BlockID, int face);
 
 }
 

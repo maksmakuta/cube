@@ -14,6 +14,9 @@ namespace cube {
 
     void VoxelRenderer::onCreate(){
         m_atlas.load(getAsset("/textures/atlas.png"));
+        m_atlas.setWrap(TextureWrap::Repeat);
+        m_atlas.setMagFilter(TextureFilter::Nearest);
+        m_atlas.setMinFilter(TextureFilter::Nearest);
 
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vbo);
@@ -34,6 +37,9 @@ namespace cube {
             getAsset("/shaders/cube.vert"),
             getAsset("/shaders/cube.frag")
         );
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
     }
 
     void VoxelRenderer::onClear(){
@@ -45,12 +51,10 @@ namespace cube {
 
     void VoxelRenderer::onResize(const int w, const int h){
         const auto aspect = static_cast<float>(w) / static_cast<float>(h);
-        m_projection = glm::perspective(glm::radians(90.f),aspect, 0.f, CHUNK_DEPTH * 8.f);
+        m_projection = glm::perspective(glm::radians(90.f),aspect, 0.01f, CHUNK_DEPTH * 8.f);
     }
 
     void VoxelRenderer::draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const {
-        glEnable(GL_DEPTH);
-
         m_atlas.bind(0);
 
         m_shader.use();

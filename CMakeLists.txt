@@ -51,6 +51,7 @@ add_executable(cube
         include/cube/graphics/renderer/Vertex.hpp
         include/cube/graphics/Mesh.hpp
         src/graphics/Mesh.cpp
+        src/models/Block.cpp
 )
 
 target_include_directories(cube PUBLIC include)
