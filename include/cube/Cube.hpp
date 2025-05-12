@@ -15,6 +15,7 @@
 namespace cube {
 
     struct FiniteWorld {
+        std::unordered_map<glm::ivec2, std::shared_ptr<Chunk>> chunks;
         std::unordered_map<glm::ivec2, ChunkMesh> meshes;
     };
 

@@ -2,7 +2,10 @@
 #include "glad/gl.h"
 
 #include <GLFW/glfw3.h>
+#include <random>
 
+#include "BS_thread_pool.hpp"
+#include "cube/generators/GeneratorHeight.hpp"
 #include "cube/graphics/renderer/Renderer.hpp"
 
 namespace cube {
@@ -10,20 +13,24 @@ namespace cube {
     Cube::Cube() = default;
 
     void Cube::onCreate() {
-
-        // const auto x = 0;
-        // const auto y = 0;
-
+        std::mutex mut;
+        BS::thread_pool<> pool{};
+        auto g = GeneratorHeight(static_cast<int>(std::random_device{}()));
         const auto r = static_cast<int>(RENDER_DIST);
         for (int x = -r; x <= r; ++x) {
-        for (int y = -r; y <= r; ++y) {
-                auto c = GeneratorFlat().generateAt({x,y});
-                m_world.meshes[{x,y}] = Mesh::toMesh(*c);
+            for (int y = -r; y <= r; ++y) {
+                //const auto j = pool.submit_task([this, &x, &y, &g, &mut] {
+                    const auto c = g.generateAt({x,y});
+                    {
+                        std::lock_guard locker(mut);
+                        m_world.chunks[{x,y}] = c;
+                        m_world.meshes[{x,y}] = Mesh::toMesh(*c);
+                    }
+                //});
+            }
         }
-        }
-
         m_voxel.onCreate();
-
+        m_player.setPosition({0, CHUNK_HEIGHT * 0.75f, 0});
     }
 
     void Cube::onClear() {

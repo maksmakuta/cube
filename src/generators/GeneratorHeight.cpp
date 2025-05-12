@@ -1,0 +1,40 @@
+#include "cube/generators/GeneratorHeight.hpp"
+
+namespace cube {
+
+    GeneratorHeight::GeneratorHeight(const int seed) : IGenerator(seed), noise(seed) {
+        noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    }
+
+    GeneratorHeight::~GeneratorHeight() = default;
+
+    std::shared_ptr<Chunk> GeneratorHeight::generateAt(const glm::vec2 &pos) {
+        const auto chunk = std::make_shared<Chunk>();
+
+        const auto offset = glm::ivec3{pos.x * CHUNK_WIDTH, 0 , pos.y * CHUNK_DEPTH};
+
+        for (int z = 0; z < CHUNK_DEPTH; ++z) {
+            for (int x = 0; x < CHUNK_WIDTH; ++x) {
+                const auto fvec = glm::vec2{offset.x + x,offset.z + z};
+                const auto n = ( noise.GetNoise(fvec.x,fvec.y) + 1.f) / 2.f;
+                const auto height = CHUNK_HEIGHT * 0.67f + static_cast<int>(n * 16);
+                for (int y = 0; y < height; ++y) {
+                    BlockID block;
+                    if (y == 0) {
+                        block = BlockID::HardStone;
+                    }else if (y == height - 1) {
+                        block = BlockID::Grass;
+                    }else if (y == height - 2) {
+                        block = BlockID::Dirt;
+                    }else {
+                        block = BlockID::Stone;
+                    }
+                    chunk->at({x,y,z}) = block;
+                }
+            }
+        }
+
+        return chunk;
+    }
+
+}
