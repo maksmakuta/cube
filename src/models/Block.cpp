@@ -34,6 +34,10 @@ namespace cube {
             }
             case BlockID::Leaves:
                 return toUV({3, 0});
+            case BlockID::Bush:
+                return toUV({9, 8});
+            case BlockID::Flower:
+                return toUV({6, 11});
             case BlockID::HardStone:
                 return toUV({9, 1});
             default:

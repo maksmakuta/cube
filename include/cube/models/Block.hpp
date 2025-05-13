@@ -12,6 +12,8 @@ namespace cube {
         Stone,
         Wood,
         Leaves,
+        Bush,
+        Flower,
         HardStone
     };
 

@@ -12,8 +12,6 @@ find_package(Freetype REQUIRED)
 add_subdirectory(libs/glad)
 add_subdirectory(libs/LodePNG)
 add_subdirectory(libs/Polyline2D)
-add_subdirectory(libs/thread_pool)
-add_subdirectory(libs/FastNoiseLite)
 
 add_executable(cube
         include/cube/core/Constants.hpp
@@ -52,8 +50,12 @@ add_executable(cube
         src/utils/Utils.cpp
         src/Cube.cpp
         src/main.cpp
+        include/cube/utils/FNoise.hpp
+        src/utils/FNoise.cpp
+        include/cube/utils/ThreadPool.hpp
+        src/utils/ThreadPool.cpp
 )
 
 target_include_directories(cube PUBLIC include)
-target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm Freetype::Freetype GLAD LodePNG Polyline2D BS_thread_pool FastNoiseLite)
+target_link_libraries(cube PUBLIC OpenGL::GL glfw glm::glm Freetype::Freetype GLAD LodePNG Polyline2D)
 target_compile_definitions(cube PRIVATE CUBE_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")

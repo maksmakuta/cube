@@ -2,9 +2,7 @@
 
 namespace cube {
 
-    GeneratorHeight::GeneratorHeight(const int seed) : IGenerator(seed), noise(seed) {
-        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    }
+    GeneratorHeight::GeneratorHeight(const int seed) : IGenerator(seed), noise(seed) {}
 
     GeneratorHeight::~GeneratorHeight() = default;
 
@@ -16,7 +14,7 @@ namespace cube {
         for (int z = 0; z < CHUNK_DEPTH; ++z) {
             for (int x = 0; x < CHUNK_WIDTH; ++x) {
                 const auto fvec = glm::vec2{offset.x + x,offset.z + z};
-                const auto n = ( noise.GetNoise(fvec.x,fvec.y) + 1.f) / 2.f;
+                const auto n = ( noise.at(fvec.x,fvec.y) + 1.f) / 2.f;
                 const auto height = CHUNK_HEIGHT * 0.67f + static_cast<int>(n * 32);
                 for (int y = 0; y < height; ++y) {
                     auto block = BlockID::Stone;

@@ -1,10 +1,8 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <string>
 #include <glm/glm.hpp>
-#include <iostream>
-
-#include "cube/core/Constants.hpp"
 
 namespace cube {
 
@@ -13,6 +11,11 @@ namespace cube {
 
     template<class... Ts>
     overloaded(Ts...) -> overloaded<Ts...>;
+
+    template<class T, class S>
+    void set(T& val, S bit, bool op) {
+        op ? val |= bit : val &= ~bit;
+    }
 
     /*
      * Color in hex format: 0xAARRGGBB

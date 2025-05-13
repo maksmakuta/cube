@@ -1,8 +1,8 @@
 #ifndef GENERATORHEIGHT_HPP
 #define GENERATORHEIGHT_HPP
 
-#include "FastNoiseLite.h"
 #include "cube/core/IGenerator.hpp"
+#include "cube/utils/FNoise.hpp"
 
 namespace cube {
 
@@ -13,7 +13,7 @@ namespace cube {
 
         std::shared_ptr<Chunk> generateAt(const glm::vec2 &pos) override;
     private:
-        FastNoiseLite noise;
+        FNoise noise;
     };
 
 }

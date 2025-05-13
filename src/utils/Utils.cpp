@@ -1,5 +1,7 @@
 #include "cube/utils/Utils.hpp"
 
+#include "cube/core/Constants.hpp"
+
 #ifndef CUBE_ASSETS_DIR
 #error "CUBE_ASSETS_DIR is not defined, please define assets dir"
 #endif
@@ -28,7 +30,7 @@ namespace cube {
     }
 
     Frustum extractFrustum(const glm::mat4& vp) {
-        Frustum f;
+        Frustum f{};
         // Left
         f.planes[0] = glm::vec4(
             vp[0][3] + vp[0][0],
@@ -75,18 +77,17 @@ namespace cube {
     }
 
     bool isAABBVisible(const AABB& box, const Frustum& f) {
-        for (int i = 0; i < 6; ++i) {
-            const glm::vec4& plane = f.planes[i];
+        for (const auto& plane : f.planes) {
             glm::vec3 positiveVertex = box.min;
             if (plane.x >= 0) positiveVertex.x = box.max.x;
             if (plane.y >= 0) positiveVertex.y = box.max.y;
             if (plane.z >= 0) positiveVertex.z = box.max.z;
 
-            float distance = plane.x * positiveVertex.x + plane.y * positiveVertex.y + plane.z * positiveVertex.z + plane.w;
+            const float distance = plane.x * positiveVertex.x + plane.y * positiveVertex.y + plane.z * positiveVertex.z + plane.w;
             if (distance < 0)
-                return false; // Fully outside
+                return false;
         }
-        return true; // At least partially inside
+        return true;
     }
 
 }
