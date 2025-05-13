@@ -17,11 +17,11 @@ namespace cube {
         void onCreate();
         void onClear();
         void onResize(int w, int h);
-
-        void draw(const std::vector<Vertex3D>& mesh, const glm::vec2& pos, const glm::mat4& view) const;
+        void use();
 
         void setLight(const glm::vec3& vec);
 
+        void draw();
 
     private:
         glm::mat4 m_projection{1.f};

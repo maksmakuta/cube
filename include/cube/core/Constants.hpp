@@ -9,7 +9,7 @@
 namespace cube {
 
     constval TITLE = "Cube";
-    constval RENDER_DIST = 8.f;
+    constval RENDER_DIST = 8;
 
     constval CHUNK_WIDTH = 16;
     constval CHUNK_DEPTH = 16;

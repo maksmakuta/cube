@@ -28,11 +28,11 @@ namespace cube {
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, 256 * sizeof(Vertex2D), nullptr, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), static_cast<void *>(nullptr));
+        glVertexAttribPointer(0, 2, GL_SHORT, GL_FALSE, sizeof(Vertex2D), static_cast<void *>(nullptr));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, tex)));
+        glVertexAttribPointer(1, 2, GL_UNSIGNED_SHORT, GL_TRUE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, tex)));
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, col)));
+        glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, col)));
         glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -43,8 +43,13 @@ namespace cube {
             getAsset("/shaders/canvas.frag")
         );
 
+    }
+
+    void Renderer::use() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
     }
 
     void Renderer::onClear() {
@@ -255,13 +260,13 @@ namespace cube {
                     const float h = g->size.y;
 
                     vertices.insert(vertices.end(),{
-                        Vertex2D(glm::vec2{x  ,y  },{g->uv_a.x,g->uv_a.y}, toVec4(text_style->color)),
-                        Vertex2D(glm::vec2{x+w,y  },{g->uv_b.x,g->uv_a.y}, toVec4(text_style->color)),
-                        Vertex2D(glm::vec2{x+w,y+h},{g->uv_b.x,g->uv_b.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x  ,y  },glm::vec2{g->uv_a.x,g->uv_a.y} * static_cast<float>(0xFFFF), text_style->color),
+                        Vertex2D(glm::vec2{x+w,y  },glm::vec2{g->uv_b.x,g->uv_a.y} * static_cast<float>(0xFFFF), text_style->color),
+                        Vertex2D(glm::vec2{x+w,y+h},glm::vec2{g->uv_b.x,g->uv_b.y} * static_cast<float>(0xFFFF), text_style->color),
 
-                        Vertex2D(glm::vec2{x  ,y  },{g->uv_a.x,g->uv_a.y}, toVec4(text_style->color)),
-                        Vertex2D(glm::vec2{x+w,y+h},{g->uv_b.x,g->uv_b.y}, toVec4(text_style->color)),
-                        Vertex2D(glm::vec2{x  ,y+h},{g->uv_a.x,g->uv_b.y}, toVec4(text_style->color)),
+                        Vertex2D(glm::vec2{x  ,y  },glm::vec2{g->uv_a.x,g->uv_a.y} * static_cast<float>(0xFFFF), text_style->color),
+                        Vertex2D(glm::vec2{x+w,y+h},glm::vec2{g->uv_b.x,g->uv_b.y} * static_cast<float>(0xFFFF), text_style->color),
+                        Vertex2D(glm::vec2{x  ,y+h},glm::vec2{g->uv_a.x,g->uv_b.y} * static_cast<float>(0xFFFF), text_style->color)
                     });
 
                     p.x += static_cast<float>(g->advance);
@@ -274,11 +279,10 @@ namespace cube {
     void Renderer::process(const std::vector<glm::vec2>& path) {
         std::visit(overloaded{
             [this, &path](const Color& fill) {
-                const auto c = toVec4(fill);
                 for (auto i = 1; i + 1 < path.size(); ++i) {
-                    vertices.emplace_back(path[0],glm::vec2{0,0},c);
-                    vertices.emplace_back(path[i],glm::vec2{0,0},c);
-                    vertices.emplace_back(path[i+1],glm::vec2{0,0},c);
+                    vertices.emplace_back(path[0],glm::vec2{0,0},fill);
+                    vertices.emplace_back(path[i],glm::vec2{0,0},fill);
+                    vertices.emplace_back(path[i+1],glm::vec2{0,0},fill);
                 }
                 flush();
             },
@@ -289,9 +293,8 @@ namespace cube {
                     static_cast<Polyline2D::JointStyle>(stroke.joint),
                     static_cast<Polyline2D::EndCapStyle>(stroke.cap)
                 );
-                const auto c = toVec4(stroke.color);
                 for (const auto& i : mesh) {
-                    vertices.emplace_back(i,glm::vec2{0,0},c);
+                    vertices.emplace_back(i,glm::vec2{0,0},stroke.color);
                 }
                 flush();
             },
@@ -309,9 +312,9 @@ namespace cube {
                 const auto size = max - min;
 
                 for (auto i = 1; i + 1 < path.size(); ++i) {
-                    vertices.emplace_back(path[0],mix(image.uv_min,image.uv_max,(path[0] - min) / size),glm::vec4{1.f});
-                    vertices.emplace_back(path[i],mix(image.uv_min,image.uv_max,(path[i] - min) / size),glm::vec4{1.f});
-                    vertices.emplace_back(path[i+1],mix(image.uv_min,image.uv_max,(path[i+1] - min) / size),glm::vec4{1.f});
+                    vertices.emplace_back(path[0],mix(image.uv_min,image.uv_max,path[0] - min),0xFFFFFFFF);
+                    vertices.emplace_back(path[i],mix(image.uv_min,image.uv_max,path[i] - min),0xFFFFFFFF);
+                    vertices.emplace_back(path[i+1],mix(image.uv_min,image.uv_max,path[i+1] - min),0xFFFFFFFF);
                 }
                 image.image.bind(0);
                 flush();

@@ -8,14 +8,13 @@
 namespace cube {
 
     struct Vertex2D {
-        glm::vec2 pos;
-        glm::vec2 tex;
-        glm::vec4 col;
+        glm::i16vec2 pos;
+        glm::i16vec2 tex;
+        glm::uint col;
     };
 
     struct Vertex3D {
         glm::vec3 pos;
-        glm::vec3 norm;
         glm::vec2 tex;
     };
 }

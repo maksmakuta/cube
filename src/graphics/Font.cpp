@@ -81,9 +81,9 @@ namespace cube {
         }
 
         m_texture.genMipmaps();
-        m_texture.setWrap(TextureWrap::ClampEdge);
-        m_texture.setMinFilter(TextureFilter::Nearest);
-        m_texture.setMagFilter(TextureFilter::Nearest);
+        m_texture.setWrap(TextureWrap::ClampBorder);
+        m_texture.setMinFilter(TextureFilter::Linear);
+        m_texture.setMagFilter(TextureFilter::Linear);
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 

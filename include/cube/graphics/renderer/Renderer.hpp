@@ -55,6 +55,7 @@ namespace cube {
         void onResize(int w,int h);
 
         void flush();
+        void use();
 
         void fill(const Color&);
         void stroke(const Color&, float w, LineCap cap = LineCap::Butt, LineJoint joint = LineJoint::Miter);

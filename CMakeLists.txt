@@ -16,6 +16,7 @@ add_subdirectory(libs/Polyline2D)
 add_executable(cube
         include/cube/core/Constants.hpp
         include/cube/core/ICallbacks.hpp
+        include/cube/core/IController.hpp
         include/cube/core/IGenerator.hpp
         include/cube/entities/Player.hpp
         include/cube/generators/GeneratorFlat.hpp
@@ -25,14 +26,16 @@ add_executable(cube
         include/cube/graphics/renderer/VoxelRenderer.hpp
         include/cube/graphics/Camera.hpp
         include/cube/graphics/Font.hpp
-        include/cube/graphics/Mesh.hpp
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
         include/cube/models/Block.hpp
+        include/cube/utils/FNoise.hpp
+        include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
         include/cube/world/Chunk.hpp
         include/cube/world/World.hpp
         include/cube/Cube.hpp
+        include/cube/Window.hpp
 
         src/entities/Player.cpp
         src/generators/GeneratorFlat.cpp
@@ -41,22 +44,20 @@ add_executable(cube
         src/graphics/renderer/VoxelRenderer.cpp
         src/graphics/Camera.cpp
         src/graphics/Font.cpp
-        src/graphics/Mesh.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
         src/models/Block.cpp
         src/world/Chunk.cpp
         src/world/World.cpp
+        src/utils/FNoise.cpp
+        src/utils/ThreadPool.cpp
         src/utils/Utils.cpp
         src/Cube.cpp
         src/main.cpp
-        include/cube/utils/FNoise.hpp
-        src/utils/FNoise.cpp
-        include/cube/utils/ThreadPool.hpp
-        src/utils/ThreadPool.cpp
-        include/cube/Window.hpp
         src/Window.cpp
-        include/cube/core/IController.hpp
+        include/cube/core/IRenderable.hpp
+        src/graphics/renderer/Vertex.cpp
+        # here new files
 )
 
 target_include_directories(cube PUBLIC include)
