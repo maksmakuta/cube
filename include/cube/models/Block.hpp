@@ -18,6 +18,7 @@ namespace cube {
     };
 
     glm::vec4 getTile(BlockID, int face);
+    bool isFullBlock(BlockID);
 
 }
 

@@ -36,6 +36,7 @@ namespace cube {
     AABB getChunkAABB(const glm::ivec2& chunkPos);
     Frustum extractFrustum(const glm::mat4& vp);
     bool isAABBVisible(const AABB& box, const Frustum& f);
+    glm::vec2 toChunk(const glm::vec3&);
 
 }
 

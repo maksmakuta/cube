@@ -5,6 +5,7 @@
 #include "cube/core/Constants.hpp"
 
 namespace cube {
+
     glm::vec4 toUV(const glm::vec2& pos) {
         const auto a = pos * TILE_SIZE;
         const auto b = (pos + 1.f)  * TILE_SIZE;
@@ -45,4 +46,9 @@ namespace cube {
         }
     }
 
+    bool isFullBlock(const BlockID id) {
+        if (id == BlockID::Bush || id == BlockID::Flower)
+            return false;
+        return true;
+    }
 }

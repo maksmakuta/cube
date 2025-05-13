@@ -54,6 +54,8 @@ add_executable(cube
         src/utils/FNoise.cpp
         include/cube/utils/ThreadPool.hpp
         src/utils/ThreadPool.cpp
+        include/cube/Window.hpp
+        src/Window.cpp
 )
 
 target_include_directories(cube PUBLIC include)

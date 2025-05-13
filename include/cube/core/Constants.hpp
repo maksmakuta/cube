@@ -15,6 +15,8 @@ namespace cube {
     constval CHUNK_DEPTH = 16;
     constval CHUNK_HEIGHT = 128;
     constval CHUNK_SIZE = CHUNK_DEPTH * CHUNK_HEIGHT * CHUNK_WIDTH;
+    constval HEIGHT_WATER = CHUNK_HEIGHT * 0.67f;
+    constval HEIGHT_GROUND = CHUNK_HEIGHT * 0.7f;
 
     constval ATLAS_SIZE = glm::vec2{160,256};
     constval TILE_SIZE = 16.f;

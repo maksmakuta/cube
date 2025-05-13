@@ -15,7 +15,7 @@ namespace cube {
             for (int x = 0; x < CHUNK_WIDTH; ++x) {
                 const auto fvec = glm::vec2{offset.x + x,offset.z + z};
                 const auto n = ( noise.at(fvec.x,fvec.y) + 1.f) / 2.f;
-                const auto height = CHUNK_HEIGHT * 0.67f + static_cast<int>(n * 32);
+                const auto height = static_cast<int>(CHUNK_HEIGHT * 0.67f + n * 32);
                 for (int y = 0; y < height; ++y) {
                     auto block = BlockID::Stone;
                     if (y == 0) {

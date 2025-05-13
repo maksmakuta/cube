@@ -6,7 +6,7 @@
 ### Dependencies 
 
  - C++20
- - OpenGL 4.6 Core
+ - OpenGL 3.3 Core
  - GLFW
  - GLM
  - Freetype
@@ -15,7 +15,6 @@
  - GLAD 
  - LodePNG 
  - Polyline2D 
- - [BS_thread_pool](https://github.com/bshoshany/thread-pool)
 
  CMake used as primary configurator tool
 
