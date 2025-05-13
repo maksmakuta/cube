@@ -1,24 +1,38 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <memory>
 
-#include "Cube.hpp"
+#include "core/IController.hpp"
+#include "cube/Cube.hpp"
 
 namespace cube {
 
-    class Window {
-    public:
-        Window();
-        ~Window();
+    struct WindowParams {
+        uint8_t gl_major{3};
+        uint8_t gl_minor{3};
+        uint8_t gl_samples{4};
+        uint8_t gl_depth{32};
 
-        void setCursorMode(bool isVisible) const;
-        void draw();
+        bool is_core{true};
+    };
+
+    class Window final : public IController{
+    public:
+        explicit Window(WindowParams = {});
+        ~Window() override;
+
+        void attach(const std::shared_ptr<Cube>&);
+        void run();
+
+        [[nodiscard]] bool isClose() const;
+
+        void setCursorVisibility(bool) override;
+        void close();
 
     private:
-        GLFWwindow* m_inner = nullptr;
-        Cube game;
+        std::shared_ptr<Cube> m_game;
+        void* m_window = nullptr;
     };
 
 }

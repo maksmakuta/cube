@@ -56,6 +56,7 @@ add_executable(cube
         src/utils/ThreadPool.cpp
         include/cube/Window.hpp
         src/Window.cpp
+        include/cube/core/IController.hpp
 )
 
 target_include_directories(cube PUBLIC include)
