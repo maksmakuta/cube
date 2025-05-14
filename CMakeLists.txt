@@ -23,7 +23,6 @@ add_executable(cube
         include/cube/generators/GeneratorHeight.hpp
         include/cube/graphics/renderer/Renderer.hpp
         include/cube/graphics/renderer/Vertex.hpp
-        include/cube/graphics/renderer/VoxelRenderer.hpp
         include/cube/graphics/Camera.hpp
         include/cube/graphics/Font.hpp
         include/cube/graphics/Shader.hpp
@@ -32,8 +31,6 @@ add_executable(cube
         include/cube/utils/FNoise.hpp
         include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
-        include/cube/world/Chunk.hpp
-        include/cube/world/World.hpp
         include/cube/Cube.hpp
         include/cube/Window.hpp
 
@@ -41,22 +38,23 @@ add_executable(cube
         src/generators/GeneratorFlat.cpp
         src/generators/GeneratorHeight.cpp
         src/graphics/renderer/Renderer.cpp
-        src/graphics/renderer/VoxelRenderer.cpp
+        src/graphics/renderer/Vertex.cpp
         src/graphics/Camera.cpp
         src/graphics/Font.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
         src/models/Block.cpp
-        src/world/Chunk.cpp
-        src/world/World.cpp
         src/utils/FNoise.cpp
         src/utils/ThreadPool.cpp
         src/utils/Utils.cpp
         src/Cube.cpp
         src/main.cpp
         src/Window.cpp
-        include/cube/core/IRenderable.hpp
-        src/graphics/renderer/Vertex.cpp
+        include/cube/core/IScreen.hpp
+        include/cube/screens/Main.hpp
+        include/cube/screens/Game.hpp
+        src/screens/Main.cpp
+        src/screens/Game.cpp
         # here new files
 )
 

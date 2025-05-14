@@ -4,7 +4,7 @@ namespace cube {
 
     GeneratorFlat::GeneratorFlat() = default;
     GeneratorFlat::~GeneratorFlat() = default;
-
+/*
     std::shared_ptr<Chunk> GeneratorFlat::generateAt(const glm::vec2 &pos) {
         const auto layout = std::vector{
             BlockID::HardStone,
@@ -23,6 +23,6 @@ namespace cube {
             }
         }
         return temp;
-    }
+    }*/
 
 }

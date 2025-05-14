@@ -5,7 +5,7 @@ namespace cube {
     GeneratorHeight::GeneratorHeight(const int seed) : IGenerator(seed), noise(seed) {}
 
     GeneratorHeight::~GeneratorHeight() = default;
-
+/*
     std::shared_ptr<Chunk> GeneratorHeight::generateAt(const glm::vec2 &pos) {
         const auto chunk = std::make_shared<Chunk>();
 
@@ -31,6 +31,6 @@ namespace cube {
         }
 
         return chunk;
-    }
+    }*/
 
 }

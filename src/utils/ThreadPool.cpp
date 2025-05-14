@@ -16,19 +16,6 @@ namespace cube {
         }
     }
 
-    template<class F>
-    auto ThreadPool::submit(F&& f) -> std::future<std::invoke_result_t<F>> {
-        using return_type = std::invoke_result_t<F>;
-        auto task = std::make_shared<std::packaged_task<return_type()>>(std::forward<F>(f));
-        std::future<return_type> res = task->get_future();
-        {
-            std::unique_lock lock(queueMutex);
-            tasks.emplace([task]() { (*task)(); });
-        }
-        condition.notify_one();
-        return res;
-    }
-
     void ThreadPool::worker() {
         while (true) {
             std::function<void()> task;
