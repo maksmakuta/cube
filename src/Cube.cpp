@@ -45,5 +45,9 @@ namespace cube {
     void Cube::onScroll(const float dx, const float dy){
         m_screen->onScroll(dx,dy);
     }
+
+    void Cube::onText(uint code) {
+        m_screen->onText(code);
+    }
 }
 

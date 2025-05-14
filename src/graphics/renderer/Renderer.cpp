@@ -86,25 +86,29 @@ namespace cube {
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<int>(vertices.size() * sizeof(Vertex2D)), vertices.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<int>(vertices.size() * sizeof(Vertex2D)), vertices.data(), GL_STREAM_DRAW);
         glDrawArrays(GL_TRIANGLES, 0,static_cast<int>(vertices.size()));
 
         vertices.clear();
     }
 
     void Renderer::fill(const Color& c) {
+        flush();
         m_paint = c;
     }
 
     void Renderer::stroke(const Color& c, const float w, const LineCap cap, const LineJoint joint) {
+        flush();
         m_paint = StrokePaint(c,w, cap, joint);
     }
 
     void Renderer::image(const Texture& t, const glm::vec2& uv_a, const glm::vec2& uv_b) {
+        flush();
         m_paint = ImagePaint(t,uv_a, uv_b);
     }
 
     void Renderer::text(const Font &t, const Color& c) {
+        flush();
         m_paint = TextPaint(t,c);
     }
 
@@ -284,7 +288,6 @@ namespace cube {
                     vertices.emplace_back(path[i],glm::vec2{0,0},fill);
                     vertices.emplace_back(path[i+1],glm::vec2{0,0},fill);
                 }
-                flush();
             },
             [this, &path](const StrokePaint& stroke) {
                 const auto mesh = Polyline2D::create(
@@ -296,20 +299,14 @@ namespace cube {
                 for (const auto& i : mesh) {
                     vertices.emplace_back(i,glm::vec2{0,0},stroke.color);
                 }
-                flush();
             },
             [this, &path](const ImagePaint& image) {
                 auto min = glm::vec2(std::numeric_limits<float>::max());
-                auto max = glm::vec2(std::numeric_limits<float>::min());
 
                 for (const auto& p : path) {
                     min.x = std::min(min.x, p.x);
                     min.y = std::min(min.y, p.y);
-                    max.x = std::max(max.x, p.x);
-                    max.y = std::max(max.y, p.y);
                 }
-
-                const auto size = max - min;
 
                 for (auto i = 1; i + 1 < path.size(); ++i) {
                     vertices.emplace_back(path[0],mix(image.uv_min,image.uv_max,path[0] - min),0xFFFFFFFF);
@@ -317,11 +314,9 @@ namespace cube {
                     vertices.emplace_back(path[i+1],mix(image.uv_min,image.uv_max,path[i+1] - min),0xFFFFFFFF);
                 }
                 image.image.bind(0);
-                flush();
             },
             [this](const TextPaint& text) {
                 text.font.getTexture().bind(0);
-                flush();
             }
         }, m_paint);
     }

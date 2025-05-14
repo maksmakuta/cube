@@ -111,7 +111,7 @@ namespace cube {
         int result = 0;
         for (const auto& c : str) {
             if (const auto& g = at(c)) {
-                result = std::max<unsigned char>(g->size.y, result);
+                result = std::max<unsigned char>(g->size.y + g->offset.y, result);
             }
         }
         return result;

@@ -15,5 +15,6 @@ namespace cube {
     void Game::onKey(int k, int a, int m){}
     void Game::onCursor(float x, float y){}
     void Game::onScroll(float dx, float dy){}
+    void Game::onText(uint) {}
     
 }

@@ -20,6 +20,8 @@ namespace cube {
         void onKey(int k, int a, int m) override;
         void onCursor(float x, float y) override;
         void onScroll(float dx, float dy) override;
+        void onText(uint) override;
+
     };
 }
 

@@ -8,8 +8,8 @@
 
 namespace cube {
     
-    ICallbacks* getCallbacks(GLFWwindow* w) {
-        return static_cast<ICallbacks *>(glfwGetWindowUserPointer(w));
+    Cube* getCallbacks(GLFWwindow* w) {
+        return static_cast<Cube*>(glfwGetWindowUserPointer(w));
     }
 
     void onResize(GLFWwindow* window, const int w, const int h) {
@@ -39,6 +39,12 @@ namespace cube {
     void onCursor(GLFWwindow * window, const double xpos, const double ypos) {
         if (const auto c = getCallbacks(window); c != nullptr) {
             c->onCursor(static_cast<float>(xpos),static_cast<float>(ypos));
+        }
+    }
+
+    void onText(GLFWwindow * window, const unsigned int codepoint) {
+        if (const auto c = getCallbacks(window); c != nullptr) {
+            c->onText(codepoint);
         }
     }
 
@@ -81,7 +87,6 @@ namespace cube {
 
     }
 
-
     void Window::run() {
         if (!m_game) {
             std::cout << "No game pointer attached" << std::endl;
@@ -108,7 +113,7 @@ namespace cube {
             isVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED
         );
     }
-    
+
     void Window::attach(const std::shared_ptr<Cube>& g) {
         m_game = g;
         if (m_game) {
@@ -120,6 +125,7 @@ namespace cube {
             glfwSetWindowSizeCallback(cast(m_window), onResize);
             glfwSetScrollCallback(cast(m_window), onScroll);
             glfwSetCursorPosCallback(cast(m_window), onCursor);
+            glfwSetCharCallback(cast(m_window), onText);
         }
     }
 

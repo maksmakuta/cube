@@ -2,6 +2,7 @@
 #define MAIN_HPP
 
 #include "cube/core/IScreen.hpp"
+#include "cube/graphics/renderer/Renderer.hpp"
 
 namespace cube {
 
@@ -20,6 +21,11 @@ namespace cube {
         void onKey(int k, int a, int m) override;
         void onCursor(float x, float y) override;
         void onScroll(float dx, float dy) override;
+        void onText(uint) override;
+    private:
+        Renderer m_renderer;
+        Font m_font{32};
+        glm::vec2 m{0};
     };
 }
 

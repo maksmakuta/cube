@@ -3,25 +3,24 @@
 
 #include <memory>
 
-#include "cube/core/ICallbacks.hpp"
 #include "cube/core/IScreen.hpp"
 
 namespace cube {
 
-    class Cube final : public ICallbacks{
+    class Cube final{
     public:
         Cube();
 
         void onCreate();
         void onClear();
         void onDraw();
-        void onTick();
 
-        void onUpdate(float dt) override;
-        void onResize(int w, int h) override;
-        void onKey(int k, int a, int m) override;
-        void onCursor(float x, float y) override;
-        void onScroll(float dx, float dy) override;
+        void onUpdate(float dt);
+        void onResize(int w, int h);
+        void onKey(int k, int a, int m);
+        void onCursor(float x, float y);
+        void onScroll(float dx, float dy);
+        void onText(uint code);
 
     private:
         std::unique_ptr<IScreen> m_screen;

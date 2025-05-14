@@ -15,9 +15,9 @@ add_subdirectory(libs/Polyline2D)
 
 add_executable(cube
         include/cube/core/Constants.hpp
-        include/cube/core/ICallbacks.hpp
         include/cube/core/IController.hpp
         include/cube/core/IGenerator.hpp
+        include/cube/core/IScreen.hpp
         include/cube/entities/Player.hpp
         include/cube/generators/GeneratorFlat.hpp
         include/cube/generators/GeneratorHeight.hpp
@@ -28,6 +28,8 @@ add_executable(cube
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
         include/cube/models/Block.hpp
+        include/cube/screens/Game.hpp
+        include/cube/screens/Main.hpp
         include/cube/utils/FNoise.hpp
         include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
@@ -44,17 +46,14 @@ add_executable(cube
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
         src/models/Block.cpp
+        src/screens/Game.cpp
+        src/screens/Main.cpp
         src/utils/FNoise.cpp
         src/utils/ThreadPool.cpp
         src/utils/Utils.cpp
         src/Cube.cpp
         src/main.cpp
         src/Window.cpp
-        include/cube/core/IScreen.hpp
-        include/cube/screens/Main.hpp
-        include/cube/screens/Game.hpp
-        src/screens/Main.cpp
-        src/screens/Game.cpp
         # here new files
 )
 
