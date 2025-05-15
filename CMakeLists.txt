@@ -15,14 +15,15 @@ add_subdirectory(libs/Polyline2D)
 
 add_executable(cube
         include/cube/core/Constants.hpp
+        include/cube/core/Face.hpp
         include/cube/core/IController.hpp
         include/cube/core/IGenerator.hpp
         include/cube/core/IScreen.hpp
         include/cube/entities/Player.hpp
         include/cube/generators/GeneratorFlat.hpp
         include/cube/generators/GeneratorHeight.hpp
-        include/cube/graphics/renderer/Renderer.hpp
-        include/cube/graphics/renderer/Vertex.hpp
+        include/cube/graphics/Renderer.hpp
+        include/cube/graphics/Vertex.hpp
         include/cube/graphics/Camera.hpp
         include/cube/graphics/Font.hpp
         include/cube/graphics/Shader.hpp
@@ -33,14 +34,16 @@ add_executable(cube
         include/cube/utils/FNoise.hpp
         include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
+        include/cube/world/Chunk.hpp
+        include/cube/world/World.hpp
         include/cube/Cube.hpp
         include/cube/Window.hpp
 
         src/entities/Player.cpp
         src/generators/GeneratorFlat.cpp
         src/generators/GeneratorHeight.cpp
-        src/graphics/renderer/Renderer.cpp
-        src/graphics/renderer/Vertex.cpp
+        src/graphics/Renderer.cpp
+        src/graphics/Vertex.cpp
         src/graphics/Camera.cpp
         src/graphics/Font.cpp
         src/graphics/Shader.cpp
@@ -54,6 +57,8 @@ add_executable(cube
         src/Cube.cpp
         src/main.cpp
         src/Window.cpp
+        src/world/Chunk.cpp
+        src/world/World.cpp
         # here new files
 )
 

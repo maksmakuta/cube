@@ -3,11 +3,10 @@
 namespace cube {
 
     GeneratorHeight::GeneratorHeight(const int seed) : IGenerator(seed), noise(seed) {}
-
     GeneratorHeight::~GeneratorHeight() = default;
-/*
-    std::shared_ptr<Chunk> GeneratorHeight::generateAt(const glm::vec2 &pos) {
-        const auto chunk = std::make_shared<Chunk>();
+
+    Chunk GeneratorHeight::generateAt(const glm::vec2 &pos) {
+        auto chunk = Chunk(pos);
 
         const auto offset = glm::ivec3{pos.x * CHUNK_WIDTH, 0 , pos.y * CHUNK_DEPTH};
 
@@ -25,12 +24,12 @@ namespace cube {
                     }else if (y >= height - 5) {
                         block = BlockID::Dirt;
                     }
-                    chunk->at({x,y,z}) = block;
+                    chunk.at({x,y,z}) = block;
                 }
             }
         }
 
         return chunk;
-    }*/
+    }
 
 }

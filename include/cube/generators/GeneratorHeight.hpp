@@ -11,7 +11,7 @@ namespace cube {
         explicit GeneratorHeight(int seed);
         ~GeneratorHeight() override;
 
-    //    std::shared_ptr<Chunk> generateAt(const glm::vec2 &pos) override;
+        Chunk generateAt(const glm::vec2 &pos) override;
     private:
         FNoise noise;
     };

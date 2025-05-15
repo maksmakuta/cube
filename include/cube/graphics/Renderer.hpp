@@ -4,7 +4,7 @@
 #include <vector>
 #include <variant>
 
-#include "Vertex.hpp"
+#include "cube/graphics/Vertex.hpp"
 #include "cube/graphics/Font.hpp"
 #include "cube/graphics/Shader.hpp"
 #include "cube/graphics/Texture.hpp"

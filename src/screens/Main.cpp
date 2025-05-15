@@ -18,7 +18,7 @@ namespace cube {
     }
 
     void Main::onDraw() {
-        clear(0xFF111111);
+        clear(0xFF222222);
         m_renderer.use();
         m_renderer.text(m_font,0xFFFFFFFF);
         m_renderer.print(m,text);
@@ -27,7 +27,9 @@ namespace cube {
         m_renderer.rect(m.x,m.y,m_font.width(text),-m_font.height(text));
     }
 
-    void Main::onTick(){}
+    void Main::onTick() {
+
+    }
 
     void Main::onUpdate(float dt){}
 

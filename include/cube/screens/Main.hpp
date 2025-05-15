@@ -2,7 +2,7 @@
 #define MAIN_HPP
 
 #include "cube/core/IScreen.hpp"
-#include "cube/graphics/renderer/Renderer.hpp"
+#include "../graphics/Renderer.hpp"
 
 namespace cube {
 

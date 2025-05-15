@@ -22,21 +22,12 @@ namespace cube {
      */
     using Color = glm::uint;
 
-    struct AABB {
-        glm::vec3 min;
-        glm::vec3 max;
-    };
-
-    struct Frustum {
-        glm::vec4 planes[6]; // left, right, bottom, top, near, far
-    };
-
     std::string getAsset(const std::string& path);
+
     glm::vec4 toVec4(const Color&);
-    AABB getChunkAABB(const glm::ivec2& chunkPos);
-    Frustum extractFrustum(const glm::mat4& vp);
-    bool isAABBVisible(const AABB& box, const Frustum& f);
     glm::vec2 toChunk(const glm::vec3&);
+
+    glm::uint hash(const char*);
 
 }
 

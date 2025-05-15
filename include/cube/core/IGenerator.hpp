@@ -1,6 +1,8 @@
 #ifndef IGENERATOR_HPP
 #define IGENERATOR_HPP
 
+#include "cube/world/Chunk.hpp"
+
 namespace cube {
 
     class IGenerator {
@@ -8,10 +10,14 @@ namespace cube {
         explicit IGenerator(const int seed = 0) : m_seed(seed){}
         virtual ~IGenerator() = default;
 
-//        virtual std::shared_ptr<Chunk> generateAt(const glm::vec2& pos) = 0;
+        virtual Chunk generateAt(const glm::vec2& pos) = 0;
 
         [[nodiscard]] int getSeed() const {
             return m_seed;
+        }
+
+        void setSeed(const int seed){
+            m_seed = seed;
         }
 
     private:

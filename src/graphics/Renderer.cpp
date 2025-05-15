@@ -1,4 +1,4 @@
-#include "cube/graphics/renderer/Renderer.hpp"
+#include "../../include/cube/graphics/Renderer.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
