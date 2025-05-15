@@ -21,10 +21,10 @@ namespace cube {
         clear(0xFF222222);
         m_renderer.use();
         m_renderer.text(m_font,0xFFFFFFFF);
-        m_renderer.print(m,text);
+        m_renderer.print(view/2.f,text, Align::Center);
 
         m_renderer.fill(0xFFFF0000);
-        m_renderer.rect(m.x,m.y,m_font.width(text),-m_font.height(text));
+        m_renderer.rect(view.x/2 - m_font.width(text)/2,view.y/2,m_font.width(text),-m_font.height(text));
     }
 
     void Main::onTick() {
@@ -34,16 +34,19 @@ namespace cube {
     void Main::onUpdate(float dt){}
 
     void Main::onResize(const int w, const int h) {
+        view = {w,h};
         m_renderer.onResize(w,h);
     }
 
     void Main::onKey(int k, int a, int m){}
 
     void Main::onCursor(float x, float y) {
-        m = {x,y};
+        mouse = {x,y};
     }
 
     void Main::onScroll(float dx, float dy){}
-    void Main::onText(uint) {}
+    void Main::onText(uint) {
+
+    }
 
 }

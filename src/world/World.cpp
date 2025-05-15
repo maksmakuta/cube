@@ -1,6 +1,7 @@
 #include "cube/world/World.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 #include "cube/generators/GeneratorFlat.hpp"
 
@@ -20,7 +21,7 @@ namespace cube {
     }
 
     void World::insert(const Chunk& c) {
-        auto it = std::ranges::find_if(m_chunks,[&c](const Chunk& t) {
+        const auto it = std::ranges::find_if(m_chunks,[&c](const Chunk& t) {
             return t.getOffset() == c.getOffset();
         });
         if (it != m_chunks.end()) {
@@ -30,10 +31,11 @@ namespace cube {
         }
     }
 
-    Chunk& World::at(const glm::vec2& pos) {
-        return *std::ranges::find_if(m_chunks,[&pos](const Chunk& c) {
+    Chunk World::at(const glm::vec2 &pos) const {
+        const auto it = std::ranges::find_if(m_chunks,[&pos](const Chunk& c) {
             return c.getOffset() == pos;
         });
+        return it != m_chunks.end() ? *it : Chunk(pos);
     }
 
     void World::remove(const glm::vec2& pos) {
@@ -43,7 +45,7 @@ namespace cube {
     }
 
     void World::onTick(const glm::vec3& pos) {
-
+        std::cout << "World::onTick()" << std::endl;
     }
 
     int World::getSeed() const {

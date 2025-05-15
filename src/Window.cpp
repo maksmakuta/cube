@@ -106,14 +106,6 @@ namespace cube {
         m_game->onClear();
     }
 
-    void Window::setCursorVisibility(const bool isVisible) {
-        glfwSetInputMode(
-            static_cast<GLFWwindow *>(m_window),
-            GLFW_CURSOR,
-            isVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED
-        );
-    }
-
     void Window::attach(const std::shared_ptr<Cube>& g) {
         m_game = g;
         if (m_game) {
@@ -135,6 +127,31 @@ namespace cube {
 
     void Window::close() {
         glfwSetWindowShouldClose(static_cast<GLFWwindow *>(m_window),true);
+    }
+
+    void Window::showCursor(const bool b) {
+        glfwSetInputMode(
+            static_cast<GLFWwindow *>(m_window),
+            GLFW_CURSOR,
+            b ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED
+        );
+    }
+
+    GLFWcursor* toCursor(const CursorIcon cursor_icon) {
+        switch (cursor_icon) {
+            case Default:
+                return glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+            case Hand:
+                return glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
+            case Input:
+                return glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+            default:
+                return glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+        }
+    }
+
+    void Window::setCursor(CursorIcon i) {
+        glfwSetCursor(static_cast<GLFWwindow *>(m_window),toCursor(i));
     }
 
 }

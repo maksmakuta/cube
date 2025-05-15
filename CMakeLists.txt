@@ -19,6 +19,8 @@ add_executable(cube
         include/cube/core/IController.hpp
         include/cube/core/IGenerator.hpp
         include/cube/core/IScreen.hpp
+        include/cube/core/IWidget.hpp
+        include/cube/core/IWindowController.hpp
         include/cube/entities/Player.hpp
         include/cube/generators/GeneratorFlat.hpp
         include/cube/generators/GeneratorHeight.hpp
@@ -54,12 +56,12 @@ add_executable(cube
         src/utils/FNoise.cpp
         src/utils/ThreadPool.cpp
         src/utils/Utils.cpp
-        src/Cube.cpp
-        src/main.cpp
-        src/Window.cpp
         src/world/Chunk.cpp
         src/world/World.cpp
-        # here new files
+        src/Cube.cpp
+        src/Window.cpp
+
+        src/main.cpp
 )
 
 target_include_directories(cube PUBLIC include)

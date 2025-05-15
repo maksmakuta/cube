@@ -3,11 +3,12 @@
 
 #include <memory>
 
+#include "core/IController.hpp"
 #include "cube/core/IScreen.hpp"
 
 namespace cube {
 
-    class Cube final{
+    class Cube final : public IController{
     public:
         Cube();
 
@@ -22,8 +23,16 @@ namespace cube {
         void onScroll(float dx, float dy);
         void onText(uint code);
 
+        void showCursor(bool) override;
+        void setCursor(CursorIcon) override;
+        void navigate(IScreen *) override;
+        void close() override;
+
+        void attachController(IWindowController*);
+
     private:
         std::unique_ptr<IScreen> m_screen;
+        IWindowController* m_win_controller = nullptr;
         double lastTick = 0;
     };
 

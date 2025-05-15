@@ -1,13 +1,17 @@
 #ifndef ICONTROLLER_HPP
 #define ICONTROLLER_HPP
 
+#include "IWindowController.hpp"
+
 namespace cube {
 
-    class IController {
-    public:
-        virtual ~IController() = default;
+    class IScreen;
 
-        virtual void setCursorVisibility(bool) = 0;
+    class IController : public IWindowController{
+    public:
+        ~IController() override = default;
+
+        virtual void navigate(IScreen*) = 0;
     };
 
 }

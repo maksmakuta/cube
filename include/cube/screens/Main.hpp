@@ -25,7 +25,7 @@ namespace cube {
     private:
         Renderer m_renderer;
         Font m_font{32};
-        glm::vec2 m{0};
+        glm::vec2 mouse{0}, view{0};
     };
 }
 

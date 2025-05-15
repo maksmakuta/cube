@@ -2,6 +2,8 @@
 #define GAME_HPP
 
 #include "cube/core/IScreen.hpp"
+#include "cube/entities/Player.hpp"
+#include "cube/world/World.hpp"
 
 namespace cube {
 
@@ -22,6 +24,10 @@ namespace cube {
         void onScroll(float dx, float dy) override;
         void onText(uint) override;
 
+    private:
+        World m_world;
+        Player m_player;
+        uint8_t m_player_dir{0};
     };
 }
 

@@ -1,5 +1,6 @@
 #ifndef ISCREEN_HPP
 #define ISCREEN_HPP
+#include "IController.hpp"
 
 namespace cube {
 
@@ -19,6 +20,16 @@ namespace cube {
         virtual void onCursor(float x, float y) = 0;
         virtual void onScroll(float dx, float dy) = 0;
         virtual void onText(uint) = 0;
+
+        void attach(IController* c) {
+            m_controller = c;
+        }
+
+        [[nodiscard]] IController* controller() const {
+            return m_controller;
+        }
+    protected:
+        IController* m_controller = nullptr;
 
     };
 

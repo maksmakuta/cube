@@ -20,7 +20,7 @@ namespace cube {
         void setSeed(int seed);
 
         void insert(const Chunk& c);
-        Chunk& at(const glm::vec2& pos);
+        Chunk at(const glm::vec2& pos) const;
         void remove(const glm::vec2& pos);
 
         void onTick(const glm::vec3& pos);

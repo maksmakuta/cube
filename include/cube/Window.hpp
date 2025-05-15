@@ -2,8 +2,7 @@
 #define WINDOW_HPP
 
 #include <memory>
-
-#include "core/IController.hpp"
+#include "core/IWindowController.hpp"
 #include "cube/Cube.hpp"
 
 namespace cube {
@@ -17,7 +16,7 @@ namespace cube {
         bool is_core{true};
     };
 
-    class Window final : public IController{
+    class Window final : public IWindowController{
     public:
         explicit Window(WindowParams = {});
         ~Window() override;
@@ -27,8 +26,9 @@ namespace cube {
 
         [[nodiscard]] bool isClose() const;
 
-        void setCursorVisibility(bool) override;
-        void close();
+        void close() override;
+        void showCursor(bool) override;
+        void setCursor(CursorIcon) override;
 
     private:
         std::shared_ptr<Cube> m_game;
