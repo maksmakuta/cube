@@ -10,7 +10,7 @@ namespace cube {
 
     class Chunk {
     public:
-        explicit Chunk(const glm::vec2& offset = {0,0});
+        explicit Chunk(const glm::ivec2& offset = {0,0});
         ~Chunk();
 
         BlockID& at(glm::uint index);
@@ -18,11 +18,11 @@ namespace cube {
 
         [[nodiscard]] BlockID get(const glm::uvec3& pos) const;
         [[nodiscard]] bool is(const glm::uvec3& pos, BlockID i) const;
-        [[nodiscard]] glm::vec2 getOffset() const;
+        [[nodiscard]] glm::ivec2 getOffset() const;
 
     private:
         std::vector<BlockID> m_blocks{CHUNK_SIZE, BlockID::Air};
-        glm::vec2 m_offset{0};
+        glm::ivec2 m_offset{0};
     };
 
 }

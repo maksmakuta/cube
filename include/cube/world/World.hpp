@@ -1,7 +1,11 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
+#include <functional>
 #include <memory>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 #include "Chunk.hpp"
 #include "cube/core/IGenerator.hpp"
@@ -20,14 +24,15 @@ namespace cube {
         void setSeed(int seed);
 
         void insert(const Chunk& c);
-        Chunk at(const glm::vec2& pos) const;
-        void remove(const glm::vec2& pos);
+        Chunk at(const glm::ivec2& pos) const;
+        void remove(const glm::ivec2& pos);
 
         void onTick(const glm::vec3& pos);
+        void forChunk(const std::function<void(Chunk&)>& fn);
 
     private:
         std::shared_ptr<IGenerator> m_generator;
-        std::vector<Chunk> m_chunks;
+        std::unordered_map<glm::ivec2,Chunk> m_chunks;
         int m_seed;
     };
 

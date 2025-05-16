@@ -79,8 +79,8 @@ namespace cube {
         m_screen->onClear();
         m_screen.reset(ptr);
         if (m_screen) {
-            m_screen->onCreate();
             m_screen->attach(this);
+            m_screen->onCreate();
         }
     }
 

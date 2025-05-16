@@ -25,7 +25,7 @@ namespace cube {
     std::string getAsset(const std::string& path);
 
     glm::vec4 toVec4(const Color&);
-    glm::vec2 toChunk(const glm::vec3&);
+    glm::ivec2 toChunk(const glm::vec3&);
 
     glm::uint hash(const char*);
 

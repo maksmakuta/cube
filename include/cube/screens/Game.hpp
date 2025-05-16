@@ -3,6 +3,9 @@
 
 #include "cube/core/IScreen.hpp"
 #include "cube/entities/Player.hpp"
+#include "cube/graphics/ChunkRenderer.hpp"
+#include "cube/graphics/Renderer.hpp"
+#include "cube/utils/ThreadPool.hpp"
 #include "cube/world/World.hpp"
 
 namespace cube {
@@ -25,9 +28,19 @@ namespace cube {
         void onText(uint) override;
 
     private:
-        World m_world;
+        ThreadPool m_pool;
+        ChunkRenderer m_chunker;
+        Renderer m_renderer;
+        Font m_font{24};
         Player m_player;
+        World m_world;
+
+        float m_last{0.f};
+        float m_fps{0.f};
+        uint m_frames{0};
+
         uint8_t m_player_dir{0};
+        bool m_debug{false};
     };
 }
 

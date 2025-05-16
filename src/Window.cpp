@@ -109,6 +109,7 @@ namespace cube {
     void Window::attach(const std::shared_ptr<Cube>& g) {
         m_game = g;
         if (m_game) {
+            m_game->attachController(this);
             m_game->onCreate();
             m_game->onResize(800, 600);
             glfwSetWindowUserPointer(cast(m_window), m_game.get());

@@ -2,11 +2,11 @@
 
 namespace cube {
 
-    Chunk::Chunk(const glm::vec2& offset) : m_offset(offset){}
+    Chunk::Chunk(const glm::ivec2& offset) : m_offset(offset){}
     Chunk::~Chunk() = default;
 
     glm::uint toIndex(const glm::uvec3& p) {
-        return p.x + CHUNK_WIDTH * (p.y + p.z * CHUNK_HEIGHT);
+        return 0;
     }
 
     BlockID& Chunk::at(const glm::uint index) {
@@ -26,7 +26,7 @@ namespace cube {
         return get(pos) == i;
     }
 
-    glm::vec2 Chunk::getOffset() const {
+    glm::ivec2 Chunk::getOffset() const {
         return m_offset;
     }
 

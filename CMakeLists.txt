@@ -24,6 +24,7 @@ add_executable(cube
         include/cube/entities/Player.hpp
         include/cube/generators/GeneratorFlat.hpp
         include/cube/generators/GeneratorHeight.hpp
+        include/cube/graphics/ChunkRenderer.hpp
         include/cube/graphics/Renderer.hpp
         include/cube/graphics/Vertex.hpp
         include/cube/graphics/Camera.hpp
@@ -44,9 +45,9 @@ add_executable(cube
         src/entities/Player.cpp
         src/generators/GeneratorFlat.cpp
         src/generators/GeneratorHeight.cpp
-        src/graphics/Renderer.cpp
-        src/graphics/Vertex.cpp
         src/graphics/Camera.cpp
+        src/graphics/ChunkRenderer.cpp
+        src/graphics/Renderer.cpp
         src/graphics/Font.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp

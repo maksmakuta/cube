@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <iostream>
+#include <ranges>
 
 #include "cube/generators/GeneratorFlat.hpp"
+#include "cube/utils/Utils.hpp"
 
 namespace cube {
 
@@ -21,31 +23,42 @@ namespace cube {
     }
 
     void World::insert(const Chunk& c) {
-        const auto it = std::ranges::find_if(m_chunks,[&c](const Chunk& t) {
-            return t.getOffset() == c.getOffset();
-        });
-        if (it != m_chunks.end()) {
-            *it = c;
-        }else {
-            m_chunks.push_back(c);
-        }
+        m_chunks.insert_or_assign(c.getOffset(),c);
     }
 
-    Chunk World::at(const glm::vec2 &pos) const {
-        const auto it = std::ranges::find_if(m_chunks,[&pos](const Chunk& c) {
-            return c.getOffset() == pos;
-        });
-        return it != m_chunks.end() ? *it : Chunk(pos);
+    Chunk World::at(const glm::ivec2 &pos) const {
+        if (auto it = m_chunks.find(pos); it != m_chunks.end()) return it->second;
+        throw std::out_of_range("Chunk not found");
     }
 
-    void World::remove(const glm::vec2& pos) {
-        std::erase_if(m_chunks,[&pos](const Chunk& c) {
-            return c.getOffset() == pos;
-        });
+    void World::remove(const glm::ivec2& pos) {
+        m_chunks.erase(pos);
     }
 
     void World::onTick(const glm::vec3& pos) {
-        std::cout << "World::onTick()" << std::endl;
+        const auto center = toChunk(pos);
+        std::unordered_map<glm::ivec2, Chunk> newChunks;
+
+        for (int dx = -RENDER_DIST; dx <= RENDER_DIST; ++dx) {
+            for (int dz = -RENDER_DIST; dz <= RENDER_DIST; ++dz) {
+                glm::ivec2 coord = center + glm::ivec2(dx, dz);
+                if (const auto it = m_chunks.find(coord); it != m_chunks.end()) {
+                    newChunks.emplace(coord, std::move(it->second));
+                } else {
+                    Chunk chunk(coord);
+                    if (m_generator)
+                        m_generator->generateAt(coord);
+                    newChunks.emplace(coord, std::move(chunk));
+                }
+            }
+        }
+        m_chunks = std::move(newChunks);
+    }
+
+    void World::forChunk(const std::function<void(Chunk &)> &fn) {
+        for (auto &item: m_chunks | std::views::values) {
+            fn(item);
+        }
     }
 
     int World::getSeed() const {

@@ -47,16 +47,22 @@ namespace cube {
     }
 
     void Camera::rotate(const float dx, const float dy) {
-
         glm::vec2 offset;
         offset.x = dx - m_last.x;
         offset.y = m_last.y - dy;
 
         m_rotation += offset * CAMERA_SENSITIVITY;
-
         m_last = {dx,dy};
 
         m_rotation.y = glm::clamp(m_rotation.y, -89.f,89.f);
+
+        if (m_rotation.x < -180) {
+            m_rotation.x = 180;
+        }
+        if (m_rotation.x > 180) {
+            m_rotation.x = -180;
+        }
+
         update();
     }
 

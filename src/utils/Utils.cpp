@@ -21,7 +21,7 @@ namespace cube {
         };
     }
 
-    glm::vec2 toChunk(const glm::vec3 &p) {
+    glm::ivec2 toChunk(const glm::vec3 &p) {
         return glm::floor(glm::vec2{p.x,p.z} / glm::vec2{CHUNK_WIDTH, CHUNK_DEPTH});
     }
 
