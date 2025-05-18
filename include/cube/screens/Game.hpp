@@ -3,7 +3,6 @@
 
 #include "cube/core/IScreen.hpp"
 #include "cube/entities/Player.hpp"
-#include "cube/graphics/ChunkRenderer.hpp"
 #include "cube/graphics/Renderer.hpp"
 #include "cube/utils/ThreadPool.hpp"
 #include "cube/world/World.hpp"
@@ -29,7 +28,6 @@ namespace cube {
 
     private:
         ThreadPool m_pool;
-        ChunkRenderer m_chunker;
         Renderer m_renderer;
         Font m_font{24};
         Player m_player;

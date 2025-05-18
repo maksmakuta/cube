@@ -21,6 +21,9 @@ namespace cube {
     Renderer::~Renderer() = default;
 
     void Renderer::onCreate() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vbo);
 
@@ -46,8 +49,6 @@ namespace cube {
     }
 
     void Renderer::use() {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
     }
@@ -82,7 +83,7 @@ namespace cube {
         m_shader.use();
         m_shader.setMat4("proj",m_proj);
         m_shader.setInt("type",type);
-        m_shader.setInt("image",0);
+        m_shader.setInt("image",15);
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -316,7 +317,7 @@ namespace cube {
                 image.image.bind(0);
             },
             [this](const TextPaint& text) {
-                text.font.getTexture().bind(0);
+                text.font.getTexture().bind(15);
             }
         }, m_paint);
     }

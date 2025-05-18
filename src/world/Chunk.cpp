@@ -6,7 +6,7 @@ namespace cube {
     Chunk::~Chunk() = default;
 
     glm::uint toIndex(const glm::uvec3& p) {
-        return 0;
+        return (p.z * CHUNK_HEIGHT * CHUNK_WIDTH) + (p.y * CHUNK_WIDTH) + p.x;
     }
 
     BlockID& Chunk::at(const glm::uint index) {
