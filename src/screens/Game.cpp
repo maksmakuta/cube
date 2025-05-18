@@ -17,17 +17,21 @@ namespace cube {
 
     void Game::onCreate() {
         controller()->showCursor(false);
+        m_voxel.onCreate();
         m_renderer.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
     }
 
     void Game::onClear() {
+        m_voxel.onClear();
         m_renderer.onClear();
         m_font.unload();
     }
 
     void Game::onDraw() {
         clear(0xFF222222);
+
+        m_voxel.onDraw(m_player.getCamera().getView());
 
         if (m_debug) {
             const auto h = m_font.getSize();
@@ -36,7 +40,7 @@ namespace cube {
             const auto cnk = toChunk(pos);
 
             m_renderer.text(m_font,0xFFFFFFFF);
-            m_renderer.print({0,h},std::format("Cube v. 0.6.3 [debug] FPS: {:.2f}", m_fps));
+            m_renderer.print({0,h},std::format("Cube v. 0.6.x [debug] FPS: {:.2f}", m_fps));
             m_renderer.print({0,h*2},std::format("Position: [{:.2f},{:.2f},{:.2f}]", pos.x,pos.y,pos.z));
             m_renderer.print({0,h*3},std::format("Rotation: [{:.2f},{:.2f}]", rot.x,rot.y));
             m_renderer.print({0,h*4},std::format("Chunk: [{},{}]", cnk.x, cnk.y));
@@ -44,7 +48,8 @@ namespace cube {
     }
 
     void Game::onTick() {
-        m_world.onTick(m_player.getPosition());
+        m_world.onTick(m_pool,m_player.getPosition());
+        m_voxel.onTick(m_pool,m_world);
     }
 
     void Game::onUpdate(const float dt) {
@@ -64,6 +69,7 @@ namespace cube {
 
     void Game::onResize(const int w, const int h) {
         m_renderer.onResize(w,h);
+        m_voxel.onResize(w,h);
     }
 
     void Game::onKey(const int k, const int a, const int m) {

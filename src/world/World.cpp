@@ -27,7 +27,7 @@ namespace cube {
     }
 
     Chunk World::at(const glm::ivec2 &pos) const {
-        if (auto it = m_chunks.find(pos); it != m_chunks.end()) return it->second;
+        if (const auto it = m_chunks.find(pos); it != m_chunks.end()) return it->second;
         throw std::out_of_range("Chunk not found");
     }
 
@@ -35,7 +35,7 @@ namespace cube {
         m_chunks.erase(pos);
     }
 
-    void World::onTick(const glm::vec3& pos) {
+    void World::onTick(ThreadPool& pool,const glm::vec3& pos) {
         const auto center = toChunk(pos);
         std::unordered_map<glm::ivec2, Chunk> newChunks;
 
@@ -45,10 +45,11 @@ namespace cube {
                 if (const auto it = m_chunks.find(coord); it != m_chunks.end()) {
                     newChunks.emplace(coord, std::move(it->second));
                 } else {
-                    Chunk chunk(coord);
-                    if (m_generator)
-                        m_generator->generateAt(coord);
-                    newChunks.emplace(coord, std::move(chunk));
+                    //pool.submit([this, coord] {
+                        auto chunk = m_generator->generateAt(coord);
+                      //  std::lock_guard lock(m_chunks_mutex);
+                        newChunks.emplace(coord, std::move(chunk));
+                    //});
                 }
             }
         }

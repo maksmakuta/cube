@@ -61,6 +61,8 @@ add_executable(cube
         src/Window.cpp
 
         src/main.cpp
+        include/cube/graphics/VoxelRenderer.hpp
+        src/graphics/VoxelRenderer.cpp
 )
 
 target_include_directories(cube PUBLIC include)

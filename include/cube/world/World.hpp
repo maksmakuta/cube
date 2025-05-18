@@ -7,8 +7,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include "Chunk.hpp"
 #include "cube/core/IGenerator.hpp"
+#include "cube/utils/ThreadPool.hpp"
 
 namespace cube {
 
@@ -27,12 +27,13 @@ namespace cube {
         Chunk at(const glm::ivec2& pos) const;
         void remove(const glm::ivec2& pos);
 
-        void onTick(const glm::vec3& pos);
+        void onTick(ThreadPool& pool,const glm::vec3& pos);
         void forChunk(const std::function<void(Chunk&)>& fn);
 
     private:
-        std::shared_ptr<IGenerator> m_generator;
         std::unordered_map<glm::ivec2,Chunk> m_chunks;
+        std::shared_ptr<IGenerator> m_generator;
+        std::mutex m_chunks_mutex;
         int m_seed;
     };
 

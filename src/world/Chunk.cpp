@@ -19,7 +19,11 @@ namespace cube {
     }
 
     BlockID Chunk::get(const glm::uvec3& pos)const {
-        return m_blocks[toIndex(pos)];
+        const auto index = toIndex(pos);
+        if (index > CHUNK_SIZE) {
+            return BlockID::Air;
+        }
+        return m_blocks[index];
     }
 
     bool Chunk::is(const glm::uvec3& pos, const BlockID i) const {
