@@ -12,13 +12,13 @@ namespace cube {
         return glm::vec4{a / ATLAS_SIZE, b / ATLAS_SIZE};
     }
 
-    glm::vec4 getTile(const BlockID b, const int face) {
+    glm::vec4 getTile(const BlockID b, const Face face) {
         switch (b) {
             case BlockID::Grass: {
-                if (face == 2) {
+                if (face == Face::Top) {
                     return toUV({2, 3});
                 }
-                if (face == 3) {
+                if (face == Face::Bottom) {
                     return toUV({1, 2});
                 }
                 return toUV({1, 3});
@@ -28,7 +28,7 @@ namespace cube {
             case BlockID::Stone:
                 return toUV({7, 0});
             case BlockID::Wood:{
-                if (face == 2 || face == 3) {
+                if (face == Face::Top || face == Face::Bottom) {
                     return toUV({5, 0});
                 }
                 return toUV({4, 0});

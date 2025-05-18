@@ -30,6 +30,7 @@ add_executable(cube
         include/cube/graphics/Font.hpp
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
+        include/cube/graphics/VoxelRenderer.hpp
         include/cube/models/Block.hpp
         include/cube/screens/Game.hpp
         include/cube/screens/Main.hpp
@@ -49,6 +50,7 @@ add_executable(cube
         src/graphics/Font.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
+        src/graphics/VoxelRenderer.cpp
         src/models/Block.cpp
         src/screens/Game.cpp
         src/screens/Main.cpp
@@ -61,8 +63,6 @@ add_executable(cube
         src/Window.cpp
 
         src/main.cpp
-        include/cube/graphics/VoxelRenderer.hpp
-        src/graphics/VoxelRenderer.cpp
 )
 
 target_include_directories(cube PUBLIC include)

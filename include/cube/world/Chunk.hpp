@@ -17,7 +17,7 @@ namespace cube {
         BlockID& at(const glm::uvec3& pos);
 
         [[nodiscard]] BlockID get(const glm::uvec3& pos) const;
-        [[nodiscard]] bool is(const glm::uvec3& pos, BlockID i) const;
+        [[nodiscard]] bool is(const glm::ivec3& pos, BlockID i) const;
         [[nodiscard]] glm::ivec2 getOffset() const;
 
     private:

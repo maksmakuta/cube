@@ -38,7 +38,7 @@ namespace cube {
         void onClear();
         void onResize(int w, int h);
 
-        void onDraw(const glm::mat4&);
+        void onDraw(const glm::mat4&, const glm::vec3& root);
         void onTick(ThreadPool& pool, World& world);
 
         static VoxelMesh toMesh(const Chunk&);

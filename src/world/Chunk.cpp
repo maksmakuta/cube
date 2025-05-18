@@ -26,7 +26,11 @@ namespace cube {
         return m_blocks[index];
     }
 
-    bool Chunk::is(const glm::uvec3& pos, const BlockID i) const {
+    bool Chunk::is(const glm::ivec3& pos, const BlockID i) const {
+        if (pos.x < 0 || pos.x >= CHUNK_WIDTH ||
+            pos.y < 0 || pos.y >= CHUNK_HEIGHT ||
+            pos.z < 0 || pos.z >= CHUNK_DEPTH )
+            return true;
         return get(pos) == i;
     }
 

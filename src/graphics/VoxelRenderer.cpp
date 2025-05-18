@@ -1,5 +1,6 @@
 #include "cube/graphics/VoxelRenderer.hpp"
 
+#include <algorithm>
 #include <unordered_set>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -64,7 +65,7 @@ namespace cube {
         m_proj = glm::perspective(glm::radians(90.f),aspect,0.01f, (RENDER_DIST * CHUNK_WIDTH) * 2.f);
     }
 
-    void VoxelRenderer::onDraw(const glm::mat4& view) {
+    void VoxelRenderer::onDraw(const glm::mat4& view, const glm::vec3& root) {
         glEnable(GL_DEPTH);
         glEnable(GL_CULL_FACE);
         m_atlas.bind(0);
@@ -74,14 +75,20 @@ namespace cube {
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
-        for (const auto&[offset, item] : m_items) {
+        std::vector<std::pair<glm::ivec2, VoxelItem>> chunks{m_items.begin(),m_items.end()};
+        std::ranges::sort(chunks,[&](const auto& a, const auto& b) {
+            const float distA = glm::distance(glm::vec3(a.first.x,root.y,a.first.y), root);
+            const float distB = glm::distance(glm::vec3(b.first.x,root.y,b.first.y), root);
+            return distA < distB; // Far to near
+        });
+
+        for (const auto&[offset, item] : chunks) {
             m_shader.setMat4("model", glm::translate({1.f},glm::vec3{offset.x * CHUNK_WIDTH,0,offset.y * CHUNK_DEPTH}));
             glBindVertexArray(item.vao);
             glDrawElements(GL_TRIANGLES,item.count,GL_UNSIGNED_INT,nullptr);
         }
         glDisable(GL_DEPTH);
         glDisable(GL_CULL_FACE);
-
     }
 
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
@@ -121,73 +128,10 @@ namespace cube {
 
     }
 
-    void addFace(std::vector<Vertex3D>& verts, std::vector<uint32_t>& indices, const glm::ivec3& blockPos,const BlockID& id, const int face) {
-        static const glm::vec3 faceVerts[6][4] = {
-            { {0,1,0}, {1,1,0}, {1,1,1}, {0,1,1} },
-            { {0,0,0}, {0,0,1}, {1,0,1}, {1,0,0} },
-            { {0,0,0}, {1,0,0}, {1,1,0}, {0,1,0} },
-            { {0,0,1}, {0,1,1}, {1,1,1}, {1,0,1} },
-            { {0,0,0}, {0,1,0}, {0,1,1}, {0,0,1} },
-            { {1,0,0}, {1,0,1}, {1,1,1}, {1,1,0} }
-        };
-
-        static constexpr glm::vec2 faceUVs[4] = {
-            {0, 0}, {1, 0}, {1, 1}, {0, 1}
-        };
-
-        const auto startIndex = static_cast<uint32_t>(verts.size());
-        const auto uv = getTile(id,face);
-        for (int i = 0; i < 4; ++i) {
-            verts.push_back({
-                glm::vec3(blockPos) + faceVerts[face][i],
-                glm::mix(glm::vec2{uv.x,uv.y},glm::vec2{uv.x,uv.y},faceUVs[i])
-            });
-        }
-
-        indices.insert(indices.end(), {
-            startIndex + 0, startIndex + 1, startIndex + 2,
-            startIndex + 2, startIndex + 3, startIndex + 0
-        });
-    }
-
-    glm::ivec3 faceNormal(const int face) {
-        switch (face) {
-            case 0: return {  0,  1,  0 };
-            case 1: return {  0, -1,  0 };
-            case 2: return {  0,  0, -1 };
-            case 3: return {  0,  0,  1 };
-            case 4: return { -1,  0,  0 };
-            case 5: return {  1,  0,  0 };
-            default: return { 0, 0, 0 };
-        }
-    }
-
-    bool isInside(const glm::ivec3& vec) {
-        return  vec.x >= 0 && vec.x < CHUNK_WIDTH &&
-                vec.y >= 0 && vec.y < CHUNK_HEIGHT &&
-                vec.z >= 0 && vec.z < CHUNK_DEPTH;
-    }
-
     VoxelMesh VoxelRenderer::toMesh(const Chunk& chunk) {
+
         VoxelMesh result;
         result.key = chunk.getOffset();
-
-        for (int x = 0; x < CHUNK_WIDTH; ++x)
-            for (int z = 0; z < CHUNK_DEPTH; ++z)
-                for (int y = 0; y < CHUNK_HEIGHT; ++y){
-                    if (chunk.get({x, y, z}) == BlockID::Air) continue;
-
-                    glm::ivec3 pos = { x, y, z };
-
-                    for (int face = 0; face < 6; ++face) {
-                        const auto neighbor = pos + faceNormal(face);
-                        if (isInside(neighbor)) {
-                            const auto id = chunk.get(neighbor);
-                            if (id != BlockID::Air)
-                                addFace(result.vertices, result.indices, pos, id, face);
-                        }
-                    }
-                }
 
         return result;
     }

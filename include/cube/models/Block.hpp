@@ -3,6 +3,8 @@
 
 #include <glm/vec4.hpp>
 
+#include "cube/core/Face.hpp"
+
 namespace cube {
 
     enum class BlockID {
@@ -17,7 +19,7 @@ namespace cube {
         HardStone
     };
 
-    glm::vec4 getTile(BlockID, int face);
+    glm::vec4 getTile(BlockID, Face face);
     bool isFullBlock(BlockID);
 
 }

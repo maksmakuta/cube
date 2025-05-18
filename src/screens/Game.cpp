@@ -8,6 +8,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
+#include "cube/generators/GeneratorHeight.hpp"
 #include "cube/utils/Utils.hpp"
 
 namespace cube {
@@ -18,6 +19,7 @@ namespace cube {
     void Game::onCreate() {
         controller()->showCursor(false);
         m_voxel.onCreate();
+        //m_world.setGenerator(std::make_shared<GeneratorHeight>(0));
         m_renderer.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
     }
@@ -31,7 +33,7 @@ namespace cube {
     void Game::onDraw() {
         clear(0xFF222222);
 
-        m_voxel.onDraw(m_player.getCamera().getView());
+        m_voxel.onDraw(m_player.getCamera().getView(), m_player.getPosition());
 
         if (m_debug) {
             const auto h = m_font.getSize();
