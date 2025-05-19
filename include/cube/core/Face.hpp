@@ -5,13 +5,13 @@
 
 namespace cube {
 
-    enum class Face : uint8_t{
+    enum class Face : uint8_t {
+        Right,
+        Left,
         Top,
         Bottom,
-        Left,
-        Right,
-        Near,
-        Far
+        Front,
+        Back
     };
 
 }

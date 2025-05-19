@@ -3,6 +3,7 @@
 
 #include "cube/world/Chunk.hpp"
 #include "cube/graphics/Vertex.hpp"
+#include "cube/world/World.hpp"
 
 namespace cube {
 
@@ -17,7 +18,7 @@ namespace cube {
         Mesher();
         ~Mesher();
 
-        VoxelMesh toMesh(const Chunk& c);
+        VoxelMesh toMesh(World& w, const glm::ivec2& current);
 
     };
 

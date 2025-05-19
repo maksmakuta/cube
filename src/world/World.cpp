@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iostream>
 #include <ranges>
+#include <shared_mutex>
+#include <glm/gtx/string_cast.hpp>
 
 #include "cube/generators/GeneratorFlat.hpp"
 #include "cube/generators/GeneratorTerrain.hpp"
@@ -23,19 +25,6 @@ namespace cube {
         return m_generator;
     }
 
-    void World::insert(const Chunk& c) {
-        m_chunks.insert_or_assign(c.getOffset(),c);
-    }
-
-    Chunk World::at(const glm::ivec2 &pos) const {
-        if (const auto it = m_chunks.find(pos); it != m_chunks.end()) return it->second;
-        throw std::out_of_range("Chunk not found");
-    }
-
-    void World::remove(const glm::ivec2& pos) {
-        m_chunks.erase(pos);
-    }
-
     void World::onTick(ThreadPool& pool,const glm::vec3& pos) {
         const auto center = toChunk(pos);
         std::unordered_map<glm::ivec2, Chunk> newChunks;
@@ -46,11 +35,11 @@ namespace cube {
                 if (const auto it = m_chunks.find(coord); it != m_chunks.end()) {
                     newChunks.emplace(coord, std::move(it->second));
                 } else {
-                     pool.submit([this, coord] {
-                        auto chunk = m_generator->generateAt(coord);
-                         std::lock_guard lock(m_chunks_mutex);
-                        m_new_chunks.emplace(std::move(chunk));
-                    });
+                    pool.submit([this, coord] {
+                       auto chunk = m_generator->generateAt(coord);
+                        std::lock_guard lock(m_chunks_mutex);
+                       m_new_chunks.emplace(std::move(chunk));
+                   });
                 }
             }
         }
@@ -67,8 +56,8 @@ namespace cube {
         m_chunks = std::move(newChunks);
     }
 
-    void World::forChunk(const std::function<void(Chunk &)> &fn) {
-        for (auto &item: m_chunks | std::views::values) {
+    void World::forChunk(const std::function<void(const glm::ivec2 &)> &fn) {
+        for (auto &item: m_chunks | std::views::keys) {
             fn(item);
         }
     }
@@ -84,4 +73,7 @@ namespace cube {
         }
     }
 
+    Chunk & World::at(const glm::ivec2& v) {
+        return m_chunks.at(v);
+    }
 }

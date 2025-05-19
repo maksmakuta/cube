@@ -80,7 +80,7 @@ namespace cube {
         std::ranges::sort(chunks,[&](const auto& a, const auto& b) {
             const float distA = glm::distance(glm::vec3(a.first.x,root.y,a.first.y), root);
             const float distB = glm::distance(glm::vec3(b.first.x,root.y,b.first.y), root);
-            return distA > distB;
+            return distA < distB;
         });
 
         for (const auto&[offset, item] : chunks) {
@@ -95,12 +95,11 @@ namespace cube {
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
         std::unordered_set<glm::ivec2> current;
 
-        world.forChunk([&](Chunk& chunk) {
-            const auto pos = chunk.getOffset();
-            current.insert(pos);
-            if (!m_items.contains(pos)) {
-                pool.submit([this, chunk] {
-                    if (auto mesh = m_mesher.toMesh(chunk); !mesh.vertices.empty()) {
+        world.forChunk([&](const glm::ivec2& chunk_pos) {;
+            current.insert(chunk_pos);
+            if (!m_items.contains(chunk_pos)) {
+                pool.submit([this, chunk_pos, &world] {
+                    if (auto mesh = m_mesher.toMesh(world,chunk_pos); !mesh.vertices.empty()) {
                         std::lock_guard lock(m_meshes_mutex);
                         m_meshes.push_back(std::move(mesh));
                     }
