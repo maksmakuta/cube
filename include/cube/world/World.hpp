@@ -33,6 +33,7 @@ namespace cube {
     private:
         std::unordered_map<glm::ivec2,Chunk> m_chunks;
         std::shared_ptr<IGenerator> m_generator;
+        std::queue<Chunk> m_new_chunks;
         std::mutex m_chunks_mutex;
         int m_seed;
     };

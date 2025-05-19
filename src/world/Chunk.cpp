@@ -30,7 +30,7 @@ namespace cube {
         if (pos.x < 0 || pos.x >= CHUNK_WIDTH ||
             pos.y < 0 || pos.y >= CHUNK_HEIGHT ||
             pos.z < 0 || pos.z >= CHUNK_DEPTH )
-            return true;
+            return false;
         return get(pos) == i;
     }
 

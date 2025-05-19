@@ -5,11 +5,12 @@
 #include <ranges>
 
 #include "cube/generators/GeneratorFlat.hpp"
+#include "cube/generators/GeneratorTerrain.hpp"
 #include "cube/utils/Utils.hpp"
 
 namespace cube {
 
-    World::World(const int seed) : m_generator(std::make_shared<GeneratorFlat>()), m_seed(seed) {}
+    World::World(const int seed) : m_generator(std::make_shared<GeneratorTerrain>()), m_seed(seed) {}
 
     World::~World() = default;
 
@@ -45,14 +46,24 @@ namespace cube {
                 if (const auto it = m_chunks.find(coord); it != m_chunks.end()) {
                     newChunks.emplace(coord, std::move(it->second));
                 } else {
-                    //pool.submit([this, coord] {
+                     pool.submit([this, coord] {
                         auto chunk = m_generator->generateAt(coord);
-                      //  std::lock_guard lock(m_chunks_mutex);
-                        newChunks.emplace(coord, std::move(chunk));
-                    //});
+                         std::lock_guard lock(m_chunks_mutex);
+                        m_new_chunks.emplace(std::move(chunk));
+                    });
                 }
             }
         }
+
+        {
+            std::lock_guard lock(m_chunks_mutex);
+            while (!m_new_chunks.empty()){
+                const auto item = m_new_chunks.front();
+                newChunks[item.getOffset()] = item;
+                m_new_chunks.pop();
+            }
+        }
+
         m_chunks = std::move(newChunks);
     }
 

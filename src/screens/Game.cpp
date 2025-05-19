@@ -2,13 +2,14 @@
 #include "glad/gl.h"
 
 #include <format>
+#include <random>
 #include <iostream>
 #include <GLFW/glfw3.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
-#include "cube/generators/GeneratorHeight.hpp"
+#include "cube/generators/GeneratorTerrain.hpp"
 #include "cube/utils/Utils.hpp"
 
 namespace cube {
@@ -17,9 +18,9 @@ namespace cube {
     Game::~Game() = default;
 
     void Game::onCreate() {
+        std::random_device rd{};
         controller()->showCursor(false);
         m_voxel.onCreate();
-        //m_world.setGenerator(std::make_shared<GeneratorHeight>(0));
         m_renderer.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
     }
@@ -46,6 +47,10 @@ namespace cube {
             m_renderer.print({0,h*2},std::format("Position: [{:.2f},{:.2f},{:.2f}]", pos.x,pos.y,pos.z));
             m_renderer.print({0,h*3},std::format("Rotation: [{:.2f},{:.2f}]", rot.x,rot.y));
             m_renderer.print({0,h*4},std::format("Chunk: [{},{}]", cnk.x, cnk.y));
+
+            m_renderer.print({0,h*6},std::format("Render Distance: {}", RENDER_DIST));
+            m_renderer.print({0,h*7},std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
+
         }
     }
 

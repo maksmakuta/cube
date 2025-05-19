@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "cube/core/Constants.hpp"
+#include "cube/graphics/Mesher.hpp"
 #include "cube/utils/Utils.hpp"
 #include "glad/gl.h"
 
@@ -62,7 +63,7 @@ namespace cube {
 
     void VoxelRenderer::onResize(const int w, const int h) {
         const auto aspect = static_cast<float>(w) / static_cast<float>(h);
-        m_proj = glm::perspective(glm::radians(90.f),aspect,0.01f, (RENDER_DIST * CHUNK_WIDTH) * 2.f);
+        m_proj = glm::perspective(glm::radians(45.f),aspect,0.01f, (RENDER_DIST * CHUNK_WIDTH) * 2.f);
     }
 
     void VoxelRenderer::onDraw(const glm::mat4& view, const glm::vec3& root) {
@@ -79,7 +80,7 @@ namespace cube {
         std::ranges::sort(chunks,[&](const auto& a, const auto& b) {
             const float distA = glm::distance(glm::vec3(a.first.x,root.y,a.first.y), root);
             const float distB = glm::distance(glm::vec3(b.first.x,root.y,b.first.y), root);
-            return distA < distB; // Far to near
+            return distA > distB;
         });
 
         for (const auto&[offset, item] : chunks) {
@@ -99,8 +100,7 @@ namespace cube {
             current.insert(pos);
             if (!m_items.contains(pos)) {
                 pool.submit([this, chunk] {
-                    auto mesh = toMesh(chunk);
-                    if (!mesh.vertices.empty()) {
+                    if (auto mesh = m_mesher.toMesh(chunk); !mesh.vertices.empty()) {
                         std::lock_guard lock(m_meshes_mutex);
                         m_meshes.push_back(std::move(mesh));
                     }
@@ -126,13 +126,5 @@ namespace cube {
             } else ++it;
         }
 
-    }
-
-    VoxelMesh VoxelRenderer::toMesh(const Chunk& chunk) {
-
-        VoxelMesh result;
-        result.key = chunk.getOffset();
-
-        return result;
     }
 }
