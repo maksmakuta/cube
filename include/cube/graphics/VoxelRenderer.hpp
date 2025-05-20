@@ -35,8 +35,8 @@ namespace cube {
         void onTick(ThreadPool& pool, World& world);
     private:
         std::unordered_map<glm::ivec2, VoxelItem> m_items;
-        std::mutex m_meshes_mutex;
         std::vector<VoxelMesh> m_meshes;
+        std::shared_mutex m_mesh_mutex;
         Mesher m_mesher;
         glm::mat4 m_proj{1.f};
         Shader m_shader;

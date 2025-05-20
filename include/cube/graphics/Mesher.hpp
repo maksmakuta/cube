@@ -18,7 +18,7 @@ namespace cube {
         Mesher();
         ~Mesher();
 
-        VoxelMesh toMesh(World& w, const glm::ivec2& current);
+        VoxelMesh toMesh(const ChunkPtr& chunk, const glm::vec2& pos);
 
     };
 

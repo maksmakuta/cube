@@ -45,7 +45,7 @@ namespace cube {
             const auto cnk = toChunk(pos);
 
             m_renderer.text(m_font,0xFFFFFFFF);
-            m_renderer.print({0,h},std::format("Cube v. 0.6.x [debug] FPS: {:.2f}", m_fps));
+            m_renderer.print({0,h},std::format("Cube v. 0.7.x [debug] FPS: {:.2f}", m_fps));
             m_renderer.print({0,h*2},std::format("Position: [{:.2f},{:.2f},{:.2f}]", pos.x,pos.y,pos.z));
             m_renderer.print({0,h*3},std::format("Rotation: [{:.2f},{:.2f}]", rot.x,rot.y));
             m_renderer.print({0,h*4},std::format("Chunk: [{},{}]", cnk.x, cnk.y));
@@ -53,6 +53,7 @@ namespace cube {
             m_renderer.print({0,h*6},std::format("Render Distance: {}", RENDER_DIST));
             m_renderer.print({0,h*7},std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
 
+            m_renderer.print({0,h*9},std::format("Seed: {}", m_world.getSeed()));
         }
     }
 

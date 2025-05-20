@@ -8,34 +8,38 @@
 #include <functional>
 #include <memory>
 #include <shared_mutex>
+#include <unordered_set>
 
 #include "cube/core/IGenerator.hpp"
 #include "cube/utils/ThreadPool.hpp"
 
 namespace cube {
 
+    struct NewChunk {
+        glm::ivec2 offset;
+        ChunkPtr chunk;
+    };
+
     class World {
     public:
         explicit World(int seed = 0);
         ~World();
 
-        void setGenerator(const std::shared_ptr<IGenerator>&);
         [[nodiscard]] std::shared_ptr<IGenerator> getGenerator() const;
-
         [[nodiscard]] int getSeed() const;
+
+        void setGenerator(const std::shared_ptr<IGenerator>&);
         void setSeed(int seed);
 
-        Chunk& at(const glm::ivec2&);
+        ChunkPtr at(const glm::ivec2&);
 
-        void onTick(ThreadPool& pool,const glm::vec3& pos);
-        void forChunk(const std::function<void(const glm::ivec2&)>& fn);
+        void onTick(ThreadPool& pool,const glm::vec3& player_pos);
+        void forChunk(const std::function<void(const ChunkPtr&, const glm::ivec2&)>& fn);
 
     private:
-        std::unordered_map<glm::ivec2,Chunk> m_chunks;
+        std::shared_mutex m_mutex;
+        std::unordered_map<glm::ivec2,ChunkPtr> m_chunks;
         std::shared_ptr<IGenerator> m_generator;
-        std::queue<Chunk> m_new_chunks;
-        std::mutex m_chunks_mutex;
-        std::shared_mutex m_read_mutex;
         int m_seed;
     };
 

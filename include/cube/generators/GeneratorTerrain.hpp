@@ -8,9 +8,10 @@ namespace cube {
 
     class GeneratorTerrain final : public IGenerator {
     public:
-        explicit GeneratorTerrain(int seed = 0);
+        GeneratorTerrain();
+        explicit GeneratorTerrain(int seed);
         ~GeneratorTerrain() override;
-        Chunk generateAt(const glm::vec2 &pos) override;
+        ChunkPtr generateAt(const glm::vec2 &pos) override;
     private:
         FastNoise::SmartNode<FastNoise::FractalFBm> generator;
     };

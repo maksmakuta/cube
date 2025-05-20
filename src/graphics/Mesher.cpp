@@ -1,6 +1,5 @@
 #include "cube/graphics/Mesher.hpp"
 
-#include <queue>
 #include <glm/common.hpp>
 
 namespace cube {
@@ -30,20 +29,21 @@ namespace cube {
         {0, 0}, {1, 0}, {1, 1}, {0, 1}
     };
 
-    VoxelMesh Mesher::toMesh(World& w, const glm::ivec2& current) {
+    VoxelMesh Mesher::toMesh(const ChunkPtr& chunk, const glm::vec2& pos) {
         VoxelMesh mesh{};
-        mesh.key = current;
-
-        const auto chunk = w.at(current);
+        mesh.key = pos;
+        if (!chunk) {
+            return mesh;
+        }
 
         uint32_t inc = 0;
 
         for (int x = 0; x < CHUNK_WIDTH;++x) {
             for (int z = 0; z < CHUNK_DEPTH;++z) {
                 for (int y = 0; y < CHUNK_HEIGHT;++y) {
-                    if (!chunk.is({x,y,z},BlockID::Air)) {
+                    if (!chunk->is({x,y,z},BlockID::Air)) {
                         const auto pos = glm::ivec3{x,y,z};
-                        const auto id = chunk.get(pos);
+                        const auto id = chunk->get(pos);
 
                         for (int face = 0; face < 6; face++) {
                             // glm::ivec2 chuck_pos = current;
@@ -70,7 +70,7 @@ namespace cube {
                                 temp = w.at(chuck_pos);
                             }*/
 
-                            if (chunk.is(n,BlockID::Air)) {
+                            if (chunk->is(n,BlockID::Air) || n.x < 0 || n.x >= CHUNK_WIDTH || n.z < 0 || n.z >= CHUNK_DEPTH) {
                                 const auto uv = getTile(id,static_cast<Face>(face));
 
                                 for (int i = 0; i < 4; i++) {

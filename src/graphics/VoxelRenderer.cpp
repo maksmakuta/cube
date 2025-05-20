@@ -1,6 +1,7 @@
 #include "cube/graphics/VoxelRenderer.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <unordered_set>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -54,6 +55,8 @@ namespace cube {
         m_atlas.setWrap(TextureWrap::Repeat);
         m_atlas.setMagFilter(TextureFilter::Nearest);
         m_atlas.setMinFilter(TextureFilter::Nearest);
+        glEnable(GL_DEPTH_TEST);
+
     }
 
     void VoxelRenderer::onClear() {
@@ -67,8 +70,6 @@ namespace cube {
     }
 
     void VoxelRenderer::onDraw(const glm::mat4& view, const glm::vec3& root) {
-        glEnable(GL_DEPTH);
-        glEnable(GL_CULL_FACE);
         m_atlas.bind(0);
 
         m_shader.use();
@@ -76,53 +77,61 @@ namespace cube {
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
-        std::vector<std::pair<glm::ivec2, VoxelItem>> chunks{m_items.begin(),m_items.end()};
-        std::ranges::sort(chunks,[&](const auto& a, const auto& b) {
-            const float distA = glm::distance(glm::vec3(a.first.x,root.y,a.first.y), root);
-            const float distB = glm::distance(glm::vec3(b.first.x,root.y,b.first.y), root);
-            return distA < distB;
-        });
 
-        for (const auto&[offset, item] : chunks) {
-            m_shader.setMat4("model", glm::translate({1.f},glm::vec3{offset.x * CHUNK_WIDTH,0,offset.y * CHUNK_DEPTH}));
-            glBindVertexArray(item.vao);
-            glDrawElements(GL_TRIANGLES,item.count,GL_UNSIGNED_INT,nullptr);
+        glEnable(GL_CULL_FACE);
+        {
+            std::shared_lock lock(m_mesh_mutex);
+            std::vector<std::pair<glm::ivec2, VoxelItem>> chunks{m_items.begin(),m_items.end()};
+            std::ranges::sort(chunks,[&](const auto& a, const auto& b) {
+                const float distA = glm::distance(glm::vec3(a.first.x,0,a.first.y), glm::vec3(root.x,0,root.z));
+                const float distB = glm::distance(glm::vec3(b.first.x,0,b.first.y), glm::vec3(root.x,0,root.z));
+                return distA > distB;
+            });
+
+            for (const auto&[offset, item] : chunks) {
+                m_shader.setMat4("model", glm::translate({1.f},glm::vec3{offset.x * CHUNK_WIDTH,0,offset.y * CHUNK_DEPTH}));
+                glBindVertexArray(item.vao);
+                glDrawElements(GL_TRIANGLES,item.count,GL_UNSIGNED_INT,nullptr);
+            }
         }
-        glDisable(GL_DEPTH);
         glDisable(GL_CULL_FACE);
     }
 
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
-        std::unordered_set<glm::ivec2> current;
+        std::unordered_set<glm::ivec2> active_chunks;
 
-        world.forChunk([&](const glm::ivec2& chunk_pos) {;
-            current.insert(chunk_pos);
-            if (!m_items.contains(chunk_pos)) {
-                pool.submit([this, chunk_pos, &world] {
-                    if (auto mesh = m_mesher.toMesh(world,chunk_pos); !mesh.vertices.empty()) {
-                        std::lock_guard lock(m_meshes_mutex);
-                        m_meshes.push_back(std::move(mesh));
-                    }
+        world.forChunk([this, &active_chunks, &pool](const ChunkPtr& ptr, const glm::ivec2& pos) {
+            active_chunks.insert(pos);
+            if (!m_items.contains(pos)) {
+                pool.submit([this, &ptr, &pos] {
+                    const auto mesh = m_mesher.toMesh(ptr,pos);
+                    std::lock_guard lock(m_mesh_mutex);
+                    m_meshes.push_back(mesh);
                 });
             }
         });
 
-        {
-            std::lock_guard lock(m_meshes_mutex);
-            for (auto& [key, vertices, indices] : m_meshes) {
-                auto rc = VoxelItem();
-                rc.load();
-                rc.upload(vertices, indices);
-                m_items[key] = rc;
+        if (!m_items.empty()){
+            std::lock_guard lock(m_mesh_mutex);
+            for (auto it = m_items.begin();it != m_items.end();) {
+                if (!active_chunks.contains(it->first)) {
+                    it->second.unload();
+                    it = m_items.erase(it);
+                }else {
+                    ++it;
+                }
             }
-            m_meshes.clear();
         }
 
-        for (auto it = m_items.begin(); it != m_items.end(); ) {
-            if (!current.contains(it->first)) {
-                it->second.unload();
-                it = m_items.erase(it);
-            } else ++it;
+        if (!m_meshes.empty()) {
+            std::lock_guard lock(m_mesh_mutex);
+            for (const auto&[key, vertices, indices] : m_meshes) {
+                auto item = VoxelItem();
+                item.load();
+                item.upload(vertices,indices);
+                m_items[key] = item;
+            }
+            m_meshes.clear();
         }
 
     }

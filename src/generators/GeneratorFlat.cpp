@@ -29,12 +29,12 @@ namespace cube {
 
     GeneratorFlat::~GeneratorFlat() = default;
 
-    Chunk GeneratorFlat::generateAt(const glm::vec2 &pos) {
-        auto temp = Chunk(pos);
+    ChunkPtr GeneratorFlat::generateAt(const glm::vec2 &pos) {
+        auto temp = std::make_shared<Chunk>();
         for (int y = 0; y < m_preset.layers.size(); ++y) {
             for (int z = 0; z < CHUNK_DEPTH; ++z) {
                 for (int x = 0; x < CHUNK_WIDTH; ++x) {
-                    temp.at({x,y,z}) = m_preset.layers[y];
+                    temp->set({x,y,z},m_preset.layers[y]);
                 }
             }
         }

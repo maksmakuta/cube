@@ -24,7 +24,7 @@ namespace cube {
         explicit GeneratorFlat(FlatPreset );
         ~GeneratorFlat() override;
 
-        Chunk generateAt(const glm::vec2 &pos) override;
+        ChunkPtr generateAt(const glm::vec2 &pos) override;
 
     private:
         FlatPreset m_preset;
