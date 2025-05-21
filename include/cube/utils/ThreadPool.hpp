@@ -29,6 +29,9 @@ namespace cube {
             condition.notify_one();
             return res;
         }
+
+        void unload();
+
     private:
         void worker();
 

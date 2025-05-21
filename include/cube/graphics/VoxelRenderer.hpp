@@ -41,7 +41,7 @@ namespace cube {
         std::vector<VoxelMesh> m_meshes;
         std::shared_mutex m_mesh_mutex;
         glm::mat4 m_proj{1.f};
-        glm::ivec4 range;
+        glm::ivec4 range{0};
         Shader m_shader;
         Texture m_atlas;
         Mesher m_mesher;

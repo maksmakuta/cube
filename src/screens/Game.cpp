@@ -18,14 +18,15 @@ namespace cube {
     Game::~Game() = default;
 
     void Game::onCreate() {
-        std::random_device rd{};
         controller()->showCursor(false);
         m_voxel.onCreate();
         m_renderer.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
+        m_player.setPosition({0,96,0});
     }
 
     void Game::onClear() {
+        m_pool.unload();
         m_voxel.onClear();
         m_renderer.onClear();
         m_font.unload();
@@ -83,14 +84,6 @@ namespace cube {
     }
 
     void Game::onKey(const int k, const int a, const int m) {
-        // if (m == GLFW_MOD_CONTROL) {
-        //     m_speed = 2.0f;
-        // }else if (m == GLFW_MOD_SHIFT) {
-        //     m_speed = 0.5f;
-        // }else {
-        //     m_speed = 1.f;
-        // }
-
         const auto keys = std::vector{
             GLFW_KEY_W,
             GLFW_KEY_S,
@@ -102,6 +95,15 @@ namespace cube {
 
         for(int i = 0; i < keys.size();i++) {
             if (k == keys[i]) {
+                if (i == 0) {
+                    if (m == GLFW_MOD_CONTROL) {
+                        m_speed = 2.0f;
+                    }else if (m == GLFW_MOD_SHIFT) {
+                        m_speed = 0.5f;
+                    }else {
+                        m_speed = 1.f;
+                    }
+                }
                 set(m_player_dir,1 << (i+1),a != GLFW_RELEASE);
             }
         }

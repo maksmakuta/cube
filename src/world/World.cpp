@@ -28,8 +28,8 @@ namespace cube {
         const auto center = toChunk(player_pos);
         std::unordered_set<glm::ivec2> activeChunks;
 
-        for (int dx = -RENDER_DIST; dx <= RENDER_DIST; ++dx) {
-            for (int dz = -RENDER_DIST; dz <= RENDER_DIST; ++dz) {
+        for (int dx = -RENDER_DIST; dx < RENDER_DIST; ++dx) {
+            for (int dz = -RENDER_DIST; dz < RENDER_DIST; ++dz) {
                 glm::ivec2 pos = center + glm::ivec2(dx, dz);
                 activeChunks.insert(pos);
 
@@ -59,6 +59,8 @@ namespace cube {
                 }
             }
         }
+
+        std::cout << "Size : " << m_chunks.size() << std::endl;
 
     }
 

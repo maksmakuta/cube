@@ -9,11 +9,18 @@ namespace cube {
     }
 
     ThreadPool::~ThreadPool() {
-        stop = true;
-        condition.notify_all();
+        if (!stop) {
+            stop = true;
+            condition.notify_all();
+        }
         for (auto &worker : workers) {
             worker.join();
         }
+    }
+
+    void ThreadPool::unload() {
+        stop = true;
+        condition.notify_all();
     }
 
     void ThreadPool::worker() {
@@ -22,7 +29,7 @@ namespace cube {
             {
                 std::unique_lock lock(queueMutex);
                 condition.wait(lock, [this] { return stop || !tasks.empty(); });
-                if (stop && tasks.empty()) {
+                if (stop || tasks.empty()) {
                     return;
                 }
                 task = std::move(tasks.front());

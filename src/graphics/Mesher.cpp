@@ -32,16 +32,12 @@ namespace cube {
     VoxelMesh Mesher::toMesh(const ChunkPtr& chunk, const std::array<ChunkPtr,4>& neighbors,const glm::vec2& chunk_pos) {
         VoxelMesh mesh{};
         mesh.key = chunk_pos;
-        if (!chunk) {
-            return mesh;
-        }
-
         uint32_t inc = 0;
 
         for (int x = 0; x < CHUNK_WIDTH;++x) {
             for (int z = 0; z < CHUNK_DEPTH;++z) {
                 for (int y = 0; y < CHUNK_HEIGHT;++y) {
-                    if (!chunk->is({x,y,z},BlockID::Air)) {
+                    if(!chunk->is({x,y,z},BlockID::Air)) {
                         const auto pos = glm::ivec3{x,y,z};
                         const auto id = chunk->get(pos);
 
