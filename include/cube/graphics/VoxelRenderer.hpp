@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "FrustumCulling.hpp"
 #include "cube/graphics/Mesher.hpp"
 #include "cube/graphics/Shader.hpp"
 #include "cube/graphics/Texture.hpp"
@@ -37,10 +38,10 @@ namespace cube {
         std::unordered_map<glm::ivec2, VoxelItem> m_items;
         std::vector<VoxelMesh> m_meshes;
         std::shared_mutex m_mesh_mutex;
-        Mesher m_mesher;
         glm::mat4 m_proj{1.f};
         Shader m_shader;
         Texture m_atlas;
+        Mesher m_mesher;
     };
 
 }

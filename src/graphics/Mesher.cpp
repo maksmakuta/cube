@@ -29,9 +29,9 @@ namespace cube {
         {0, 0}, {1, 0}, {1, 1}, {0, 1}
     };
 
-    VoxelMesh Mesher::toMesh(const ChunkPtr& chunk, const glm::vec2& pos) {
+    VoxelMesh Mesher::toMesh(const ChunkPtr& chunk, const std::array<ChunkPtr,4>& neighbors,const glm::vec2& chunk_pos) {
         VoxelMesh mesh{};
-        mesh.key = pos;
+        mesh.key = chunk_pos;
         if (!chunk) {
             return mesh;
         }
@@ -46,31 +46,30 @@ namespace cube {
                         const auto id = chunk->get(pos);
 
                         for (int face = 0; face < 6; face++) {
-                            // glm::ivec2 chuck_pos = current;
-                            // auto temp = chunk;
+                            auto c = chunk;
                             auto n = pos + FaceOffsets[face];
-/*
+
                             if (n.x < 0) {
-                                chuck_pos += glm::ivec2{-1,0};
+                                c = neighbors.at(1);
                                 n.x += CHUNK_WIDTH;
-                            }else if (n.x >= CHUNK_WIDTH) {
-                                chuck_pos += glm::ivec2{1,0};
+                            }
+
+                            if (n.x >= CHUNK_WIDTH) {
+                                c = neighbors.at(0);
                                 n.x -= CHUNK_WIDTH;
                             }
 
                             if (n.z < 0) {
-                                chuck_pos += glm::ivec2{0,-1};
+                                c = neighbors.at(3);
                                 n.z += CHUNK_DEPTH;
-                            }else if (n.z >= CHUNK_DEPTH) {
-                                chuck_pos += glm::ivec2{0,1};
+                            }
+
+                            if (n.z >= CHUNK_DEPTH) {
+                                c = neighbors.at(2);
                                 n.z -= CHUNK_DEPTH;
                             }
 
-                            if (chuck_pos != current) {
-                                temp = w.at(chuck_pos);
-                            }*/
-
-                            if (chunk->is(n,BlockID::Air) || n.x < 0 || n.x >= CHUNK_WIDTH || n.z < 0 || n.z >= CHUNK_DEPTH) {
+                            if (c && c->is(n,BlockID::Air)) {
                                 const auto uv = getTile(id,static_cast<Face>(face));
 
                                 for (int i = 0; i < 4; i++) {
@@ -81,8 +80,8 @@ namespace cube {
                                 }
 
                                 mesh.indices.insert(mesh.indices.end(),{
-                                    inc, inc + 1, inc + 2,
-                                    inc, inc + 2, inc + 3,
+                                    inc, inc + 2, inc + 1,
+                                    inc, inc + 3, inc + 2,
                                 });
 
                                 inc += 4;

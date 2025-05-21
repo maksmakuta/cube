@@ -24,7 +24,7 @@ namespace cube {
     constval CAMERA_SENSITIVITY = 0.1f;
     constval CAMERA_WORLD_UP = glm::vec3{0,1,0};
 
-    constval TICK = 1.f / 5.f;
+    constval TICK = 1.f / 20.f;
     constval FPS_TICK = 0.500f;
 }
 

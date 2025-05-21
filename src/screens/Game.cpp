@@ -74,7 +74,7 @@ namespace cube {
             m_last = 0;
         }
 
-        m_player.move(m_player_dir,dt);
+        m_player.move(m_player_dir,dt * m_speed);
     }
 
     void Game::onResize(const int w, const int h) {
@@ -83,6 +83,14 @@ namespace cube {
     }
 
     void Game::onKey(const int k, const int a, const int m) {
+        // if (m == GLFW_MOD_CONTROL) {
+        //     m_speed = 2.0f;
+        // }else if (m == GLFW_MOD_SHIFT) {
+        //     m_speed = 0.5f;
+        // }else {
+        //     m_speed = 1.f;
+        // }
+
         const auto keys = std::vector{
             GLFW_KEY_W,
             GLFW_KEY_S,

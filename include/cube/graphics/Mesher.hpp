@@ -18,7 +18,7 @@ namespace cube {
         Mesher();
         ~Mesher();
 
-        VoxelMesh toMesh(const ChunkPtr& chunk, const glm::vec2& pos);
+        VoxelMesh toMesh(const ChunkPtr& chunk, const std::array<ChunkPtr,4>& neighbors, const glm::vec2& chunk_pos);
 
     };
 

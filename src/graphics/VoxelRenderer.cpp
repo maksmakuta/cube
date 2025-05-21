@@ -32,6 +32,9 @@ namespace cube {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
         glEnableVertexAttribArray(1);
 
+       // glVertexAttribIPointer(2, 1, GL_INT,  sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, ao)));
+       // glEnableVertexAttribArray(2);
+
         glBindVertexArray(0);
 
         count = static_cast<int>(indices.size());
@@ -77,8 +80,9 @@ namespace cube {
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
-
         glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
         {
             std::shared_lock lock(m_mesh_mutex);
             std::vector<std::pair<glm::ivec2, VoxelItem>> chunks{m_items.begin(),m_items.end()};
@@ -100,11 +104,16 @@ namespace cube {
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
         std::unordered_set<glm::ivec2> active_chunks;
 
-        world.forChunk([this, &active_chunks, &pool](const ChunkPtr& ptr, const glm::ivec2& pos) {
+        world.forChunk([this, &active_chunks, &pool, &world](const ChunkPtr& ptr, const glm::ivec2& pos) {
             active_chunks.insert(pos);
             if (!m_items.contains(pos)) {
-                pool.submit([this, &ptr, &pos] {
-                    const auto mesh = m_mesher.toMesh(ptr,pos);
+                pool.submit([this, &ptr, &pos, &world] {
+                    auto neighbors = std::array<ChunkPtr,4>();
+                    neighbors[0] = world.at(pos + glm::ivec2{ 1,0});
+                    neighbors[1] = world.at(pos + glm::ivec2{-1,0});
+                    neighbors[2] = world.at(pos + glm::ivec2{ 0,1});
+                    neighbors[3] = world.at(pos + glm::ivec2{0,-1});
+                    const auto mesh = m_mesher.toMesh(ptr,neighbors,pos);
                     std::lock_guard lock(m_mesh_mutex);
                     m_meshes.push_back(mesh);
                 });
