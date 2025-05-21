@@ -34,11 +34,14 @@ namespace cube {
 
         void onDraw(const glm::mat4&, const glm::vec3& root);
         void onTick(ThreadPool& pool, World& world);
+        bool isBorder(const glm::ivec2& v) const;
+
     private:
         std::unordered_map<glm::ivec2, VoxelItem> m_items;
         std::vector<VoxelMesh> m_meshes;
         std::shared_mutex m_mesh_mutex;
         glm::mat4 m_proj{1.f};
+        glm::ivec4 range;
         Shader m_shader;
         Texture m_atlas;
         Mesher m_mesher;

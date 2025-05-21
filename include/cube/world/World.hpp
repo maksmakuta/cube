@@ -40,7 +40,6 @@ namespace cube {
         std::shared_mutex m_mutex;
         std::unordered_map<glm::ivec2,ChunkPtr> m_chunks;
         std::shared_ptr<IGenerator> m_generator;
-        glm::vec4 range;
         int m_seed;
     };
 

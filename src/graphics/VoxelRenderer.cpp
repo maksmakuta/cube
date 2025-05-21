@@ -106,7 +106,7 @@ namespace cube {
 
         world.forChunk([this, &active_chunks, &pool, &world](const ChunkPtr& ptr, const glm::ivec2& pos) {
             active_chunks.insert(pos);
-            if (!m_items.contains(pos)) {
+            if (!m_items.contains(pos) || isBorder(pos)) {
                 pool.submit([this, &ptr, &pos, &world] {
                     auto neighbors = std::array<ChunkPtr,4>();
                     neighbors[0] = world.at(pos + glm::ivec2{ 1,0});
@@ -135,13 +135,35 @@ namespace cube {
         if (!m_meshes.empty()) {
             std::lock_guard lock(m_mesh_mutex);
             for (const auto&[key, vertices, indices] : m_meshes) {
-                auto item = VoxelItem();
-                item.load();
-                item.upload(vertices,indices);
-                m_items[key] = item;
+                if (m_items.contains(key)) {
+                    auto& i = m_items[key];
+                    i.upload(vertices,indices);
+                }else {
+                    auto item = VoxelItem();
+                    item.load();
+                    item.upload(vertices,indices);
+                    m_items[key] = item;
+                }
+
             }
             m_meshes.clear();
         }
 
+        glm::ivec2 r_min{0};
+        glm::ivec2 r_max{0};
+
+        for (const auto& item : active_chunks) {
+            r_min.x = std::min(r_min.x,item.x);
+            r_min.y = std::min(r_min.y,item.y);
+            r_max.x = std::max(r_min.x,item.x);
+            r_max.y = std::max(r_min.y,item.y);
+        }
+
+        range = {r_min,r_max};
+
+    }
+
+    bool VoxelRenderer::isBorder(const glm::ivec2& v) const {
+        return v.x == range.x || v.y == range.y || v.x == range.z || v.y == range.w;
     }
 }
