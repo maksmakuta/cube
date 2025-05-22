@@ -104,7 +104,16 @@ namespace cube {
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
         std::unordered_set<glm::ivec2> active_chunks;
 
-        world.forChunk([this, &active_chunks, &pool, &world](const ChunkPtr& ptr, const glm::ivec2& pos) {
+        glm::ivec2 r_min{0};
+        glm::ivec2 r_max{0};
+
+        world.forChunk([this, &active_chunks, &pool, &world, &r_min, &r_max](const ChunkPtr& ptr, const glm::ivec2& pos) {
+
+            r_min.x = std::min(r_min.x,pos.x);
+            r_min.y = std::min(r_min.y,pos.y);
+            r_max.x = std::max(r_min.x,pos.x);
+            r_max.y = std::max(r_min.y,pos.y);
+
             active_chunks.insert(pos);
             if (!m_items.contains(pos) || isBorder(pos)) {
                 pool.submit([this, &ptr, &pos, &world] {
@@ -147,16 +156,6 @@ namespace cube {
 
             }
             m_meshes.clear();
-        }
-
-        glm::ivec2 r_min{0};
-        glm::ivec2 r_max{0};
-
-        for (const auto& item : active_chunks) {
-            r_min.x = std::min(r_min.x,item.x);
-            r_min.y = std::min(r_min.y,item.y);
-            r_max.x = std::max(r_min.x,item.x);
-            r_max.y = std::max(r_min.y,item.y);
         }
 
         range = {r_min,r_max};
