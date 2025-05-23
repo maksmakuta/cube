@@ -48,9 +48,6 @@ namespace cube {
 
     }
 
-    void Renderer::use() {
-    }
-
     void Renderer::onClear() {
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);

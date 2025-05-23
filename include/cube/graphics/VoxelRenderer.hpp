@@ -3,25 +3,14 @@
 
 #include <vector>
 
-#include "FrustumCulling.hpp"
 #include "cube/graphics/Mesher.hpp"
 #include "cube/graphics/Shader.hpp"
 #include "cube/graphics/Texture.hpp"
+#include "cube/graphics/VoxelItem.hpp"
 #include "cube/utils/ThreadPool.hpp"
 #include "cube/world/World.hpp"
 
 namespace cube {
-
-    struct VoxelItem {
-        glm::uint vao;
-        glm::uint vbo;
-        glm::uint ebo;
-        int count;
-
-        void load();
-        void upload(const std::vector<Vertex3D>& vertices, const std::vector<unsigned>& indices);
-        void unload();
-    };
 
     class VoxelRenderer {
     public:

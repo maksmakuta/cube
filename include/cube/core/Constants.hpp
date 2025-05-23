@@ -9,11 +9,12 @@
 namespace cube {
 
     constval TITLE = "Cube";
-    constval RENDER_DIST = 16;
+    constval RENDER_DIST = 4;
 
     constval CHUNK_WIDTH = 16;
     constval CHUNK_DEPTH = 16;
     constval CHUNK_HEIGHT = 128;
+    constval CHUNK_WATER = CHUNK_HEIGHT / 2;
     constval CHUNK_SIZE = CHUNK_DEPTH * CHUNK_HEIGHT * CHUNK_WIDTH;
 
     constval ATLAS_SIZE = glm::vec2{160,256};

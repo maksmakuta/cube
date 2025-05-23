@@ -68,6 +68,8 @@ add_executable(cube
         src/generators/GeneratorTerrain.cpp
         include/cube/graphics/FrustumCulling.hpp
         src/graphics/FrustumCulling.cpp
+        include/cube/graphics/VoxelItem.hpp
+        src/graphics/VoxelItem.cpp
 )
 
 target_include_directories(cube PUBLIC include)

@@ -25,6 +25,12 @@ namespace cube {
         return glm::floor(glm::vec2{p.x,p.z} / glm::vec2{CHUNK_WIDTH, CHUNK_DEPTH});
     }
 
+    bool inChunk(const glm::ivec3 &vec) {
+        return vec.x >= 0 && vec.x < CHUNK_WIDTH &&
+               vec.y >= 0 && vec.y < CHUNK_HEIGHT &&
+               vec.z >= 0 && vec.z < CHUNK_DEPTH;
+    }
+
     glm::uint hash(const char* str) {
         uint32_t hash = 0x811c9dc5;
         while (*str) {

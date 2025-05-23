@@ -19,7 +19,7 @@ namespace cube {
 
     void Main::onDraw() {
         clear(0xFF222222);
-        m_renderer.use();
+
         m_renderer.text(m_font,0xFFFFFFFF);
         m_renderer.print(view/2.f,text, Align::Center);
 

@@ -3,6 +3,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
+#include "cube/utils/Utils.hpp"
 #include "FastNoise/FastNoise.h"
 
 namespace cube {
@@ -31,9 +32,21 @@ namespace cube {
                     }
                     chunk->set({x,h,z},BlockID::Grass);
                 }
+
+                const auto f = generator->GenSingle2D((delta.x + x) * 0.9f,(delta.y + z) * 0.9f, getSeed() + 1);
+                if (f >= 0.5f) {
+                    chunk->set({x,h + 1 ,z},BlockID::Flower);
+                }else if (f <= -0.5f) {
+                    chunk->set({x,h + 1 ,z},BlockID::Bush);
+                }
+
+                const auto t = generator->GenSingle2D((delta.x + x) * 0.69f,(delta.y + z) * 0.69f, getSeed() - 1);
+                if (t >= 0.5f) {
+                    chunk->set({x,h + 1 ,z},BlockID::Wood);
+                    //TODO( generate normal trees)
+                }
             }
         }
-
         return chunk;
     }
 

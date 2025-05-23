@@ -38,8 +38,6 @@ namespace cube {
         m_voxel.onDraw(m_player.getCamera().getView(), m_player.getPosition());
 
         if (m_debug) {
-            m_renderer.use();
-
             const auto h = m_font.getSize();
             const auto pos = m_player.getPosition();
             const auto rot = m_player.getRotation();

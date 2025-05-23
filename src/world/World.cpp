@@ -60,8 +60,6 @@ namespace cube {
             }
         }
 
-        std::cout << "Size : " << m_chunks.size() << std::endl;
-
     }
 
     void World::forChunk(const std::function<void(const ChunkPtr&, const glm::ivec2&)> &fn) {

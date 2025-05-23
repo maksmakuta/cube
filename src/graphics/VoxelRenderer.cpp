@@ -11,40 +11,6 @@
 #include "glad/gl.h"
 
 namespace cube {
-    void VoxelItem::load() {
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
-    }
-
-    void VoxelItem::upload(const std::vector<Vertex3D> &vertices, const std::vector<unsigned> &indices) {
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<int>(vertices.size() * sizeof(Vertex3D)), vertices.data(), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<int>(indices.size() * sizeof(uint32_t)), indices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), static_cast<void *>(nullptr));
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
-        glEnableVertexAttribArray(1);
-
-       // glVertexAttribIPointer(2, 1, GL_INT,  sizeof(Vertex3D), reinterpret_cast<void *>(offsetof(Vertex3D, ao)));
-       // glEnableVertexAttribArray(2);
-
-        glBindVertexArray(0);
-
-        count = static_cast<int>(indices.size());
-    }
-
-    void VoxelItem::unload() {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ebo);
-    }
 
     VoxelRenderer::VoxelRenderer() = default;
     VoxelRenderer::~VoxelRenderer() = default;
@@ -59,7 +25,6 @@ namespace cube {
         m_atlas.setMagFilter(TextureFilter::Nearest);
         m_atlas.setMinFilter(TextureFilter::Nearest);
         glEnable(GL_DEPTH_TEST);
-
     }
 
     void VoxelRenderer::onClear() {
@@ -80,9 +45,6 @@ namespace cube {
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
         {
             std::shared_lock lock(m_mesh_mutex);
             std::vector<std::pair<glm::ivec2, VoxelItem>> chunks{m_items.begin(),m_items.end()};
@@ -92,13 +54,28 @@ namespace cube {
                 return distA > distB;
             });
 
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+            glFrontFace(GL_CW);
+
             for (const auto&[offset, item] : chunks) {
                 m_shader.setMat4("model", glm::translate({1.f},glm::vec3{offset.x * CHUNK_WIDTH,0,offset.y * CHUNK_DEPTH}));
-                glBindVertexArray(item.vao);
-                glDrawElements(GL_TRIANGLES,item.count,GL_UNSIGNED_INT,nullptr);
+                glBindVertexArray(item.terrain.vao);
+                glDrawElements(GL_TRIANGLES, item.terrain.count,GL_UNSIGNED_INT, nullptr);
             }
+
+            glDisable(GL_CULL_FACE);
+            glDepthMask(GL_FALSE);
+
+            for (const auto &[offset, item]: chunks) {
+                m_shader.setMat4("model", glm::translate({1.f}, glm::vec3{
+                                                             offset.x * CHUNK_WIDTH, 0, offset.y * CHUNK_DEPTH
+                                                         }));
+                glBindVertexArray(item.billboard.vao);
+                glDrawElements(GL_TRIANGLES, item.billboard.count,GL_UNSIGNED_INT, nullptr);
+            }
+            glDepthMask(GL_TRUE);
         }
-        glDisable(GL_CULL_FACE);
     }
 
     void VoxelRenderer::onTick(ThreadPool& pool, World& world) {
@@ -117,11 +94,22 @@ namespace cube {
             active_chunks.insert(pos);
             if (!m_items.contains(pos) || isBorder(pos)) {
                 pool.submit([this, &ptr, &pos, &world] {
-                    auto neighbors = std::array<ChunkPtr,4>();
-                    neighbors[0] = world.at(pos + glm::ivec2{ 1,0});
-                    neighbors[1] = world.at(pos + glm::ivec2{-1,0});
-                    neighbors[2] = world.at(pos + glm::ivec2{ 0,1});
-                    neighbors[3] = world.at(pos + glm::ivec2{0,-1});
+                    /*      Y+
+                     *    0 1 2
+                     * X- 3 x 4 X+
+                     *    5 6 7
+                     *      Y-
+                     */
+
+                    auto neighbors = std::array<ChunkPtr, 8>();
+                    neighbors[0] = world.at(pos + glm::ivec2{-1, 1});
+                    neighbors[1] = world.at(pos + glm::ivec2{0, 1});
+                    neighbors[2] = world.at(pos + glm::ivec2{1, 1});
+                    neighbors[3] = world.at(pos + glm::ivec2{-1, 0});
+                    neighbors[4] = world.at(pos + glm::ivec2{1, 0});
+                    neighbors[5] = world.at(pos + glm::ivec2{-1, -1});
+                    neighbors[6] = world.at(pos + glm::ivec2{0, -1});
+                    neighbors[7] = world.at(pos + glm::ivec2{1, -1});
                     const auto mesh = m_mesher.toMesh(ptr,neighbors,pos);
                     std::lock_guard lock(m_mesh_mutex);
                     m_meshes.push_back(mesh);
@@ -131,9 +119,10 @@ namespace cube {
 
         if (!m_items.empty()){
             std::lock_guard lock(m_mesh_mutex);
-            for (auto it = m_items.begin();it != m_items.end();) {
+            for (auto it = m_items.begin(); it != m_items.end();) {
                 if (!active_chunks.contains(it->first)) {
-                    it->second.unload();
+                    it->second.terrain.unload();
+                    it->second.billboard.unload();
                     it = m_items.erase(it);
                 }else {
                     ++it;
@@ -143,14 +132,18 @@ namespace cube {
 
         if (!m_meshes.empty()) {
             std::lock_guard lock(m_mesh_mutex);
-            for (const auto&[key, vertices, indices] : m_meshes) {
+            for (const auto &[key, terrain, billboard]: m_meshes) {
                 if (m_items.contains(key)) {
-                    auto& i = m_items[key];
-                    i.upload(vertices,indices);
-                }else {
+                    auto &i = m_items[key];
+                    i.terrain.upload(terrain.vertices, terrain.indices);
+                    i.billboard.upload(billboard.vertices, billboard.indices);
+                } else {
                     auto item = VoxelItem();
-                    item.load();
-                    item.upload(vertices,indices);
+                    item.terrain.load();
+                    item.billboard.load();
+
+                    item.terrain.upload(terrain.vertices, terrain.indices);
+                    item.billboard.upload(billboard.vertices, billboard.indices);
                     m_items[key] = item;
                 }
 

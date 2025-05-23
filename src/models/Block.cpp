@@ -36,7 +36,7 @@ namespace cube {
             case BlockID::Leaves:
                 return toUV({3, 0});
             case BlockID::Bush:
-                return toUV({9, 8});
+                return toUV({4, 9});
             case BlockID::Flower:
                 return toUV({6, 11});
             case BlockID::HardStone:
@@ -47,7 +47,7 @@ namespace cube {
     }
 
     bool isFullBlock(const BlockID id) {
-        if (id == BlockID::Bush || id == BlockID::Flower)
+        if (id == BlockID::Bush || id == BlockID::Flower || id == BlockID::Air)
             return false;
         return true;
     }

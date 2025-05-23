@@ -26,6 +26,7 @@ namespace cube {
 
     glm::vec4 toVec4(const Color&);
     glm::ivec2 toChunk(const glm::vec3&);
+    bool inChunk(const glm::ivec3& vec);
 
     glm::uint hash(const char*);
 
