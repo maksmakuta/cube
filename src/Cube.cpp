@@ -1,58 +1,119 @@
 #include "cube/Cube.hpp"
 
-#include <functional>
+#include <format>
 #include <iostream>
+#include <GLFW/glfw3.h>
 
 #include "cube/core/Constants.hpp"
-#include "cube/screens/Game.hpp"
-#include "glad/gl.h"
 
 namespace cube {
 
     Cube::Cube() = default;
 
     void Cube::onCreate() {
-        m_screen = std::make_unique<Game>();
-        m_screen->attach(this);
-        m_screen->onCreate();
+        showCursor(false);
+        m_renderer.onCreate();
+        m_font.load(getAsset("/fonts/BlockCraft.otf"));
+        m_player.setPosition({0,96,0});
     }
 
     void Cube::onClear() {
-        m_screen->onClear();
+        m_pool.unload();
+        m_renderer.onClear();
+        m_font.unload();
     }
 
     void Cube::onDraw() {
-        m_screen->onDraw();
+        clear(0xFF222222);
+
+        if (m_debug) {
+            const auto h = m_font.getSize();
+            const auto pos = m_player.getPosition();
+            const auto rot = m_player.getRotation();
+            const auto cnk = toChunk(pos);
+
+            m_renderer.text(m_font,0xFFFFFFFF);
+            m_renderer.print({0,h},std::format("Cube v. 0.8.0 [debug] FPS: {:.2f}", m_fps));
+            m_renderer.print({0,h*2},std::format("Position: [{:.2f},{:.2f},{:.2f}]", pos.x,pos.y,pos.z));
+            m_renderer.print({0,h*3},std::format("Rotation: [{:.2f},{:.2f}]", rot.x,rot.y));
+            m_renderer.print({0,h*4},std::format("Chunk: [{},{}]", cnk.x, cnk.y));
+
+            // m_renderer.print({0,h*6},std::format("Render Distance: {}", RENDER_DIST));
+            m_renderer.print({0,h*7},std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
+
+        }
+    }
+
+    void Cube::onTick() {
+
     }
 
     void Cube::onUpdate(const float dt) {
-        m_screen->onUpdate(dt);
+        m_frames++;
+        m_last += dt;
+
+        if (m_last > FPS_TICK) {
+            m_fps = static_cast<float>(m_frames) / m_last;
+            constexpr float alpha = 0.1f;
+            m_fps = (1.0f / dt) * alpha + m_fps * (1.0f - alpha);
+            m_frames = 0;
+            m_last = 0;
+        }
+
+        m_player.move(m_player_dir,dt * m_speed);
+
         lastTick += dt;
         if (lastTick > TICK) {
-            m_screen->onTick();
+            onTick();
             lastTick = 0;
         }
     }
 
     void Cube::onResize(const int w, const int h){
         glViewport(0,0,w,h);
-        m_screen->onResize(w,h);
+        m_renderer.onResize(w,h);
     }
 
     void Cube::onKey(const int k, const int a, const int m){
-        m_screen->onKey(k,a,m);
+        const auto keys = std::vector{
+            GLFW_KEY_W,
+            GLFW_KEY_S,
+            GLFW_KEY_A,
+            GLFW_KEY_D,
+            GLFW_KEY_SPACE,
+            GLFW_KEY_LEFT_SHIFT
+        };
+
+        for(int i = 0; i < keys.size();i++) {
+            if (k == keys[i]) {
+                if (i == 0) {
+                    if (m == GLFW_MOD_CONTROL) {
+                        m_speed = 2.0f;
+                    }else if (m == GLFW_MOD_SHIFT) {
+                        m_speed = 0.5f;
+                    }else {
+                        m_speed = 1.f;
+                    }
+                }
+                set(m_player_dir,1 << (i+1),a != GLFW_RELEASE);
+            }
+        }
+
+        if (k == GLFW_KEY_F1 && a == GLFW_PRESS){
+            m_debug = !m_debug;
+        }
     }
 
     void Cube::onCursor(const float x, const float y){
-        m_screen->onCursor(x,y);
+        m_player.rotate(x,y);
     }
 
     void Cube::onScroll(const float dx, const float dy){
-        m_screen->onScroll(dx,dy);
+
     }
 
     void Cube::onText(uint code) {
-        m_screen->onText(code);
+
     }
 
     void onController(IWindowController* c,const std::function<void(IWindowController*)>& fn) {
@@ -73,15 +134,6 @@ namespace cube {
         onController(m_win_controller,[&i](IWindowController* c){
             c->setCursor(i);
         });
-    }
-
-    void Cube::navigate(IScreen* ptr) {
-        m_screen->onClear();
-        m_screen.reset(ptr);
-        if (m_screen) {
-            m_screen->attach(this);
-            m_screen->onCreate();
-        }
     }
 
     void Cube::close() {

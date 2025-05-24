@@ -1,13 +1,11 @@
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
 
-#include <glm/vec4.hpp>
-
-#include "cube/core/Face.hpp"
+#include "cube/enums/Face.hpp"
 
 namespace cube {
 
-    enum class BlockID {
+    enum class BlockID : uint8_t{
         Air,
         Grass,
         Dirt,
@@ -18,10 +16,6 @@ namespace cube {
         Flower,
         HardStone
     };
-
-    glm::vec4 getTile(BlockID, Face face);
-    bool isFullBlock(BlockID);
-
 }
 
 #endif //BLOCK_HPP

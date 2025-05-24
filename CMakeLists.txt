@@ -18,58 +18,46 @@ add_subdirectory(libs/FastNoise2)
 
 add_executable(cube
         include/cube/core/Constants.hpp
-        include/cube/core/Face.hpp
-        include/cube/core/IController.hpp
-        include/cube/core/IGenerator.hpp
-        include/cube/core/IScreen.hpp
-        include/cube/core/IWidget.hpp
         include/cube/core/IWindowController.hpp
+
         include/cube/entities/Player.hpp
-        include/cube/generators/GeneratorFlat.hpp
+
+        include/cube/enums/ChunkStage.hpp
+        include/cube/enums/Face.hpp
+
         include/cube/graphics/Renderer.hpp
-        include/cube/graphics/Mesher.hpp
         include/cube/graphics/Vertex.hpp
         include/cube/graphics/Camera.hpp
         include/cube/graphics/Font.hpp
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
-        include/cube/graphics/VoxelRenderer.hpp
+
         include/cube/models/Block.hpp
-        include/cube/screens/Game.hpp
-        include/cube/screens/Main.hpp
+
         include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
-        include/cube/world/Chunk.hpp
-        include/cube/world/World.hpp
+
         include/cube/Cube.hpp
         include/cube/Window.hpp
 
+
         src/entities/Player.cpp
-        src/generators/GeneratorFlat.cpp
+
         src/graphics/Camera.cpp
         src/graphics/Renderer.cpp
-        src/graphics/Mesher.cpp
         src/graphics/Font.cpp
         src/graphics/Shader.cpp
         src/graphics/Texture.cpp
-        src/graphics/VoxelRenderer.cpp
+
         src/models/Block.cpp
-        src/screens/Game.cpp
-        src/screens/Main.cpp
+
         src/utils/ThreadPool.cpp
         src/utils/Utils.cpp
-        src/world/Chunk.cpp
-        src/world/World.cpp
+
         src/Cube.cpp
         src/Window.cpp
 
         src/main.cpp
-        include/cube/generators/GeneratorTerrain.hpp
-        src/generators/GeneratorTerrain.cpp
-        include/cube/graphics/FrustumCulling.hpp
-        src/graphics/FrustumCulling.cpp
-        include/cube/graphics/VoxelItem.hpp
-        src/graphics/VoxelItem.cpp
 )
 
 target_include_directories(cube PUBLIC include)
