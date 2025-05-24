@@ -73,8 +73,12 @@ namespace cube {
         {0, 0}, {1, 0}, {1, 1}, {0, 1}
     };
 
-    VoxelMesh Mesher::toMesh(const ChunkPtr &chunk, const std::array<ChunkPtr, 8> &neighbors,
-                             const glm::vec2 &chunk_pos) {
+    VoxelMesh Mesher::toMesh(const ChunkPtr &chunk, const std::array<ChunkPtr, 8> &neighbors,const glm::vec2 &chunk_pos) {
+
+        if (!chunk) {
+            return {};
+        }
+
         VoxelMesh mesh{};
         mesh.key = chunk_pos;
         uint32_t inc_t = 0;
@@ -151,10 +155,13 @@ namespace cube {
                                 );
                             }
 
-                            mesh.billboard.indices.insert(mesh.billboard.indices.end(), {
-                                                              inc_b, inc_b + 2, inc_b + 1,
-                                                              inc_b, inc_b + 3, inc_b + 2,
-                                                          });
+                            mesh.billboard.indices.insert(
+                                mesh.billboard.indices.end(),
+                                {
+                                    inc_b, inc_b + 2, inc_b + 1,
+                                    inc_b, inc_b + 3, inc_b + 2,
+                                }
+                            );
 
                             inc_b += 4;
                         }

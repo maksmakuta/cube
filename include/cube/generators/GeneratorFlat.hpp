@@ -25,6 +25,7 @@ namespace cube {
         ~GeneratorFlat() override;
 
         ChunkPtr generateAt(const glm::vec2 &pos) override;
+        void postGenerate(const ChunkPtr &center, const std::array<ChunkPtr, 8> &neighbors,const glm::vec2 &pos) override;
 
     private:
         FlatPreset m_preset;

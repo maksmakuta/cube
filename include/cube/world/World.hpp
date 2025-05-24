@@ -8,7 +8,6 @@
 #include <functional>
 #include <memory>
 #include <shared_mutex>
-#include <unordered_set>
 
 #include "cube/core/IGenerator.hpp"
 #include "cube/utils/ThreadPool.hpp"
@@ -21,6 +20,7 @@ namespace cube {
     };
 
     class World {
+        using ChunkPair = std::pair<ChunkPtr, bool>;
     public:
         explicit World(int seed = 0);
         ~World();
@@ -38,7 +38,7 @@ namespace cube {
 
     private:
         std::shared_mutex m_mutex;
-        std::unordered_map<glm::ivec2,ChunkPtr> m_chunks;
+        std::unordered_map<glm::ivec2,ChunkPair> m_chunks;
         std::shared_ptr<IGenerator> m_generator;
         int m_seed;
     };

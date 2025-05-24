@@ -41,4 +41,9 @@ namespace cube {
         return temp;
     }
 
+    void GeneratorFlat::postGenerate(const ChunkPtr& center,const std::array<ChunkPtr, 8> &neighbors,const glm::vec2 &pos) {
+        // nothing to do here
+    }
+
+
 }

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <random>
+#include <unordered_set>
 #include <glm/gtx/string_cast.hpp>
 
 #include "cube/generators/GeneratorFlat.hpp"
@@ -43,7 +44,7 @@ namespace cube {
                     const ChunkPtr chunk = getGenerator()->generateAt(pos);
                     if (chunk) {
                         std::lock_guard lock(m_mutex);
-                        m_chunks.insert({pos, chunk});
+                        m_chunks.insert({pos, {chunk, false}});
                     }
                 });
             }
@@ -60,12 +61,49 @@ namespace cube {
             }
         }
 
+        {
+            for (auto& [pos, chunkPair] : m_chunks) {
+                if (chunkPair.second) {
+                    continue;
+                }
+
+                auto neighbors = std::array<ChunkPtr, 8>();
+                neighbors[0] = at(pos + glm::ivec2{-1, 1});
+                neighbors[1] = at(pos + glm::ivec2{0, 1});
+                neighbors[2] = at(pos + glm::ivec2{1, 1});
+                neighbors[3] = at(pos + glm::ivec2{-1, 0});
+                neighbors[4] = at(pos + glm::ivec2{1, 0});
+                neighbors[5] = at(pos + glm::ivec2{-1, -1});
+                neighbors[6] = at(pos + glm::ivec2{0, -1});
+                neighbors[7] = at(pos + glm::ivec2{1, -1});
+
+                if (!std::ranges::all_of(neighbors,[](const auto& item) {
+                    return item != nullptr;
+                })) {
+                    continue;
+                }
+
+                ChunkPtr chunk = chunkPair.first;
+                glm::ivec2 chunkPos = pos;
+                pool.submit([this, chunk, neighbors, chunkPos] {
+                    getGenerator()->postGenerate(chunk, neighbors, chunkPos);
+
+                    std::scoped_lock lock(m_mutex);
+                    if (const auto it = m_chunks.find(chunkPos); it != m_chunks.end()) {
+                        it->second.second = true;
+                    }
+                });
+            }
+        }
+
     }
 
     void World::forChunk(const std::function<void(const ChunkPtr&, const glm::ivec2&)> &fn) {
         std::lock_guard lock(m_mutex);
         for (auto & [pos, chunk]: m_chunks) {
-            fn(chunk,pos);
+            if (chunk.second) {
+                fn(chunk.first, pos);
+            }
         }
     }
 
@@ -83,6 +121,6 @@ namespace cube {
     ChunkPtr World::at(const glm::ivec2& v) {
         std::shared_lock lock(m_mutex);
         const auto it = m_chunks.find(v);
-        return it != m_chunks.end() ? it->second : nullptr;
+        return it != m_chunks.end() ? it->second.first : nullptr;
     }
 }

@@ -11,6 +11,7 @@ namespace cube {
         virtual ~IGenerator() = default;
 
         virtual ChunkPtr generateAt(const glm::vec2& pos) = 0;
+        virtual void postGenerate(const ChunkPtr& center,const std::array<ChunkPtr, 8> &neighbors,const glm::vec2 &pos) = 0;
 
         [[nodiscard]] int getSeed() const {
             return m_seed;
