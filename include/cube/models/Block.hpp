@@ -1,7 +1,7 @@
 #ifndef BLOCK_HPP
 #define BLOCK_HPP
 
-#include "cube/enums/Face.hpp"
+#include <cstdint>
 
 namespace cube {
 

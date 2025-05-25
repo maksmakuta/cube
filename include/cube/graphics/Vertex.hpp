@@ -3,6 +3,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace cube {
 
@@ -14,8 +15,7 @@ namespace cube {
 
     struct Vertex3D {
         glm::vec3 pos;
-        glm::vec2 tex;
-        int ao;
+        glm::vec3 col;
     };
 }
 
