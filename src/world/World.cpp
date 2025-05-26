@@ -57,8 +57,8 @@ namespace cube {
     std::vector<glm::ivec2> World::getChunks() const {
         const auto l = std::views::keys(m_chunks);
         auto vec = std::vector<glm::ivec2>{l.begin(), l.end()};
-        std::ranges::sort(vec,[](const glm::ivec2& a,const glm::ivec2& b) {
-           return a.x > b.x && a.y > b.y;
+        std::ranges::sort(vec, [](const glm::ivec2 &a, const glm::ivec2 &b) {
+            return a.x > b.x && a.y > b.y;
         });
 
         return vec;

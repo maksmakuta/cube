@@ -7,7 +7,6 @@
 #include "glad/gl.h"
 
 namespace cube {
-
     VoxelRenderer::VoxelRenderer() = default;
     VoxelRenderer::~VoxelRenderer() = default;
 
@@ -79,9 +78,7 @@ namespace cube {
 
         GLuint baseVertex = 0;
         GLuint firstIndex = 0;
-        GLuint baseInstance = 0;
-
-        {
+        GLuint baseInstance = 0; {
             std::shared_lock qlock(m_qmutex);
             for (const auto &i: world.getChunks()) {
                 if (!m_mesh_cache.contains(i)) {
@@ -92,7 +89,7 @@ namespace cube {
                             m_mesh_cache.emplace(i, m);
                         }
                     });
-                }else{
+                } else {
                     positions.emplace_back(glm::ivec3{i.x, 0, i.y} * CHUNK_ORIGIN);
                     const auto &[vertices, indices] = m_mesh_cache[i];
                     if (vertices.empty() || indices.empty()) {
@@ -131,9 +128,7 @@ namespace cube {
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
         glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
-        commandCount = static_cast<GLsizei>(commands.size());
-
-        {
+        commandCount = static_cast<GLsizei>(commands.size()); {
             //clean far chunks
             auto _ = std::unique_lock(m_qmutex);
             for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {

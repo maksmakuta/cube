@@ -10,7 +10,6 @@
 #include "cube/world/World.hpp"
 
 namespace cube {
-
     struct DrawElementsIndirectCommand {
         uint count;
         uint instanceCount;
@@ -27,7 +26,9 @@ namespace cube {
         void onCreate();
         void onClear();
         void onDraw(const glm::mat4 &view);
+
         void onTick(ThreadPool &, World &);
+
         void onResize(int w, int h);
 
         int count();
@@ -44,7 +45,6 @@ namespace cube {
         uint vbo{0};
         uint ebo{0};
     };
-
 }
 
 #endif //VOXELRENDERER_HPP

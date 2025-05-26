@@ -18,11 +18,15 @@ namespace cube {
     class World {
     public:
         explicit World(int seed = 0);
+
         ~World();
 
         void onTick(ThreadPool &pool, const Player &player);
+
         void onUpdate(const Player &player);
+
         [[nodiscard]] std::vector<glm::ivec2> getChunks() const;
+
         ChunkPtr getChunk(const glm::ivec2 &p) const;
 
         int getSeed() const;
