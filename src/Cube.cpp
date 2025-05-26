@@ -2,9 +2,11 @@
 
 #include <format>
 #include <iostream>
+#include <random>
 #include <GLFW/glfw3.h>
 
 #include "cube/core/Constants.hpp"
+#include "cube/generators/GeneratorHeight.hpp"
 
 namespace cube {
 
@@ -12,6 +14,8 @@ namespace cube {
 
     void Cube::onCreate() {
         showCursor(false);
+        m_world.setSeed(static_cast<int>(std::random_device{}()));
+        m_world.setGenerator(std::make_unique<GeneratorHeight>());
         m_renderer.onCreate();
         m_voxel.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
@@ -53,11 +57,10 @@ namespace cube {
 
             m_renderer.print({0, h * 7}, std::format("Render Distance: {}", RENDER_DIST));
             m_renderer.print({0, h * 8}, std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
-
-            m_renderer.print({0, h * 10}, std::format("Loaded: {}", m_world.getChunks().size()));
-            m_renderer.print({0, h * 11}, std::format("Visible: {}", m_world.getVisibleChunks().size()));
-
-            m_renderer.print({0, h * 13}, std::format("Wireframe: {}", m_mesh));
+            m_renderer.print({0, h * 9}, std::format("Loaded: {}", m_world.getChunks().size()));
+            m_renderer.print({0, h * 10}, std::format("Rendered: {}", m_voxel.count()));
+            m_renderer.print({0, h * 11}, std::format("Seed: {}", m_world.getSeed()));
+            m_renderer.print({0, h * 12}, std::format("Wireframe: {}", m_mesh));
         }
     }
 
@@ -79,6 +82,7 @@ namespace cube {
         }
 
         m_player.move(m_player_dir, dt * m_speed);
+        m_world.onUpdate(m_player);
 
         lastTick += dt;
         if (lastTick > TICK) {

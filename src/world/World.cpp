@@ -1,5 +1,6 @@
 #include "cube/world/World.hpp"
 
+#include <algorithm>
 #include <ranges>
 
 #include "cube/core/Constants.hpp"
@@ -16,43 +17,25 @@ namespace cube {
     void World::onTick(ThreadPool &pool, const Player &player) {
         const auto center = toChunk(player.getPosition());
         std::unordered_set<glm::ivec2> needed;
-        //m_visible.clear();
 
         for (int dz = -RENDER_DIST; dz <= RENDER_DIST; ++dz) {
             for (int dx = -RENDER_DIST; dx <= RENDER_DIST; ++dx) {
                 const auto cp = center + glm::ivec2(dx, dz);
                 needed.insert(cp);
-                //
-                // const auto cc = glm::vec3(glm::ivec3{dx, 0, dz} * CHUNK_ORIGIN + CHUNK_CENTER);
-                // auto toChunk = glm::normalize(glm::vec2(cc.x - player.getPosition().x, cc.z - player.getPosition().z));
-                // auto forward = glm::vec2(cos(glm::radians(player.getRotation().x)), sin(glm::radians(player.getRotation().x)));
-                // const float dot = glm::dot(toChunk, forward); // 1 = perfect forward
-                //
-                // const float maxDot = cosf(glm::radians(45.f) * 0.5f);
-                // if (dot >= maxDot) {
-                //     m_visible.insert(cp);
-                // }
 
                 if (!m_chunks.contains(cp)) {
-                    //lock here and put into pool
-                    auto chunk = m_generator->getChunk(cp);
-                    m_chunks[cp] = std::move(chunk);
-
-                    pool.submit([=]() {
+                    pool.submit([this, cp]() {
                         const auto new_chunk = m_generator->getChunk(cp);
                         std::lock_guard lock(m_qmutex);
-                        m_results.emplace(cp,new_chunk);
+                        m_results.emplace(cp, new_chunk);
                     });
                 }
             }
-        }
-
-        {
+        } {
             std::lock_guard inner_lock(m_qmutex);
-            while(!m_results.empty()) {
-                auto [pos, data] = m_results.front();
-                if (!m_chunks.contains(pos)) {
-                    m_chunks.insert_or_assign(pos,data);
+            while (!m_results.empty()) {
+                if (auto [pos, data] = m_results.front(); !m_chunks.contains(pos)) {
+                    m_chunks.insert_or_assign(pos, data);
                 }
                 m_results.pop();
             }
@@ -67,13 +50,18 @@ namespace cube {
         }
     }
 
-    std::unordered_set<glm::ivec2> World::getVisibleChunks() const {
-        return m_visible;
+    void World::onUpdate(const Player &player) {
+        center = player.getPosition();
     }
 
-    std::unordered_set<glm::ivec2> World::getChunks() const {
+    std::vector<glm::ivec2> World::getChunks() const {
         const auto l = std::views::keys(m_chunks);
-        return {l.begin(), l.end()};
+        auto vec = std::vector<glm::ivec2>{l.begin(), l.end()};
+        std::ranges::sort(vec,[](const glm::ivec2& a,const glm::ivec2& b) {
+           return a.x > b.x && a.y > b.y;
+        });
+
+        return vec;
     }
 
     ChunkPtr World::getChunk(const glm::ivec2 &p) const {
@@ -90,5 +78,11 @@ namespace cube {
 
     void World::setSeed(const int s) {
         m_generator->setSeed(s);
+    }
+
+    void World::setGenerator(std::unique_ptr<IGenerator> new_generator) {
+        const auto seed = m_generator->getSeed();
+        m_generator = std::move(new_generator);
+        m_generator->setSeed(seed);
     }
 }
