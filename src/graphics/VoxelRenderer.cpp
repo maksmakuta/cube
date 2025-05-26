@@ -65,14 +65,17 @@ namespace cube {
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, commandCount, 0);
         glDisable(GL_CULL_FACE);
-
     }
 
     void VoxelRenderer::onTick(ThreadPool &pool, const World &world) {
-        for (const auto &i: world.getChunks()) {
-            const auto c = world.getChunk(i);
-            if (c && !m_mesh_cache.contains(i)) {
-                m_mesh_cache[i] = toMesh(c);
+        {
+            std::lock_guard qlock(m_qmutex);
+            while (!m_result.empty()) {
+                const auto [pos, mesh] = m_result.front();
+                if (!m_mesh_cache.contains(pos)) {
+                    m_mesh_cache[pos] = mesh;
+                }
+                m_result.pop();
             }
         }
 
@@ -87,6 +90,13 @@ namespace cube {
 
         for (const auto &i: world.getChunks()) {
             if (!m_mesh_cache.contains(i)) {
+                pool.submit([&world, &i, this] {
+                    if (const auto c = world.getChunk(i)) {
+                        const auto m = toMesh(c);
+                        std::lock_guard qlock(m_qmutex);
+                        m_result.emplace(i,m);
+                    }
+                });
                 continue;
             }
             positions.push_back(glm::ivec3{i.x, 0, i.y} * CHUNK_ORIGIN);
@@ -126,6 +136,16 @@ namespace cube {
         glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
         commandCount = static_cast<GLsizei>(commands.size());
+
+
+        //clean far chunks
+        for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
+            if (!world.getChunks().contains(it->first)) {
+                it = m_mesh_cache.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
     void VoxelRenderer::onResize(const int w, const int h) {

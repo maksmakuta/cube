@@ -16,7 +16,7 @@ namespace cube {
     void World::onTick(ThreadPool &pool, const Player &player) {
         const auto center = toChunk(player.getPosition());
         std::unordered_set<glm::ivec2> needed;
-        m_visible.clear();
+        //m_visible.clear();
 
         for (int dz = -RENDER_DIST; dz <= RENDER_DIST; ++dz) {
             for (int dx = -RENDER_DIST; dx <= RENDER_DIST; ++dx) {
@@ -25,7 +25,7 @@ namespace cube {
                 //
                 // const auto cc = glm::vec3(glm::ivec3{dx, 0, dz} * CHUNK_ORIGIN + CHUNK_CENTER);
                 // auto toChunk = glm::normalize(glm::vec2(cc.x - player.getPosition().x, cc.z - player.getPosition().z));
-                // auto forward = glm::vec2(cos(player.getRotation().x), sin(player.getRotation().x));
+                // auto forward = glm::vec2(cos(glm::radians(player.getRotation().x)), sin(glm::radians(player.getRotation().x)));
                 // const float dot = glm::dot(toChunk, forward); // 1 = perfect forward
                 //
                 // const float maxDot = cosf(glm::radians(45.f) * 0.5f);
@@ -37,7 +37,24 @@ namespace cube {
                     //lock here and put into pool
                     auto chunk = m_generator->getChunk(cp);
                     m_chunks[cp] = std::move(chunk);
+
+                    pool.submit([=]() {
+                        const auto new_chunk = m_generator->getChunk(cp);
+                        std::lock_guard lock(m_qmutex);
+                        m_results.emplace(cp,new_chunk);
+                    });
                 }
+            }
+        }
+
+        {
+            std::lock_guard inner_lock(m_qmutex);
+            while(!m_results.empty()) {
+                auto [pos, data] = m_results.front();
+                if (!m_chunks.contains(pos)) {
+                    m_chunks.insert_or_assign(pos,data);
+                }
+                m_results.pop();
             }
         }
 

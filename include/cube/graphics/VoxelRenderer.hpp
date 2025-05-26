@@ -19,24 +19,19 @@ namespace cube {
     class VoxelRenderer {
     public:
         VoxelRenderer();
-
         ~VoxelRenderer();
 
         void onCreate();
-
         void onClear();
-
         void onDraw(const glm::mat4 &view);
-
         void onTick(ThreadPool &, const World &);
-
         void onResize(int w, int h);
 
     private:
-        void load();
-
+        std::mutex m_qmutex;
         glm::mat4 m_proj;
         std::unordered_map<glm::ivec2, Mesh> m_mesh_cache;
+        std::queue<std::pair<glm::ivec2, Mesh>> m_result;
         Shader m_shader;
         uint commandCount{0};
         uint indirectBuffer{0};

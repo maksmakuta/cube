@@ -18,24 +18,21 @@ namespace cube {
     class World {
     public:
         World(int seed = 0);
-
         ~World();
 
         void onTick(ThreadPool &pool, const Player &player);
-
         [[nodiscard]] std::unordered_set<glm::ivec2> getVisibleChunks() const;
-
         [[nodiscard]] std::unordered_set<glm::ivec2> getChunks() const;
-
         ChunkPtr getChunk(const glm::ivec2 &p) const;
 
         int getSeed() const;
-
         void setSeed(int);
 
     private:
+        std::mutex m_qmutex;
         std::unordered_map<glm::ivec2, ChunkPtr> m_chunks;
         std::unordered_set<glm::ivec2> m_visible;
+        std::queue<std::pair<glm::ivec2,ChunkPtr>> m_results;
         std::unique_ptr<IGenerator> m_generator;
     };
 }
