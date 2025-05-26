@@ -2,6 +2,7 @@
 #define BLOCK_HPP
 
 #include <cstdint>
+#include <glm/vec3.hpp>
 
 namespace cube {
 
@@ -16,6 +17,8 @@ namespace cube {
         Flower,
         HardStone
     };
+
+    glm::vec3 getColor(BlockID);
 }
 
 #endif //BLOCK_HPP

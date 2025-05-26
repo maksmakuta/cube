@@ -28,7 +28,15 @@ namespace cube {
     void Cube::onDraw() {
         clear(0xFF222222);
 
+        if (m_mesh) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
         m_voxel.onDraw(m_player.getCamera().getView());
+
+        if (m_mesh) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         if (m_debug) {
             const auto h = m_font.getSize();
@@ -37,17 +45,19 @@ namespace cube {
             const auto cnk = toChunk(pos);
 
             m_renderer.text(m_font, 0xFFFFFFFF);
-            m_renderer.print({0, h}, std::format("Cube v. 0.8.0 [debug] FPS: {:.2f}", m_fps));
+            m_renderer.print({0, h}, std::format("FPS: {:.2f}", m_fps));
             m_renderer.print({0, h * 2}, std::format("Position: [{:.2f},{:.2f},{:.2f}]", pos.x, pos.y, pos.z));
             m_renderer.print({0, h * 3}, std::format("Rotation: [{:.2f},{:.2f}]", rot.x, rot.y));
             m_renderer.print({0, h * 4}, std::format("Speed: {:.2f}", m_speed));
-
             m_renderer.print({0, h * 5}, std::format("Chunk: [{},{}]", cnk.x, cnk.y));
-            m_renderer.print({0, h * 6}, std::format("Render Distance: {}", RENDER_DIST));
-            m_renderer.print({0, h * 7}, std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
 
-            m_renderer.print({0, h * 9}, std::format("Loaded: {}", m_world.getChunks().size()));
-            m_renderer.print({0, h * 10}, std::format("Visible: {}", m_world.getVisibleChunks().size()));
+            m_renderer.print({0, h * 7}, std::format("Render Distance: {}", RENDER_DIST));
+            m_renderer.print({0, h * 8}, std::format("Chunk size: [{},{},{}]", CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_DEPTH));
+
+            m_renderer.print({0, h * 10}, std::format("Loaded: {}", m_world.getChunks().size()));
+            m_renderer.print({0, h * 11}, std::format("Visible: {}", m_world.getVisibleChunks().size()));
+
+            m_renderer.print({0, h * 13}, std::format("Wireframe: {}", m_mesh));
         }
     }
 
@@ -107,8 +117,13 @@ namespace cube {
             }
         }
 
-        if (k == GLFW_KEY_F1 && a == GLFW_PRESS) {
-            m_debug = !m_debug;
+        if (a == GLFW_PRESS) {
+            if (k == GLFW_KEY_F1) {
+                m_debug = !m_debug;
+            }
+            if (k == GLFW_KEY_F2) {
+                m_mesh = !m_mesh;
+            }
         }
     }
 

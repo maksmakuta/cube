@@ -22,16 +22,16 @@ namespace cube {
             for (int dx = -RENDER_DIST; dx <= RENDER_DIST; ++dx) {
                 const auto cp = center + glm::ivec2(dx, dz);
                 needed.insert(cp);
-
-                const auto cc = glm::vec3(glm::ivec3{dx, 0, dz} * CHUNK_ORIGIN + CHUNK_CENTER);
-                auto toChunk = glm::normalize(glm::vec2(cc.x - player.getPosition().x, cc.z - player.getPosition().z));
-                auto forward = glm::vec2(cos(player.getRotation().x), sin(player.getRotation().x));
-                const float dot = glm::dot(toChunk, forward); // 1 = perfect forward
-
-                const float maxDot = cosf(glm::radians(45.f) * 0.5f);
-                if (dot >= maxDot) {
-                    m_visible.insert(cp);
-                }
+                //
+                // const auto cc = glm::vec3(glm::ivec3{dx, 0, dz} * CHUNK_ORIGIN + CHUNK_CENTER);
+                // auto toChunk = glm::normalize(glm::vec2(cc.x - player.getPosition().x, cc.z - player.getPosition().z));
+                // auto forward = glm::vec2(cos(player.getRotation().x), sin(player.getRotation().x));
+                // const float dot = glm::dot(toChunk, forward); // 1 = perfect forward
+                //
+                // const float maxDot = cosf(glm::radians(45.f) * 0.5f);
+                // if (dot >= maxDot) {
+                //     m_visible.insert(cp);
+                // }
 
                 if (!m_chunks.contains(cp)) {
                     //lock here and put into pool

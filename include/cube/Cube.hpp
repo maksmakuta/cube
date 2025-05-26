@@ -46,6 +46,7 @@ namespace cube {
         uint m_frames{0};
         uint8_t m_player_dir{0};
         bool m_debug{false};
+        bool m_mesh{false};
         IWindowController* m_win_controller = nullptr;
     };
 

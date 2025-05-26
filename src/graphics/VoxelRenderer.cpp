@@ -55,6 +55,8 @@ namespace cube {
             return;
         }
 
+        glEnable(GL_CULL_FACE);
+
         m_shader.use();
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
@@ -62,6 +64,8 @@ namespace cube {
         glBindVertexArray(vao);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, commandCount, 0);
+        glDisable(GL_CULL_FACE);
+
     }
 
     void VoxelRenderer::onTick(ThreadPool &pool, const World &world) {
