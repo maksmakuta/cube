@@ -2,7 +2,6 @@
 #define BLOCK_HPP
 
 #include <cstdint>
-#include <glm/vec3.hpp>
 
 namespace cube {
 
@@ -10,15 +9,16 @@ namespace cube {
         Air,
         Grass,
         Dirt,
+        Sand,
         Stone,
+        Graystone,
         Wood,
         Leaves,
-        Bush,
-        Flower,
-        HardStone
+        Mushroom,
+        Cactus,
+        Water
     };
 
-    glm::vec3 getColor(BlockID);
 }
 
 #endif //BLOCK_HPP

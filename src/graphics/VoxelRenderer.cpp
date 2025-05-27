@@ -70,7 +70,18 @@ namespace cube {
         glDisable(GL_CULL_FACE);
     }
 
-    void VoxelRenderer::onTick(ThreadPool &pool, World &world) {
+    void VoxelRenderer::onTick(ThreadPool &pool, World &world) { {
+            //clean far chunks
+            auto _ = std::unique_lock(m_qmutex);
+            for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
+                if (!world.getChunk(it->first)) {
+                    it = m_mesh_cache.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+        }
+
         std::vector<Vertex3D> allVertices;
         std::vector<uint32_t> allIndices;
         std::vector<DrawElementsIndirectCommand> commands;
@@ -128,17 +139,7 @@ namespace cube {
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
         glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
 
-        commandCount = static_cast<GLsizei>(commands.size()); {
-            //clean far chunks
-            auto _ = std::unique_lock(m_qmutex);
-            for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
-                if (!world.getChunk(it->first)) {
-                    it = m_mesh_cache.erase(it);
-                } else {
-                    ++it;
-                }
-            }
-        }
+        commandCount = static_cast<GLsizei>(commands.size());
     }
 
     void VoxelRenderer::onResize(const int w, const int h) {
@@ -146,7 +147,7 @@ namespace cube {
         m_proj = glm::perspective(glm::radians(45.f), aspect, 0.01f, RENDER_DIST * CHUNK_HEIGHT * 1.25f);
     }
 
-    int VoxelRenderer::count() {
-        return m_mesh_cache.size();
+    int VoxelRenderer::count() const {
+        return static_cast<int>(m_mesh_cache.size());
     }
 }

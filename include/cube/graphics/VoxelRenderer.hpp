@@ -31,7 +31,7 @@ namespace cube {
 
         void onResize(int w, int h);
 
-        int count();
+        int count() const;
 
     private:
         mutable std::shared_mutex m_qmutex;

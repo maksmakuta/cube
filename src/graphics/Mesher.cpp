@@ -2,6 +2,9 @@
 
 namespace cube {
     Mesh toMesh(const ChunkPtr &chunk) {
-        return {};
+        Mesh mesh{};
+        if (!chunk) return mesh;
+
+        return mesh;
     }
 }

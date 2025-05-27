@@ -32,7 +32,7 @@ namespace cube {
                 for (int y = 0; y < h; ++y) {
                     BlockID b;
                     if (y == 0) {
-                        b = BlockID::HardStone;
+                        b = BlockID::Graystone;
                     } else if (y >= h - 3) {
                         b = BlockID::Dirt;
                     } else {

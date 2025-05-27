@@ -9,12 +9,11 @@
 namespace cube {
 
     constval TITLE = "Cube";
-    constval RENDER_DIST = 4;
+    constval RENDER_DIST = 8;
 
     constval CHUNK_WIDTH = 16;
     constval CHUNK_DEPTH = 16;
     constval CHUNK_HEIGHT = 128;
-    constval CHUNK_WATER = CHUNK_HEIGHT / 2;
     constval CHUNK_SIZE = CHUNK_DEPTH * CHUNK_HEIGHT * CHUNK_WIDTH;
     constval CHUNK_CENTER = glm::ivec3(CHUNK_WIDTH / 2, 0, CHUNK_DEPTH / 2);
     constval CHUNK_ORIGIN = glm::ivec3(CHUNK_WIDTH, 0, CHUNK_DEPTH);
