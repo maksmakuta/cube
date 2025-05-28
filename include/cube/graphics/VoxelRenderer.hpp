@@ -6,6 +6,7 @@
 
 #include "cube/graphics/Mesher.hpp"
 #include "cube/graphics/Shader.hpp"
+#include "cube/graphics/Texture.hpp"
 #include "cube/utils/ThreadPool.hpp"
 #include "cube/world/World.hpp"
 
@@ -35,6 +36,7 @@ namespace cube {
 
     private:
         mutable std::shared_mutex m_qmutex;
+        Texture m_atlas;
         glm::mat4 m_proj{1.f};
         std::unordered_map<glm::ivec2, Mesh> m_mesh_cache;
         Shader m_shader;

@@ -11,6 +11,7 @@ namespace cube {
     VoxelRenderer::~VoxelRenderer() = default;
 
     void VoxelRenderer::onCreate() {
+        m_atlas.load(getAsset("/textures/atlas.png"));
         m_shader.load(
             getAsset("/shaders/cube.vert"),
             getAsset("/shaders/cube.frag")
@@ -49,6 +50,7 @@ namespace cube {
         glDeleteBuffers(1, &instanceBuffer);
         glDeleteVertexArrays(1, &vao);
         m_shader.unload();
+        m_atlas.unload();
     }
 
     void VoxelRenderer::onDraw(const glm::mat4 &view) {
@@ -66,21 +68,22 @@ namespace cube {
 
         glBindVertexArray(vao);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, commandCount, 0);
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, static_cast<int>(commandCount), 0);
         glDisable(GL_CULL_FACE);
     }
 
-    void VoxelRenderer::onTick(ThreadPool &pool, World &world) { {
-            //clean far chunks
-            auto _ = std::unique_lock(m_qmutex);
-            for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
-                if (!world.getChunk(it->first)) {
-                    it = m_mesh_cache.erase(it);
-                } else {
-                    ++it;
-                }
-            }
-        }
+    void VoxelRenderer::onTick(ThreadPool &pool, World &world) {
+        //{
+        //    //clean far chunks
+        //    auto _ = std::unique_lock(m_qmutex);
+        //    for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
+        //        if (!world.getChunk(it->first)) {
+        //            it = m_mesh_cache.erase(it);
+        //        } else {
+        //            ++it;
+        //        }
+        //    }
+        //}
 
         std::vector<Vertex3D> allVertices;
         std::vector<uint32_t> allIndices;

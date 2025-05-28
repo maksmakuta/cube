@@ -12,10 +12,13 @@ namespace cube {
         Sand,
         Stone,
         Graystone,
-        Wood,
-        Leaves,
+        Wood1,
+        Wood2,
+        Leaves1,
+        Leaves2,
         Mushroom,
         Cactus,
+        Weed,
         Water
     };
 

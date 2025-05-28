@@ -5,7 +5,7 @@
 
 ### Features
 
-- [X] Multithreading support
+- [X] Multithreading support (using ThreadPool)
 - [ ] Optimized renderer (in progress)
     - [ ] Greedy Meshing (in progress)
     - [ ] Texture atlas support (in progress)

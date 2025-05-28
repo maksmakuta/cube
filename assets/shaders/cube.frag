@@ -1,7 +1,10 @@
 #version 460 core
-in vec3 f_col;
+in vec2 f_tex;
+
+uniform sampler2D atlas;
+
 out vec4 f_color;
 
 void main() {
-    f_color = vec4(f_col, 1.0);
+    f_color = texture(atlas, f_tex);
 }

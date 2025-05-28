@@ -34,7 +34,6 @@ add_executable(cube
         include/cube/graphics/VoxelRenderer.hpp
         include/cube/graphics/Shader.hpp
         include/cube/graphics/Texture.hpp
-        include/cube/graphics/TextureAtlas.hpp
         include/cube/models/Block.hpp
         include/cube/utils/ThreadPool.hpp
         include/cube/utils/Utils.hpp
@@ -61,7 +60,6 @@ add_executable(cube
         src/Window.cpp
 
         src/main.cpp
-        src/graphics/TextureAtlas.cpp
 )
 
 target_include_directories(cube PUBLIC include)
