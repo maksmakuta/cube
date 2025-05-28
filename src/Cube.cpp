@@ -19,7 +19,7 @@ namespace cube {
         m_renderer.onCreate();
         m_voxel.onCreate();
         m_font.load(getAsset("/fonts/BlockCraft.otf"));
-        // m_player.setPosition({0, 96, 0});
+        m_player.setPosition({0, 96, 0});
     }
 
     void Cube::onClear() {

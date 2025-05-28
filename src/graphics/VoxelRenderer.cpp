@@ -1,6 +1,10 @@
 #include "cube/graphics/VoxelRenderer.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <algorithm>
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
+#include <ranges>
 
 #include "cube/core/Constants.hpp"
 #include "cube/utils/Utils.hpp"
@@ -12,6 +16,12 @@ namespace cube {
 
     void VoxelRenderer::onCreate() {
         m_atlas.load(getAsset("/textures/atlas.png"));
+        m_atlas.bind(0);
+        m_atlas.setMagFilter(TextureFilter::Linear);
+        m_atlas.setMinFilter(TextureMinFilter::NearestLinear);
+        m_atlas.setWrap(TextureWrap::Repeat);
+        m_atlas.genMipmaps();
+
         m_shader.load(
             getAsset("/shaders/cube.vert"),
             getAsset("/shaders/cube.frag")
@@ -29,8 +39,8 @@ namespace cube {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D), static_cast<void *>(nullptr));
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D),
-                              reinterpret_cast<void *>(offsetof(Vertex3D, col)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3D),
+                              reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
         glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
@@ -62,7 +72,10 @@ namespace cube {
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
 
+        m_atlas.bind();
+
         m_shader.use();
+        m_shader.setInt("image",0);
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
@@ -92,23 +105,36 @@ namespace cube {
 
         GLuint baseVertex = 0;
         GLuint firstIndex = 0;
-        GLuint baseInstance = 0; {
+        GLuint baseInstance = 0;
+        {
             std::shared_lock qlock(m_qmutex);
             for (const auto &i: world.getChunks()) {
                 if (!m_mesh_cache.contains(i)) {
-                    pool.submit([&world, &i, this] {
+                    pool.submit([&world, i, this] {
                         if (const auto c = world.getChunk(i)) {
-                            const auto m = toMesh(c);
-                            std::unique_lock qlock(m_qmutex);
-                            m_mesh_cache.emplace(i, m);
+                            auto n = std::array<ChunkPtr,4>();
+                            n[0] = world.getChunk(i + glm::ivec2{1,0});
+                            n[1] = world.getChunk(i + glm::ivec2{-1,0});
+                            n[2] = world.getChunk(i + glm::ivec2{0,1});
+                            n[3] = world.getChunk(i + glm::ivec2{0,-1});
+                            bool allNotNull = std::all_of(n.begin(), n.end(), [](const ChunkPtr& ptr) {
+                                return ptr != nullptr;
+                            });
+                            if (allNotNull) {
+                                const auto m = toMesh(c,n);
+                                {
+                                    std::unique_lock qlock1(m_qmutex);
+                                    m_mesh_cache.emplace(i, m);
+                                }
+                            }
                         }
                     });
                 } else {
-                    positions.emplace_back(glm::ivec3{i.x, 0, i.y} * CHUNK_ORIGIN);
                     const auto &[vertices, indices] = m_mesh_cache[i];
                     if (vertices.empty() || indices.empty()) {
                         continue;
                     }
+                    positions.emplace_back(glm::ivec3{i.x, 0, i.y} * CHUNK_ORIGIN);
                     allVertices.insert(allVertices.end(), vertices.begin(), vertices.end());
                     allIndices.insert(allIndices.end(), indices.begin(), indices.end());
 
@@ -128,21 +154,22 @@ namespace cube {
                 }
             }
         }
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, allVertices.size() * sizeof(Vertex3D), allVertices.data(), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, allIndices.size() * sizeof(uint32_t), allIndices.data(), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(DrawElementsIndirectCommand), commands.data(),
-                     GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-        glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
-
         commandCount = static_cast<GLsizei>(commands.size());
+
+        if (commandCount > 0) {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, allVertices.size() * sizeof(Vertex3D), allVertices.data(), GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, allIndices.size() * sizeof(uint32_t), allIndices.data(), GL_STATIC_DRAW);
+
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
+            glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(DrawElementsIndirectCommand), commands.data(),
+                         GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+            glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
+        }
     }
 
     void VoxelRenderer::onResize(const int w, const int h) {

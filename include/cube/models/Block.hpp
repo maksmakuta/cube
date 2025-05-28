@@ -2,6 +2,9 @@
 #define BLOCK_HPP
 
 #include <cstdint>
+#include <glm/vec4.hpp>
+
+#include "cube/enums/Face.hpp"
 
 namespace cube {
 
@@ -12,16 +15,19 @@ namespace cube {
         Sand,
         Stone,
         Graystone,
-        Wood1,
-        Wood2,
-        Leaves1,
-        Leaves2,
-        Mushroom,
+        WoodDark,
+        WoodLight,
+        LeavesGreen,
+        LeavesOrange,
+        MushroomRed,
+        MushroomBrown,
         Cactus,
+        WeedDry,
         Weed,
         Water
     };
 
+    glm::vec4 getTile(BlockID, Face);
 }
 
 #endif //BLOCK_HPP

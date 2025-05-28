@@ -60,6 +60,7 @@ add_executable(cube
         src/Window.cpp
 
         src/main.cpp
+        src/models/Block.cpp
 )
 
 target_include_directories(cube PUBLIC include)

@@ -8,8 +8,9 @@
 - [X] Multithreading support (using ThreadPool)
 - [ ] Optimized renderer (in progress)
     - [ ] Greedy Meshing (in progress)
-    - [ ] Texture atlas support (in progress)
+  - [X] Texture atlas support
     - [ ] Lightning
+  - [ ] Ambient Occlusion
 - [ ] Simple Day/Night cycle
 - [ ] Biomes (Plains, Forest, Desert)
 - [ ] Commands support
