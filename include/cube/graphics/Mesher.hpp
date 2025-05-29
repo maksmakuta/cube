@@ -14,7 +14,8 @@ namespace cube {
         std::vector<uint32_t> indices;
     };
 
-    Mesh toMesh(const ChunkPtr &, const std::array<ChunkPtr,4>& neighbours);
+    Mesh toMesh(const ChunkPtr &, const std::array<ChunkPtr, 4> &neighbours);
+
 }
 
 #endif //MESHER_HPP

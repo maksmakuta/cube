@@ -16,6 +16,7 @@ namespace cube {
     struct Vertex3D {
         glm::vec3 pos;
         glm::vec2 tex;
+        int ao;
     };
 }
 

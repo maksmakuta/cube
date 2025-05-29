@@ -17,8 +17,8 @@ namespace cube {
     void VoxelRenderer::onCreate() {
         m_atlas.load(getAsset("/textures/atlas.png"));
         m_atlas.bind(0);
-        m_atlas.setMagFilter(TextureFilter::Linear);
-        m_atlas.setMinFilter(TextureMinFilter::NearestLinear);
+        m_atlas.setMagFilter(TextureFilter::Nearest);
+        m_atlas.setMinFilter(TextureMinFilter::NearestNearest);
         m_atlas.setWrap(TextureWrap::Repeat);
         m_atlas.genMipmaps();
 
@@ -43,10 +43,14 @@ namespace cube {
                               reinterpret_cast<void *>(offsetof(Vertex3D, tex)));
         glEnableVertexAttribArray(1);
 
-        glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), static_cast<void *>(nullptr));
+        glVertexAttribIPointer(2, 1, GL_INT, sizeof(Vertex3D),
+                      reinterpret_cast<void *>(offsetof(Vertex3D, ao)));
         glEnableVertexAttribArray(2);
-        glVertexAttribDivisor(2, 1);
+
+        glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), static_cast<void *>(nullptr));
+        glEnableVertexAttribArray(3);
+        glVertexAttribDivisor(3, 1);
 
         glBindVertexArray(0);
 
@@ -75,7 +79,7 @@ namespace cube {
         m_atlas.bind();
 
         m_shader.use();
-        m_shader.setInt("image",0);
+        m_shader.setInt("image", 0);
         m_shader.setMat4("proj", m_proj);
         m_shader.setMat4("view", view);
 
@@ -86,43 +90,43 @@ namespace cube {
     }
 
     void VoxelRenderer::onTick(ThreadPool &pool, World &world) {
-        //{
-        //    //clean far chunks
-        //    auto _ = std::unique_lock(m_qmutex);
-        //    for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
-        //        if (!world.getChunk(it->first)) {
-        //            it = m_mesh_cache.erase(it);
-        //        } else {
-        //            ++it;
-        //        }
-        //    }
-        //}
+        {
+            //clean far chunks
+            auto _ = std::unique_lock(m_qmutex);
+            for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
+                if (!world.getChunk(it->first)) {
+                    it = m_mesh_cache.erase(it);
+                } else {
+                    ++it;
+                }
+            }
+        }
 
         std::vector<Vertex3D> allVertices;
         std::vector<uint32_t> allIndices;
         std::vector<DrawElementsIndirectCommand> commands;
         std::vector<glm::vec3> positions;
 
-        GLuint baseVertex = 0;
         GLuint firstIndex = 0;
         GLuint baseInstance = 0;
+        GLuint baseVertex = 0;
+
         {
             std::shared_lock qlock(m_qmutex);
             for (const auto &i: world.getChunks()) {
                 if (!m_mesh_cache.contains(i)) {
                     pool.submit([&world, i, this] {
                         if (const auto c = world.getChunk(i)) {
-                            auto n = std::array<ChunkPtr,4>();
-                            n[0] = world.getChunk(i + glm::ivec2{1,0});
-                            n[1] = world.getChunk(i + glm::ivec2{-1,0});
-                            n[2] = world.getChunk(i + glm::ivec2{0,1});
-                            n[3] = world.getChunk(i + glm::ivec2{0,-1});
-                            bool allNotNull = std::all_of(n.begin(), n.end(), [](const ChunkPtr& ptr) {
+                            auto n = std::array<ChunkPtr, 4>();
+                            n[0] = world.getChunk(i + glm::ivec2{1, 0});
+                            n[1] = world.getChunk(i + glm::ivec2{-1, 0});
+                            n[2] = world.getChunk(i + glm::ivec2{0, 1});
+                            n[3] = world.getChunk(i + glm::ivec2{0, -1});
+                            bool allNotNull = std::all_of(n.begin(), n.end(), [](const ChunkPtr &ptr) {
                                 return ptr != nullptr;
                             });
                             if (allNotNull) {
-                                const auto m = toMesh(c,n);
-                                {
+                                const auto m = toMesh(c, n); {
                                     std::unique_lock qlock1(m_qmutex);
                                     m_mesh_cache.emplace(i, m);
                                 }
@@ -161,10 +165,12 @@ namespace cube {
             glBufferData(GL_ARRAY_BUFFER, allVertices.size() * sizeof(Vertex3D), allVertices.data(), GL_STATIC_DRAW);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, allIndices.size() * sizeof(uint32_t), allIndices.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, allIndices.size() * sizeof(uint32_t), allIndices.data(),
+                         GL_STATIC_DRAW);
 
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-            glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(DrawElementsIndirectCommand), commands.data(),
+            glBufferData(GL_DRAW_INDIRECT_BUFFER, commands.size() * sizeof(DrawElementsIndirectCommand),
+                         commands.data(),
                          GL_STATIC_DRAW);
 
             glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
