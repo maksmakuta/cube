@@ -44,7 +44,7 @@ namespace cube {
         glEnableVertexAttribArray(1);
 
         glVertexAttribIPointer(2, 1, GL_INT, sizeof(Vertex3D),
-                      reinterpret_cast<void *>(offsetof(Vertex3D, ao)));
+                               reinterpret_cast<void *>(offsetof(Vertex3D, ao)));
         glEnableVertexAttribArray(2);
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
@@ -89,8 +89,7 @@ namespace cube {
         glDisable(GL_CULL_FACE);
     }
 
-    void VoxelRenderer::onTick(ThreadPool &pool, World &world) {
-        {
+    void VoxelRenderer::onTick(ThreadPool &pool, World &world) { {
             //clean far chunks
             auto _ = std::unique_lock(m_qmutex);
             for (auto it = m_mesh_cache.begin(); it != m_mesh_cache.end();) {
@@ -109,9 +108,7 @@ namespace cube {
 
         GLuint firstIndex = 0;
         GLuint baseInstance = 0;
-        GLuint baseVertex = 0;
-
-        {
+        GLuint baseVertex = 0; {
             std::shared_lock qlock(m_qmutex);
             for (const auto &i: world.getChunks()) {
                 if (!m_mesh_cache.contains(i)) {

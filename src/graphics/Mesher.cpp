@@ -62,6 +62,52 @@ namespace cube {
         {0, 0},
     };
 
+    constexpr glm::ivec3 aoDirections[6][4][3] = {
+        // +X face
+        {
+            {{0, -1,  0}, {0,  0, -1}, {0, -1, -1}}, // Bottom-Back
+            {{0, -1,  0}, {0,  0,  1}, {0, -1,  1}}, // Bottom-Front
+            {{0,  1,  0}, {0,  0,  1}, {0,  1,  1}}, // Top-Front
+            {{0,  1,  0}, {0,  0, -1}, {0,  1, -1}}, // Top-Back
+        },
+        // -X face
+        {
+            {{0, -1,  0}, {0,  0,  1}, {0, -1,  1}},
+            {{0, -1,  0}, {0,  0, -1}, {0, -1, -1}},
+            {{0,  1,  0}, {0,  0, -1}, {0,  1, -1}},
+            {{0,  1,  0}, {0,  0,  1}, {0,  1,  1}},
+        },
+        // +Y face
+        {
+            {{1,   1,  0}, {0,  1, -1}, {1,   1, -1}},
+            {{1,   1,  0}, {0,  1,  1}, {1,   1,  1}},
+            {{-1,  1,  0}, {0,  1,  1}, {-1,  1,  1}},
+            {{-1,  1,  0}, {0,  1, -1}, {-1,  1, -1}},
+        },
+        // -Y face
+        {
+            {{1,  0,  0}, {0,  0, -1}, {1,  0, -1}},
+            {{-1, 0,  0}, {0,  0, -1}, {-1, 0, -1}},
+            {{-1, 0,  0}, {0,  0,  1}, {-1, 0,  1}},
+            {{1,  0,  0}, {0,  0,  1}, {1,  0,  1}},
+        },
+        // +Z face
+        {
+            {{-1,  0,  0}, {0, -1,  0}, {-1, -1,  0}},
+            {{1,   0,  0}, {0, -1,  0}, {1,  -1,  0}},
+            {{1,   0,  0}, {0,  1,  0}, {1,   1,  0}},
+            {{-1,  0,  0}, {0, 1, 0}, {-1, 1, 0}},
+        },
+        // -Z face
+        {
+            {{1, 0, 0}, {0, -1, 0}, {1, -1, 0}},
+            {{-1, 0, 0}, {0, -1, 0}, {-1, -1, 0}},
+            {{-1, 0, 0}, {0, 1, 0}, {-1, 1, 0}},
+            {{1, 0, 0}, {0, 1, 0}, {1, 1, 0}},
+        }
+    };
+
+
     bool isFullBlock(const BlockID i) {
         if (i == BlockID::MushroomBrown ||
             i == BlockID::MushroomRed ||
@@ -73,6 +119,31 @@ namespace cube {
 
     int computeAO(const bool side1, const bool side2, const bool corner) {
         return side1 && side2 ? 0 : (side1 + side2 + corner);
+    }
+
+    bool isSolid(glm::ivec3 pos, const ChunkPtr & chunk, const std::array<ChunkPtr, 4> & neighbours) {
+        ChunkPtr c = chunk;
+
+        if (pos.x >= CHUNK_WIDTH) {
+            c = neighbours[0];
+            pos.x -= CHUNK_WIDTH;
+        } else if (pos.x < 0) {
+            c = neighbours[1];
+            pos.x += CHUNK_WIDTH;
+        }
+
+        if (pos.z >= CHUNK_DEPTH) {
+            c = neighbours[2];
+            pos.z -= CHUNK_DEPTH;
+        } else if (pos.z < 0) {
+            c = neighbours[3];
+            pos.z += CHUNK_DEPTH;
+        }
+
+        if (c) {
+            return c->getBlock(pos) != BlockID::Air;
+        }
+        return false;
     }
 
     Mesh toMesh(const ChunkPtr &chunk, const std::array<ChunkPtr, 4> &neighbours) {
@@ -88,7 +159,8 @@ namespace cube {
                         continue;
                     }
 
-                    for (int f = 0; f < 6; f++) {
+                    const auto f = 2;
+//                    for (int f = 0; f < 6; f++) {
                         ChunkPtr c = chunk;
                         auto n = pos + normals[f];
 
@@ -109,51 +181,38 @@ namespace cube {
                         }
 
                         if (c && c->getBlock(n) == BlockID::Air) {
-
                             const auto face = static_cast<Face>(f);
                             const auto uv = getTile(chunk->getBlock(pos), face);
+
+                            auto temp = std::vector<Vertex3D>();
+
                             for (int i = 0; i < 4; ++i) {
-                                int ao = 0;
-                                for (const auto& r  : {0,1,4,5}) {
-                                    ChunkPtr c2 = chunk;
-                                    auto n2 = pos + normals[r];
-
-                                    if (n2.x >= CHUNK_WIDTH) {
-                                        c2 = neighbours[0];
-                                        n2.x -= CHUNK_WIDTH;
-                                    } else if (n2.x < 0) {
-                                        c2 = neighbours[1];
-                                        n2.x += CHUNK_WIDTH;
-                                    }
-
-                                    if (n2.z >= CHUNK_DEPTH) {
-                                        c2 = neighbours[2];
-                                        n2.z -= CHUNK_DEPTH;
-                                    } else if (n2.z < 0) {
-                                        c2 = neighbours[3];
-                                        n2.z += CHUNK_DEPTH;
-                                    }
-
-                                    if (c2) {
-                                        ao += c2->getBlock(n2) != BlockID::Air;
-                                    }
-                                }
-
-                                mesh.vertices.emplace_back(
+                                temp.emplace_back(
                                     pos + vertices[f][i],
                                     glm::mix(glm::vec2{uv.x, uv.y}, glm::vec2{uv.z, uv.w}, uv_coords[i]),
-                                    ao
+                                    3 - computeAO(
+                                        isSolid(pos + aoDirections[f][i][0], chunk, neighbours),
+                                        isSolid(pos + aoDirections[f][i][1], chunk, neighbours),
+                                        isSolid(pos + aoDirections[f][i][2], chunk, neighbours)
+                                    )
                                 );
                             }
 
+                            if (
+                                temp[0].ao + temp[3].ao < temp[1].ao + temp[2].ao
+                            ) {
+                                std::swap(temp[0].ao,temp[2].ao);
+                                std::swap(temp[1].ao,temp[3].ao);
+                            }
 
+                            mesh.vertices.insert(mesh.vertices.end(), temp.begin(), temp.end());
                             const auto indices = (f & 1)
-                                ? std::initializer_list{
-                                    index, index + 1, index + 2, index, index + 2, index + 3
-                                }
-                                : std::initializer_list{
-                                    index, index + 2, index + 1, index, index + 3, index + 2
-                                };
+                                                     ? std::initializer_list{
+                                                         index, index + 1, index + 2, index, index + 2, index + 3
+                                                     }
+                                                     : std::initializer_list{
+                                                         index, index + 2, index + 1, index, index + 3, index + 2
+                                                     };
 
                             mesh.indices.insert(
                                 mesh.indices.end(),
@@ -163,7 +222,7 @@ namespace cube {
                             index += 4;
                         }
                     }
-                }
+//                }
             }
         }
         return mesh;

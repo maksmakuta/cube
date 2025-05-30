@@ -11,10 +11,8 @@ uniform mat4 view;
 out vec2 f_tex;
 out float f_ao;
 
-const float AO = 1.f / 6.f;
-
 void main() {
     f_tex = tex;
-    f_ao = float(ao) * 0.25f;
+    f_ao = 0.25f + float(ao) * 0.25f;
     gl_Position = (proj * view) * vec4(pos + offset, 1.0);
 }

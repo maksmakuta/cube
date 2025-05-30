@@ -15,7 +15,6 @@ namespace cube {
     };
 
     Mesh toMesh(const ChunkPtr &, const std::array<ChunkPtr, 4> &neighbours);
-
 }
 
 #endif //MESHER_HPP
