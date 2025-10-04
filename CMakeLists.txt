@@ -5,6 +5,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(glm REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+
+add_subdirectory(libs/glad)
+
 add_executable(${PROJECT_NAME}
 
         cube/core/IEngine.hpp
@@ -41,4 +47,11 @@ add_executable(${PROJECT_NAME}
         cube/Cube.hpp
 
         main.cpp
+)
+
+target_include_directories(${PROJECT_NAME} PUBLIC cube libs)
+target_link_libraries(
+        ${PROJECT_NAME}
+        PUBLIC
+        glfw glm OpenGL::GL glad
 )
