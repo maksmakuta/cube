@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 4.0)
 project(cube)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 add_executable(${PROJECT_NAME}
 
         cube/core/IEngine.hpp
@@ -17,6 +21,11 @@ add_executable(${PROJECT_NAME}
         cube/engine/Engine.cpp
         cube/engine/Engine.hpp
 
+        cube/entity/Player.cpp
+        cube/entity/Player.hpp
+
+        cube/graphics/Font.cpp
+        cube/graphics/Font.hpp
         cube/graphics/Shader.cpp
         cube/graphics/Shader.hpp
         cube/graphics/Renderer2D.cpp
@@ -27,11 +36,6 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Texture.hpp
         cube/graphics/Window.cpp
         cube/graphics/Window.hpp
-
-        cube/models/Player.cpp
-        cube/models/Player.hpp
-        cube/models/Camera.cpp
-        cube/models/Camera.hpp
 
         cube/Cube.cpp
         cube/Cube.hpp
