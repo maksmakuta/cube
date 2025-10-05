@@ -1,6 +1,8 @@
 #ifndef CUBE_ISCREEN_HPP
 #define CUBE_ISCREEN_HPP
 
+#include "window/Event.hpp"
+
 namespace cube {
 
     class IScreen {
@@ -12,7 +14,7 @@ namespace cube {
         virtual void onUpdate(float) = 0;
         virtual void onDraw() = 0;
         virtual void onTick() = 0;
-        virtual void onEvent() = 0;
+        virtual void onEvent(const Event&) = 0;
 
     };
 

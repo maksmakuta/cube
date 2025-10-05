@@ -13,11 +13,8 @@ add_subdirectory(libs/glad)
 
 add_executable(${PROJECT_NAME}
 
-        cube/core/IEngine.hpp
-        cube/core/IObject.hpp
         cube/core/IManager.hpp
         cube/core/IEntity.hpp
-        cube/core/IRenderer.hpp
         cube/core/IScreen.hpp
 
         cube/data/World.cpp
@@ -50,6 +47,15 @@ add_executable(${PROJECT_NAME}
         cube/window/Event.hpp
 
         cube/main.cpp
+        cube/graphics/Context.cpp
+        cube/graphics/Context.hpp
+        cube/graphics/Color.cpp
+        cube/graphics/Color.hpp
+        cube/ui/screen/MainScreen.cpp
+        cube/ui/screen/MainScreen.hpp
+        cube/window/Key.cpp
+        cube/window/Key.hpp
+        cube/utils/LambdaVisitor.hpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC cube libs)

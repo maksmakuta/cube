@@ -1,13 +1,23 @@
-//
-// Created by maks on 10/4/25.
-//
-
 #ifndef CUBE_SCREENMANAGER_HPP
 #define CUBE_SCREENMANAGER_HPP
 
+#include "window/Event.hpp"
 
-class ScreenManager {
-};
+namespace cube {
 
+    class ScreenManager {
+    public:
+        ScreenManager();
+        ~ScreenManager();
+
+        void onInit();
+        void onDeinit();
+        void onUpdate(float);
+        void onDraw();
+        void onTick();
+        void onEvent(const Event&);
+    };
+
+}
 
 #endif //CUBE_SCREENMANAGER_HPP

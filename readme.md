@@ -52,6 +52,10 @@ Voxel rendering engine
  - GLM
  - GLFW 3.x
 
+### Thanks to
+
+ Jetbrains - for free licence for CLion
+
 ## Author
 
 Maks Makuta (C) 2025  

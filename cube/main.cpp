@@ -1,5 +1,8 @@
+#include <iostream>
 #include <memory>
+#include <ostream>
 
+#include "graphics/Context.hpp"
 #include "window/Window.hpp"
 
 class CubeGame {
@@ -10,9 +13,14 @@ public:
 
     void run() const {
         while(!m_window->isClosed()) {
+            clear(cube::Color(0xFFFFFFFF));
             m_window->update();
-            glClear(GL_COLOR_BUFFER_BIT);
-            glClearColor(0.5f, 0.6f, 0.7f, 1.0f);
+
+            while (m_window->isNextEvent()) {
+                const auto e = m_window->getEvent();
+                std::cout << cube::toString(e) << std::endl;
+            }
+
             m_window->swapBuffers();
         }
     }
