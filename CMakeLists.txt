@@ -13,7 +13,6 @@ add_subdirectory(libs/glad)
 
 add_executable(${PROJECT_NAME}
 
-        cube/core/IManager.hpp
         cube/core/IEntity.hpp
         cube/core/IScreen.hpp
 
@@ -22,10 +21,8 @@ add_executable(${PROJECT_NAME}
         cube/data/Chunk.cpp
         cube/data/Chunk.hpp
 
-        cube/engine/Engine.cpp
-        cube/engine/Engine.hpp
-        cube/engine/ScreenManager.cpp
-        cube/engine/ScreenManager.hpp
+        cube/game/ScreenManager.cpp
+        cube/game/ScreenManager.hpp
 
         cube/entity/Player.cpp
         cube/entity/Player.hpp
@@ -56,6 +53,7 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.cpp
         cube/window/Key.hpp
         cube/utils/LambdaVisitor.hpp
+        cube/core/IRenderer.hpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC cube libs)

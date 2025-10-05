@@ -12,9 +12,8 @@ namespace cube {
 
         void onInit() override;
         void onDeinit() override;
-        void onUpdate(float) override;
-        void onDraw() override;
-        void onTick() override;
+        void onDraw(Context&) override;
+        void onTick(float) override;
         void onEvent(const Event&) override;
     };
 
