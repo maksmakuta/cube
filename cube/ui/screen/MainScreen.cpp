@@ -13,7 +13,7 @@ namespace cube {
 
     }
 
-    void MainScreen::onDraw(Context&) {
+    void MainScreen::onDraw(Context& ctx) {
         clear(Color(0xFF9a62cd));
     }
 

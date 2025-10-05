@@ -48,7 +48,7 @@ Voxel rendering engine
 ### Dependencies
 
  - OpenGL 4.6 Core profile
- - GLAD
+ - GLAD ([included](/libs/glad))
  - GLM
  - GLFW 3.x
 
