@@ -4,10 +4,10 @@ Voxel rendering engine
 
 ### Features
 
-- [ ] Window
-  - [ ] Resizeable
-  - [ ] Load OpenGL functions
-  - [ ] Fill rendering
+- [x] Window
+  - [x] Resizeable
+  - [x] Load OpenGL functions
+  - [x] Fill rendering
 
 ### Dependencies
 

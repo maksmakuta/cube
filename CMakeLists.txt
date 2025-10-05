@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
         cube/core/IManager.hpp
         cube/core/IEntity.hpp
         cube/core/IRenderer.hpp
+        cube/core/IScreen.hpp
 
         cube/data/World.cpp
         cube/data/World.hpp
@@ -26,6 +27,8 @@ add_executable(${PROJECT_NAME}
 
         cube/engine/Engine.cpp
         cube/engine/Engine.hpp
+        cube/engine/ScreenManager.cpp
+        cube/engine/ScreenManager.hpp
 
         cube/entity/Player.cpp
         cube/entity/Player.hpp
@@ -40,13 +43,13 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Renderer3D.hpp
         cube/graphics/Texture.cpp
         cube/graphics/Texture.hpp
-        cube/graphics/Window.cpp
-        cube/graphics/Window.hpp
 
-        cube/Cube.cpp
-        cube/Cube.hpp
+        cube/window/Window.cpp
+        cube/window/Window.hpp
+        cube/window/Event.cpp
+        cube/window/Event.hpp
 
-        main.cpp
+        cube/main.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC cube libs)

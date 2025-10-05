@@ -1,7 +1,9 @@
+#include "glad/gl.h"
 #include "Window.hpp"
 
 #include <iostream>
 #include <ostream>
+
 
 namespace cube {
     void error(const std::string& message) {
@@ -9,7 +11,7 @@ namespace cube {
         std::exit(EXIT_FAILURE);
     }
 
-    Window::Window() {
+    Window::Window() : m_window(nullptr){
         if (!glfwInit()) {
             error("Failed to initialize GLFW");
         }
@@ -18,11 +20,14 @@ namespace cube {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        m_window = glfwCreateWindow(640, 480, "Cube Window", NULL, NULL);
+        m_window = glfwCreateWindow(640, 480, "Cube Window", nullptr, nullptr);
         if (!m_window) {
             error("Failed to create GLFW window");
         }
         glfwMakeContextCurrent(m_window);
+        if (!gladLoadGL(glfwGetProcAddress)) {
+            error("Failed to load OpenGL functions");
+        }
     }
 
     Window::~Window() {

@@ -28,9 +28,6 @@ namespace cube {
 
     private:
         GLFWwindow* m_window;
-        glm::vec2 m_pos;
-        glm::vec2 m_size;
-        std::string m_title;
     };
 
 }
