@@ -11,6 +11,9 @@ Voxel rendering engine
   - [ ] Generator 
     - [ ] Multithread support
     - [ ] Biomes support
+      - [ ] Based on temperature and humidity
+      - [ ] Limited height
+    - [ ] Structures
 - [ ] 2D Rendering
   - [ ] UI Rendering
   - [ ] Layouts
@@ -35,6 +38,13 @@ Voxel rendering engine
     - [ ] #-shaped
   - [ ] Support for chunk rendering
     - [ ] Multithreading mesh generator
+  - [ ] Camera system
+    - [ ] First person camera
+    - [ ] Third person camera
+  - [ ] Lighting
+    - [ ] Ambient light
+    - [ ] Directional light
+    - [ ] Spot light
 - [x] Window
   - [x] Resizeable
   - [x] Load OpenGL functions

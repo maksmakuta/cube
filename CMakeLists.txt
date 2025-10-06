@@ -16,6 +16,9 @@ add_executable(${PROJECT_NAME}
         cube/core/IRenderer.hpp
         cube/core/IScreen.hpp
 
+        cube/data/Block.cpp
+        cube/data/Block.hpp
+
         cube/game/ScreenManager.cpp
         cube/game/ScreenManager.hpp
 
@@ -29,6 +32,8 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Shader.hpp
         cube/graphics/Texture.cpp
         cube/graphics/Texture.hpp
+        cube/graphics/TextureArray.cpp
+        cube/graphics/TextureArray.hpp
 
         cube/ui/screen/MainScreen.cpp
         cube/ui/screen/MainScreen.hpp

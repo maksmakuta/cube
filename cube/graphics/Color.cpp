@@ -1,5 +1,7 @@
 #include "Color.hpp"
 
+#include <algorithm>
+
 namespace cube {
 
     Color::Color(const uint32_t rgba) : value(rgba) {}

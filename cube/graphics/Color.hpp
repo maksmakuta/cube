@@ -1,9 +1,10 @@
 #ifndef CUBE_COLOR_HPP
 #define CUBE_COLOR_HPP
-#include <algorithm>
+
 #include <cstdint>
 
 namespace cube {
+
     class Color {
     public:
         Color() = default;
@@ -30,6 +31,7 @@ namespace cube {
     private:
         uint32_t value = 0xFFFFFFFF;
     };
+
 }
 
 #endif //CUBE_COLOR_HPP
