@@ -15,6 +15,8 @@ namespace cube {
         void onDraw(Context&) override;
         void onTick(float) override;
         void onEvent(const Event&) override;
+    private:
+        uint font_handle{0};
     };
 
 }

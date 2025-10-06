@@ -7,9 +7,9 @@
 class CubeGame {
 public:
     CubeGame() {
-        m_window = std::make_shared<cube::Window>();
-        m_context = std::make_shared<cube::Context>();
-        m_manager = std::make_unique<cube::ScreenManager>();
+        m_window    = std::make_shared<cube::Window>();
+        m_context   = std::make_shared<cube::Context>();
+        m_manager   = std::make_unique<cube::ScreenManager>();
         m_manager->push(std::make_shared<cube::MainScreen>());
     }
 

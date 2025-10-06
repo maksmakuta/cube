@@ -48,6 +48,8 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
+        cube/graphics/Renderer2D.cpp
+        cube/graphics/Renderer2D.hpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC cube libs)
