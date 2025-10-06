@@ -50,7 +50,12 @@ add_executable(${PROJECT_NAME}
         cube/main.cpp
         cube/graphics/Renderer2D.cpp
         cube/graphics/Renderer2D.hpp
+        cube/utils/AssetsPaths.hpp
 )
+
+set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETS_PATH=\"${ASSETS_DIR}\")
 
 target_include_directories(${PROJECT_NAME} PUBLIC cube libs)
 target_link_libraries(
