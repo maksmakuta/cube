@@ -2,7 +2,6 @@
 #define CUBE_RENDERER2D_HPP
 
 #include <vector>
-#include <glm/fwd.hpp>
 #include <glm/mat4x4.hpp>
 
 #include "Color.hpp"
@@ -10,6 +9,18 @@
 #include "Texture.hpp"
 
 namespace cube {
+
+    enum class JoinType {
+        Miter,
+        Round,
+        Bevel
+    };
+
+    enum class CapType {
+        Flat,
+        Square,
+        Round
+    };
 
     struct Vertex2D {
         glm::vec2 pos;
@@ -19,14 +30,14 @@ namespace cube {
 
     class Renderer2D {
     public:
-        Renderer2D();
+        explicit Renderer2D(int alloc = 1024*1024);
         ~Renderer2D();
 
         void resize(const glm::vec2&);
 
         void begin();
-        void end();
-        void flush();
+        void end() const;
+        void flush() const;
 
         void point(const glm::vec2&);
         void line(const glm::vec2& a, const glm::vec2& b);
@@ -46,17 +57,25 @@ namespace cube {
         void fill(const Color&);
         void fill(const Texture&);
         void stroke(const Color&, float w = 1.f);
+        void setJoin(JoinType);
+        void setCap(CapType);
 
     private:
-        size_t m_len{0};
+        void push(const glm::vec2& vertex, const glm::vec2& uv = {0,0});
+        void toStroke(const std::vector<glm::vec2>&, bool loop = true);
+        void toFill(const std::vector<glm::vec2>&);
+
+        Color m_color;
+        Shader m_shader;
         uint32_t m_vao{0};
         uint32_t m_vbo{0};
-        Color m_color{1.f, 1.f, 1.f, 1.f};
-        Shader m_shader;
+        bool is_fill{true};
+        float m_line_width{1.f};
+        CapType m_cap = CapType::Flat;
+        JoinType m_join = JoinType::Miter;
         const Texture *m_texture{nullptr};
         std::vector<Vertex2D> m_vertices;
         glm::mat4 m_projection{1.f};
-        float m_lineWidth{1.f};
     };
 
 }

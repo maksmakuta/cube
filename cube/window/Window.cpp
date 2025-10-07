@@ -67,22 +67,23 @@ namespace cube {
         }
     }
 
-    void glfwCharCallback(GLFWwindow* window, unsigned int codepoint) {
+    void glfwCharCallback(GLFWwindow* window, const unsigned int codepoint) {
         if (const auto w = static_cast<Window*>(glfwGetWindowUserPointer(window))) {
             w->push(InputEvent{ codepoint });
         }
     }
 
-    Window::Window() : m_window(nullptr){
+    Window::Window(const std::string& title, const glm::ivec2& size) : m_window(nullptr){
         if (!glfwInit()) {
             error("Failed to initialize GLFW");
         }
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        glfwWindowHint(GLFW_SAMPLES, 8);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        m_window = glfwCreateWindow(640, 480, "Cube Window", nullptr, nullptr);
+        m_window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
         if (!m_window) {
             error("Failed to create GLFW window");
         }
@@ -97,12 +98,6 @@ namespace cube {
         glfwSetCursorPosCallback(m_window, glfwCursorPosCallback);
         glfwSetScrollCallback(m_window, glfwScrollCallback);
         glfwSetCharCallback(m_window, glfwCharCallback);
-
-        std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-        std::cout << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-        std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
-        std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
-
     }
 
     Window::~Window() {
@@ -144,7 +139,7 @@ namespace cube {
         glfwSetWindowTitle(m_window, t.c_str());
     }
 
-    void Window::update() const {
+    void update() {
         glfwPollEvents();
     }
 
@@ -166,4 +161,11 @@ namespace cube {
         m_events.push(e);
     }
 
+    void Window::close() const {
+        glfwSetWindowShouldClose(m_window, true);
+    }
+
+    double getTime() {
+        return glfwGetTime();
+    }
 }

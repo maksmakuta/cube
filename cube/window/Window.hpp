@@ -13,7 +13,7 @@ namespace cube {
 
     class Window {
     public:
-        Window();
+        explicit Window(const std::string& title, const glm::ivec2& size = {640,480});
         ~Window();
 
         [[nodiscard]] glm::vec2 getSize() const;
@@ -28,14 +28,17 @@ namespace cube {
         void setPos(const glm::vec2&) const;
         void setTitle(const std::string&) const;
 
-        void update() const;
         void swapBuffers() const;
         void push(const Event&);
+        void close() const;
 
     private:
         GLFWwindow* m_window;
         std::queue<Event> m_events;
     };
+
+    void update();
+    double getTime();
 
 }
 

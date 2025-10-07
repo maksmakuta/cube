@@ -31,6 +31,11 @@ namespace cube {
         ctx2d->begin();
         ctx2d->fill(Color(0xFF0080FF));
         ctx2d->circle(m_view / 2.f, m_size);
+        ctx2d->stroke(Color(0xFFFF8000));
+        const auto len = m_size;
+        const auto s = glm::vec2(len, len);
+        ctx2d->rect(m_view / 2.f - s, s * 2.f);
+
         ctx2d->end();
     }
 
@@ -42,19 +47,17 @@ namespace cube {
         std::visit(LambdaVisitor{
             [this](const ResizeEvent& re) {
                 m_view = glm::vec2(re.width, re.height);
-                std::cout << glm::to_string(m_view) << std::endl;
             },
             [this](const KeyEvent& ke) {
                 if (ke.pressed) {
                     if (ke.key == Key::W) {
-                        m_size += 1.f;
-                        m_size = std::min(m_size, 150.0f);
+                        m_size += 1.5f;
+                        m_size = std::min(m_size, 450.0f);
                     }
                     if (ke.key == Key::S) {
-                        m_size -= 1.f;
+                        m_size -= 1.5f;
                         m_size = std::max(m_size, 10.0f);
                     }
-                    std::cout << m_size << std::endl;
                 }
             },
             [](const MouseEvent& me) {},

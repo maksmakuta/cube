@@ -8,7 +8,7 @@
 class CubeGame {
 public:
     CubeGame() {
-        m_window    = std::make_shared<cube::Window>();
+        m_window    = std::make_shared<cube::Window>("Cube");
         m_context   = std::make_shared<cube::Context>();
         m_context->setRenderer(std::make_shared<cube::Renderer2D>());
         m_manager   = std::make_unique<cube::ScreenManager>();
@@ -16,10 +16,13 @@ public:
     }
 
     void run(){
-        constexpr auto dt = 1.f / 144.f;
         m_manager->onInit();
         while(!m_window->isClosed()) {
-            m_window->update();
+            const double now = cube::getTime();
+            const auto dt = static_cast<float>(now - m_time);
+            m_time = now;
+
+            cube::update();
             while (m_window->isNextEvent()) {
                 onEvent(m_window->getEvent());
             }
@@ -39,7 +42,11 @@ public:
                     r->resize(glm::vec2(re.width, re.height));
                 }
             },
-            [](const cube::KeyEvent& ke) {},
+            [this](const cube::KeyEvent& ke) {
+                if (ke.pressed && ke.key == cube::Key::Escape) {
+                    m_window->close();
+                }
+            },
             [](const cube::MouseEvent& me) {},
             [](const cube::ScrollEvent& se) {},
             [](const cube::InputEvent& ie) {}
@@ -52,6 +59,7 @@ private:
     std::shared_ptr<cube::Window> m_window = nullptr;
     std::shared_ptr<cube::Context> m_context = nullptr;
     std::unique_ptr<cube::ScreenManager> m_manager = nullptr;
+    double m_time = 0.f;
 };
 
 int main(){
