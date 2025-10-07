@@ -1,35 +1,66 @@
 #include "MainScreen.hpp"
 
+#include <iostream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
+#include "utils/LambdaVisitor.hpp"
+
 namespace cube {
 
     MainScreen::MainScreen() = default;
     MainScreen::~MainScreen() = default;
 
     void MainScreen::onInit() {
-//        font_handle = m_assets->load<Font>("monocraft.ttf", 32);
+
     }
 
     void MainScreen::onDeinit() {
-//        m_assets->unload(font_handle); //if it's not needed - unload asset, else asset will be available until asset manager gets destructed
-//        m_assets->unloadAll();       // if need to unload all assets
+
     }
 
     void MainScreen::onDraw(Context& ctx) {
-        clear(Color(0xFF9a62cd));
+        clear(Color(0x00A0A0FF));
 
-/*        auto& ctx2d = ctx->get2D();
+        const auto ctx2d = ctx.getRenderer2D();
+        if (!ctx2d) {
+            std::cout << "No 2D renderer found" << std::endl;
+            return;
+        }
 
-        ctx2d.begin();
-        ctx2d.drawText(m_assets.get<Font>(font_handle), "Hello World!", {100, 100});
-        ctx2d.end();*/
+        ctx2d->begin();
+        ctx2d->fill(Color(0xFF0080FF));
+        ctx2d->circle(m_view / 2.f, m_size);
+        ctx2d->end();
     }
 
     void MainScreen::onTick(float) {
 
     }
 
-    void MainScreen::onEvent(const Event&) {
-
+    void MainScreen::onEvent(const Event& e) {
+        std::visit(LambdaVisitor{
+            [this](const ResizeEvent& re) {
+                m_view = glm::vec2(re.width, re.height);
+                std::cout << glm::to_string(m_view) << std::endl;
+            },
+            [this](const KeyEvent& ke) {
+                if (ke.pressed) {
+                    if (ke.key == Key::W) {
+                        m_size += 1.f;
+                        m_size = std::min(m_size, 150.0f);
+                    }
+                    if (ke.key == Key::S) {
+                        m_size -= 1.f;
+                        m_size = std::max(m_size, 10.0f);
+                    }
+                    std::cout << m_size << std::endl;
+                }
+            },
+            [](const MouseEvent& me) {},
+            [](const ScrollEvent& se) {},
+            [](const InputEvent& ie) {}
+        }, e);
     }
 
 }

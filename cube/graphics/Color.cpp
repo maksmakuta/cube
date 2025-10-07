@@ -4,7 +4,7 @@
 
 namespace cube {
 
-    Color::Color(const uint32_t rgba) : value(rgba) {}
+    Color::Color(const uint32_t argb) : value(argb) {}
 
     Color::Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) {
         setBytes(r, g, b, a);

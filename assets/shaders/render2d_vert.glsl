@@ -4,7 +4,7 @@ layout(location = 0) in vec2 a_Pos;
 layout(location = 1) in vec2 a_UV;
 layout(location = 2) in uint a_Color;
 
-layout(location = 0) uniform mat4 u_Projection;
+uniform mat4 u_Projection;
 
 out vec2 v_UV;
 out vec4 v_Color;

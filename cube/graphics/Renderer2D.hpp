@@ -22,7 +22,7 @@ namespace cube {
         Renderer2D();
         ~Renderer2D();
 
-        void resize(const glm::ivec2&);
+        void resize(const glm::vec2&);
 
         void begin();
         void end();
@@ -51,9 +51,12 @@ namespace cube {
         size_t m_len{0};
         uint32_t m_vao{0};
         uint32_t m_vbo{0};
-        //Shader m_shader;
+        Color m_color{1.f, 1.f, 1.f, 1.f};
+        Shader m_shader;
+        const Texture *m_texture{nullptr};
         std::vector<Vertex2D> m_vertices;
         glm::mat4 m_projection{1.f};
+        float m_lineWidth{1.f};
     };
 
 }

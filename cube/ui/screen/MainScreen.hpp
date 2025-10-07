@@ -16,7 +16,8 @@ namespace cube {
         void onTick(float) override;
         void onEvent(const Event&) override;
     private:
-        uint font_handle{0};
+        glm::vec2 m_view{1,1};
+        float m_size{10.0f};
     };
 
 }
