@@ -1,12 +1,16 @@
 #include "Renderer2D.hpp"
 
 #include <functional>
-
-#include "utils/AssetsPaths.hpp"
+#include <optional>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "utils/AssetsPaths.hpp"
+
 namespace cube {
-    Renderer2D::Renderer2D(int alloc) : m_shader(
+
+    constexpr auto maxMiterLength = 50.f;
+
+    Renderer2D::Renderer2D(const int alloc) : m_shader(
         Shader::fromFiles(
             getShader("render2d_vert.glsl"),
             getShader("render2d_frag.glsl")
@@ -21,13 +25,13 @@ namespace cube {
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(alloc * sizeof(Vertex2D)), nullptr, GL_DYNAMIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, pos));
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, pos)));
 
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, uv));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, uv)));
 
         glEnableVertexAttribArray(2);
-        glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Vertex2D), (void*)offsetof(Vertex2D, col));
+        glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, col)));
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -110,8 +114,55 @@ namespace cube {
         rect(origin, size, glm::vec4(r.x, r.y, r.x, r.y));
     }
 
-    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec4& r){
 
+    void subArc(std::vector<glm::vec2>& path, const glm::vec2& center, const glm::vec2& r, const glm::vec2& range) {
+        constexpr int segments = 8; // Segments per corner arc
+        const float step = (range.y - range.x) / segments;
+
+        for (int i = 0; i <= segments; ++i) {
+            const float angle = range.x + static_cast<float>(i) * step;
+            path.emplace_back(center + glm::vec2(std::cos(angle), std::sin(angle)) * r);
+        }
+    }
+
+    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec4& r){
+        const glm::vec4 radii = glm::min(r, glm::vec4(glm::min(size.x, size.y) * 0.5f));
+
+        std::vector<glm::vec2> path;
+        path.reserve(64);
+
+        if (radii.x > 0.f) {
+            subArc(path, origin + glm::vec2(radii.x, radii.x),
+                   glm::vec2(radii.x), glm::vec2(glm::pi<float>(), glm::half_pi<float>() * 3.f));
+        } else {
+            path.emplace_back(origin);
+        }
+
+        if (radii.y > 0.f) {
+            subArc(path, origin + glm::vec2(size.x - radii.y, radii.y),
+                   glm::vec2(radii.y), glm::vec2(glm::half_pi<float>() * 3.f, glm::two_pi<float>()));
+        } else {
+            path.emplace_back(origin + glm::vec2(size.x, 0.f));
+        }
+
+        if (radii.z > 0.f) {
+            subArc(path, origin + glm::vec2(size.x - radii.z, size.y - radii.z),
+                   glm::vec2(radii.z), glm::vec2(0.f, glm::half_pi<float>()));
+        } else {
+            path.emplace_back(origin + size);
+        }
+
+        if (radii.w > 0.f) {
+            subArc(path, origin + glm::vec2(radii.w, size.y - radii.w),
+                   glm::vec2(radii.w), glm::vec2(glm::half_pi<float>(), glm::pi<float>()));
+        } else {
+            path.emplace_back(origin + glm::vec2(0.f, size.y));
+        }
+
+        if (is_fill)
+            toFill(path);
+        else
+            toStroke(path);
     }
 
     void Renderer2D::circle(const glm::vec2& center, const float r){
@@ -123,7 +174,7 @@ namespace cube {
         constexpr float step = glm::two_pi<float>() / segments;
         auto path = std::vector<glm::vec2>{};
         for (int i = 0; i < segments; ++i) {
-            const float t0 = static_cast<float>(i    ) * step;
+            const float t0 = static_cast<float>(i) * step;
             glm::vec2 p0 = center + glm::vec2(std::cos(t0), std::sin(t0)) * r;
             path.emplace_back(p0);
         }
@@ -145,7 +196,7 @@ namespace cube {
         if (is_fill)
             toFill(path);
         else
-            toStroke(path,false);
+            toStroke(path);
     }
 
     void Renderer2D::pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range){
@@ -164,101 +215,51 @@ namespace cube {
             toStroke(path);
     }
 
+    void Renderer2D::path(const std::vector<glm::vec2>& p) {
+        if (is_fill)
+            toFill(p);
+        else
+            toStroke(p);
+    }
+
     void Renderer2D::fill(const Color& c){
+        if (!is_fill || m_texture != nullptr) {
+            flush();
+        }
         m_color = c;
         is_fill = true;
         m_line_width = 1.f;
     }
 
     void Renderer2D::fill(const Texture& t){
+        if (!is_fill || m_texture == nullptr) {
+            flush();
+        }
         m_texture = &t;
         is_fill = true;
         m_line_width = 1.f;
     }
 
-    void Renderer2D::stroke(const Color& c, const float w){
+    void Renderer2D::stroke(const Color& c, const float w, const bool loop){
+        if (is_fill || m_texture == nullptr) {
+            flush();
+        }
         is_fill = false;
         m_color = c;
         m_line_width = w;
+        is_loop = loop;
     }
 
-    void Renderer2D::setJoin(JoinType j){
+    void Renderer2D::setJoin(const JoinType j){
         m_join = j;
     }
 
-    void Renderer2D::setCap(CapType c){
+    void Renderer2D::setCap(const CapType c){
         m_cap = c;
     }
 
     void Renderer2D::push(const glm::vec2& vertex, const glm::vec2& uv) {
         m_vertices.emplace_back(vertex, uv, static_cast<uint32_t>(m_color));
-    }
-
-    struct Line {
-        Line(const glm::vec2& start, const glm::vec2& end) : a(start), b(end) {}
-
-        Line operator + (const glm::vec2& w) const {
-            return {a + w, b + w};
-        }
-
-        Line operator - (const glm::vec2& w) const {
-            return {a - w, b - w};
-        }
-
-        [[nodiscard]] glm::vec2 dir(bool n = true) const {
-            const auto d = b - a;
-            if (n) return glm::normalize(d);
-            return d;
-        }
-
-        [[nodiscard]] glm::vec2 norm() const {
-            const auto d = dir();
-            return {-d.y, d.x};
-        }
-
-        glm::vec2 a;
-        glm::vec2 b;
-    };
-
-    struct Segment {
-        Segment(const Line& l, const float w) :
-            top(l + l.norm() * w), bottom(l - l.norm() * w) {}
-
-        void toVertices(const std::function<void(const glm::vec2&)>& callback) const {
-            callback(top.a);
-            callback(top.b);
-            callback(bottom.a);
-
-            callback(top.b);
-            callback(bottom.a);
-            callback(bottom.b);
-        }
-
-        Line top;
-        Line bottom;
-    };
-
-    void Renderer2D::toStroke(const std::vector<glm::vec2>& path, bool loop) {
-        if (path.size() < 2) return;
-
-        const float half = m_line_width * 0.5f;
-        const size_t count = path.size();
-
-        std::vector<Segment> segments;
-        for (size_t i = 0; i < count - 1; ++i) {
-            segments.emplace_back(Line(path[i], path[i + 1]), half);
-        }
-
-        if (loop) {
-            segments.emplace_back(Line(path.back(), path.front()), half);
-        }
-
-        for (const auto& s : segments) {
-            s.toVertices([this](const glm::vec2& v){
-                push(v);
-            });
-        }
-
     }
 
     void Renderer2D::toFill(const std::vector<glm::vec2>& path) {
@@ -269,5 +270,68 @@ namespace cube {
         }
     }
 
+    struct Line {
+
+        Line(const glm::vec2& start, const glm::vec2& end) : a(start), b(end){}
+
+        Line operator + (const glm::vec2& v) const {
+            return {a + v, b + v};
+        }
+
+        Line operator - (const glm::vec2& v) const {
+            return {a - v, b - v};
+        }
+
+        [[nodiscard]] glm::vec2 dir(const bool n = true) const {
+            const auto d = b - a;
+            if (n) return glm::normalize(d);
+            return d;
+        }
+
+        [[nodiscard]] glm::vec2 normal() const {
+            const auto d = dir();
+            return {-d.y, d.x};
+        }
+
+        glm::vec2 a,b;
+    };
+
+    struct Segment {
+
+        Segment(const Line& middle, float thick) : top(middle + middle.normal() * thick),
+            bottom(middle - middle.normal() * thick) , center(middle){}
+
+        Line top;
+        Line bottom;
+        Line center;
+    };
+
+    void Renderer2D::toStroke(const std::vector<glm::vec2>& path) {
+        if (path.size() < 2) return;
+
+        const auto thick = m_line_width * 0.5f;
+
+        auto segments = std::vector<Segment>();
+
+        if (is_loop) {
+            segments.emplace_back(Line(path.front(), path.back()), thick);
+        }
+
+        for (auto i = 0; i + 1 < path.size(); ++i) {
+            segments.emplace_back(Line(path[i], path[i+1]), thick);
+        }
+
+        for (const auto& s : segments) {
+            push(s.top.a);
+            push(s.top.b);
+            push(s.bottom.a);
+
+            push(s.top.b);
+            push(s.bottom.a);
+            push(s.bottom.b);
+
+        }
+
+    }
 
 }

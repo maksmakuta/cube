@@ -16,8 +16,13 @@ namespace cube {
         void onTick(float) override;
         void onEvent(const Event&) override;
     private:
-        glm::vec2 m_view{1,1};
-        float m_size{10.0f};
+        glm::vec2 mouse{};
+        bool pressed{false};
+        int join = 0;
+        int cap = 0;
+        int selected = -1;
+
+        std::vector<glm::vec2> path;
     };
 
 }

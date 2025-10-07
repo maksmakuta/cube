@@ -54,15 +54,17 @@ namespace cube {
         void arc(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range);
         void pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range);
 
+        void path(const std::vector<glm::vec2>&);
+
         void fill(const Color&);
         void fill(const Texture&);
-        void stroke(const Color&, float w = 1.f);
+        void stroke(const Color&, float w = 1.f, bool loop = true);
         void setJoin(JoinType);
         void setCap(CapType);
 
     private:
         void push(const glm::vec2& vertex, const glm::vec2& uv = {0,0});
-        void toStroke(const std::vector<glm::vec2>&, bool loop = true);
+        void toStroke(const std::vector<glm::vec2>&);
         void toFill(const std::vector<glm::vec2>&);
 
         Color m_color;
@@ -70,6 +72,7 @@ namespace cube {
         uint32_t m_vao{0};
         uint32_t m_vbo{0};
         bool is_fill{true};
+        bool is_loop{true};
         float m_line_width{1.f};
         CapType m_cap = CapType::Flat;
         JoinType m_join = JoinType::Miter;

@@ -55,6 +55,12 @@ namespace cube {
         }
     }
 
+    void glfwButtonCallback(GLFWwindow* window, const int key, const int action, int) {
+        if (const auto w = static_cast<Window*>(glfwGetWindowUserPointer(window))) {
+            w->push(KeyEvent{ toKey(key), action != GLFW_RELEASE });
+        }
+    }
+
     void glfwCursorPosCallback(GLFWwindow* window, const double xpos, const double ypos) {
         if (const auto w = static_cast<Window*>(glfwGetWindowUserPointer(window))) {
             w->push(MouseEvent{ static_cast<float>(xpos),static_cast<float>(ypos) });
@@ -96,6 +102,7 @@ namespace cube {
         glfwSetFramebufferSizeCallback(m_window, glfwFramebufferSizeCallback);
         glfwSetKeyCallback(m_window, glfwKeyCallback);
         glfwSetCursorPosCallback(m_window, glfwCursorPosCallback);
+        glfwSetMouseButtonCallback(m_window,glfwButtonCallback);
         glfwSetScrollCallback(m_window, glfwScrollCallback);
         glfwSetCharCallback(m_window, glfwCharCallback);
     }
