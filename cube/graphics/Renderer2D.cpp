@@ -327,6 +327,54 @@ namespace cube {
         Line center;
     };
 
+    void fan(
+        std::vector<Vertex2D>& vertices,
+        const glm::vec2& center,
+        const glm::vec2& connect,
+        const glm::vec2& from,
+        const glm::vec2& to,
+        const bool clockwise,
+        const glm::uint& color
+    ) {
+        const auto point1 = from - center;
+        const auto point2 = to - center;
+        auto angle1 = atan2f(point1.y, point1.x);
+        auto angle2 = atan2f(point2.y, point2.x);
+
+        if (clockwise) {
+            if (angle2 > angle1) {
+                angle2 = angle2 - glm::two_pi<float>();
+            }
+        } else {
+            if (angle1 > angle2) {
+                angle1 = angle1 - glm::two_pi<float>();
+            }
+        }
+
+        const auto jointAngle = angle2 - angle1;
+        const auto numTriangles = std::max(1, static_cast<int>(std::floor(std::abs(jointAngle) / 0.174533)));
+        const auto triAngle = jointAngle / static_cast<float>(numTriangles);
+
+        auto startPoint = from;
+        glm::vec2 endPoint;
+        for (int t = 0; t < numTriangles; t++) {
+            if (t + 1 == numTriangles) {
+                endPoint = to;
+            } else {
+                const auto rot = static_cast<float>(t + 1) * triAngle;
+                endPoint.x = std::cosf(rot) * point1.x - std::sinf(rot) * point1.y;
+                endPoint.y = std::sinf(rot) * point1.x + std::cosf(rot) * point1.y;
+                endPoint = endPoint + center;
+            }
+
+            vertices.emplace_back(startPoint, glm::vec2{}, color);
+            vertices.emplace_back(endPoint, glm::vec2{}, color);
+            vertices.emplace_back(connect, glm::vec2{}, color);
+
+            startPoint = endPoint;
+        }
+    }
+
     void Renderer2D::toStroke(const std::vector<glm::vec2>& path) {
         if (path.size() < 2) return;
 
@@ -342,7 +390,11 @@ namespace cube {
             segments.emplace_back(Line(path.front(), path.back()), thick);
         }else {
             if (m_cap == CapType::Round) {
-                //TODO(Round cap)
+                fan(m_vertices, segments.back().center.b, segments.back().center.b,
+                    segments.back().top.b, segments.back().bottom.b, true, static_cast<uint32_t>(m_color));
+
+                fan(m_vertices, segments.front().center.a, segments.front().center.a,
+                    segments.front().bottom.a, segments.front().top.a, true, static_cast<uint32_t>(m_color));
             }
             if (m_cap == CapType::Square) {
                 segments.back().top.b += segments.back().center.dir() * thick;
