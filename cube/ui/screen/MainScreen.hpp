@@ -16,13 +16,11 @@ namespace cube {
         void onTick(float) override;
         void onEvent(const Event&) override;
     private:
-        glm::vec2 mouse{};
-        bool pressed{false};
-        int join = 0;
-        int cap = 0;
-        int selected = -1;
+        void onDraw2D(Renderer2D&);
+        void loadTexture(int id);
 
-        std::vector<glm::vec2> path;
+        Texture dirt;
+        int id = 0;
     };
 
 }

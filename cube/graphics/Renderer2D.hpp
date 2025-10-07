@@ -63,9 +63,11 @@ namespace cube {
         void setCap(CapType);
 
     private:
-        void push(const glm::vec2& vertex, const glm::vec2& uv = {0,0});
+        void push(const glm::vec2& vertex, const glm::vec2& uv = {-1,-1});
         void toStroke(const std::vector<glm::vec2>&);
         void toFill(const std::vector<glm::vec2>&);
+        void calcBox(const std::vector<glm::vec2>&);
+
 
         Color m_color;
         Shader m_shader;
@@ -77,6 +79,7 @@ namespace cube {
         CapType m_cap = CapType::Flat;
         JoinType m_join = JoinType::Miter;
         const Texture *m_texture{nullptr};
+        glm::vec4 m_box{-1};
         std::vector<Vertex2D> m_vertices;
         glm::mat4 m_projection{1.f};
     };

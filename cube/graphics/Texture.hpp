@@ -1,5 +1,6 @@
 #ifndef CUBE_TEXTURE_HPP
 #define CUBE_TEXTURE_HPP
+
 #include <string>
 
 #include "glad/gl.h"
@@ -8,8 +9,9 @@ namespace cube {
 
     class Texture {
     public:
-        explicit Texture(const std::string& path, bool flip = true);
-        Texture(int width, int height, GLenum format = GL_RGBA);
+        Texture() = default;
+        explicit Texture(const std::string& path, bool flip = false);
+        Texture(int width, int height, GLint format = GL_RGBA);
         ~Texture();
 
         Texture(const Texture&) = delete;

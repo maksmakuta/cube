@@ -265,11 +265,42 @@ namespace cube {
     }
 
     void Renderer2D::toFill(const std::vector<glm::vec2>& path) {
-        for (auto i = 1; i + 1 < path.size(); ++i) {
-            push(path.front());
-            push(path[i]);
-            push(path[i+1]);
+        calcBox(path);
+
+        const float minX = m_box.x;
+        const float minY = m_box.y;
+        const float maxX = m_box.z;
+        const float maxY = m_box.w;
+
+        auto computeUV = [&](const glm::vec2& v) -> glm::vec2 {
+            float u_ = (v.x - minX) / (maxX - minX);
+            float v_ = (v.y - minY) / (maxY - minY);
+            return {u_, v_};
+        };
+
+        for (size_t i = 1; i + 1 < path.size(); ++i) {
+            push(path.front(), computeUV(path.front()));
+            push(path[i], computeUV(path[i]));
+            push(path[i + 1], computeUV(path[i + 1]));
         }
+    }
+
+    void Renderer2D::calcBox(const std::vector<glm::vec2> &path) {
+        if (path.empty()) return;
+
+        float minX = path[0].x;
+        float maxX = path[0].x;
+        float minY = path[0].y;
+        float maxY = path[0].y;
+
+        for (const auto& p : path) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
+
+        m_box = glm::vec4(minX, minY, maxX, maxY);
     }
 
     struct Line {
@@ -369,9 +400,9 @@ namespace cube {
                 endPoint = endPoint + center;
             }
 
-            vertices.emplace_back(startPoint, glm::vec2{}, color);
-            vertices.emplace_back(endPoint, glm::vec2{}, color);
-            vertices.emplace_back(connect, glm::vec2{}, color);
+            vertices.emplace_back(startPoint, glm::vec2{-1,-1}, color);
+            vertices.emplace_back(endPoint, glm::vec2{-1,-1}, color);
+            vertices.emplace_back(connect, glm::vec2{-1,-1}, color);
 
             startPoint = endPoint;
         }
