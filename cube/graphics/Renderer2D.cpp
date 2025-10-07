@@ -2,7 +2,9 @@
 
 #include <functional>
 #include <optional>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include "utils/AssetsPaths.hpp"
 
@@ -408,6 +410,20 @@ namespace cube {
             auto& s1 = segments[i];
             auto& s2 = segments[i + 1];
 
+            auto dir1 = s1.center.dir();
+            auto dir2 = s2.center.dir();
+
+            const auto _angle = glm::angle(dir1, dir2);
+
+            auto wrappedAngle = _angle;
+            if (wrappedAngle > glm::half_pi<float>()) {
+                wrappedAngle = glm::pi<float>() - wrappedAngle;
+            }
+
+            if (m_join == JoinType::Miter && wrappedAngle < 0.349066) {
+                m_join = JoinType::Bevel;
+            }
+
             const glm::vec2 d1 = s1.center.dir();
             const glm::vec2 d2 = s2.center.dir();
             const bool left = (d1.x * d2.y - d1.y * d2.x) > 0.f;
@@ -421,9 +437,19 @@ namespace cube {
                 outer1.b = *p;
                 outer2.a = *p;
             }
-            if (auto p = intersect(inner1, inner2, false)) {
-                inner1.b = *p;
-                inner2.a = *p;
+
+            if (m_join == JoinType::Round) {
+                fan(m_vertices, s1.center.b, outer1.b,
+                    inner1.b, inner2.a, !left, static_cast<uint32_t>(m_color));
+            }else if (m_join == JoinType::Miter) {
+                if (auto p = intersect(inner1, inner2, true)) {
+                    inner1.b = *p;
+                    inner2.a = *p;
+                }
+            }else if (m_join == JoinType::Bevel) {
+                push(outer1.b);
+                push(inner1.b);
+                push(inner2.a);
             }
         }
 
@@ -434,7 +460,6 @@ namespace cube {
             push(s.top.b);
             push(s.bottom.a);
             push(s.bottom.b);
-
         }
 
     }
