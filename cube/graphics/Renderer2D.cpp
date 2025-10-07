@@ -334,12 +334,22 @@ namespace cube {
 
         auto segments = std::vector<Segment>();
 
-        if (is_loop) {
-            segments.emplace_back(Line(path.front(), path.back()), thick);
-        }
-
         for (auto i = 0; i + 1 < path.size(); ++i) {
             segments.emplace_back(Line(path[i], path[i+1]), thick);
+        }
+
+        if (is_loop) {
+            segments.emplace_back(Line(path.front(), path.back()), thick);
+        }else {
+            if (m_cap == CapType::Round) {
+                //TODO(Round cap)
+            }
+            if (m_cap == CapType::Square) {
+                segments.back().top.b += segments.back().center.dir() * thick;
+                segments.back().bottom.b += segments.back().center.dir() * thick;
+                segments.front().top.a -= segments.front().center.dir() * thick;
+                segments.front().bottom.a -= segments.front().center.dir() * thick;
+            }
         }
 
         for (auto i = 0; i + 1 < segments.size(); ++i) {
@@ -364,7 +374,6 @@ namespace cube {
                 inner2.a = *p;
             }
         }
-
 
         for (const auto& s : segments) {
             push(s.top.a);
