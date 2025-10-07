@@ -296,6 +296,27 @@ namespace cube {
         glm::vec2 a,b;
     };
 
+    std::optional<glm::vec2> intersect(const Line& l1, const Line& l2, const bool infinite = false) {
+        const auto p = l1.a;
+        const auto r = l1.b - l1.a;
+        const auto q = l2.a;
+        const auto s = l2.b - l2.a;
+
+        const auto rxs = r.x * s.y - r.y * s.x;
+        if (std::abs(rxs) < 1e-6f)
+            return std::nullopt;
+
+        const auto qp = q - p;
+        const auto t = (qp.x * s.y - qp.y * s.x) / rxs;
+        const auto u = (qp.x * r.y - qp.y * r.x) / rxs;
+
+        if (!infinite && (t < 0.f || t > 1.f || u < 0.f || u > 1.f)){
+            return std::nullopt;
+        }
+
+        return p + t * r;
+    }
+
     struct Segment {
 
         Segment(const Line& middle, float thick) : top(middle + middle.normal() * thick),
@@ -321,11 +342,34 @@ namespace cube {
             segments.emplace_back(Line(path[i], path[i+1]), thick);
         }
 
+        for (auto i = 0; i + 1 < segments.size(); ++i) {
+            auto& s1 = segments[i];
+            auto& s2 = segments[i + 1];
+
+            const glm::vec2 d1 = s1.center.dir();
+            const glm::vec2 d2 = s2.center.dir();
+            const bool left = (d1.x * d2.y - d1.y * d2.x) > 0.f;
+
+            Line& outer1 = left ? s1.top : s1.bottom;
+            Line& inner1 = left ? s1.bottom : s1.top;
+            Line& outer2 = left ? s2.top : s2.bottom;
+            Line& inner2 = left ? s2.bottom : s2.top;
+
+            if (auto p = intersect(outer1, outer2, true)) {
+                outer1.b = *p;
+                outer2.a = *p;
+            }
+            if (auto p = intersect(inner1, inner2, false)) {
+                inner1.b = *p;
+                inner2.a = *p;
+            }
+        }
+
+
         for (const auto& s : segments) {
             push(s.top.a);
             push(s.top.b);
             push(s.bottom.a);
-
             push(s.top.b);
             push(s.bottom.a);
             push(s.bottom.b);
