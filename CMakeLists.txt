@@ -51,6 +51,9 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Renderer2D.cpp
         cube/graphics/Renderer2D.hpp
         cube/utils/AssetsPaths.hpp
+        cube/graphics/TextureBuilder.cpp
+        cube/graphics/TextureBuilder.hpp
+        cube/graphics/TextureParams.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

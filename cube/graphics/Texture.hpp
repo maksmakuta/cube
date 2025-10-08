@@ -1,7 +1,7 @@
 #ifndef CUBE_TEXTURE_HPP
 #define CUBE_TEXTURE_HPP
 
-#include <string>
+#include <glm/vec2.hpp>
 
 #include "glad/gl.h"
 
@@ -9,26 +9,17 @@ namespace cube {
 
     class Texture {
     public:
-        Texture() = default;
-        explicit Texture(const std::string& path, bool flip = false);
-        Texture(int width, int height, GLint format = GL_RGBA);
+        Texture();
         ~Texture();
-
-        Texture(const Texture&) = delete;
-        Texture& operator=(const Texture&) = delete;
-
-        Texture(Texture&& other) noexcept;
-        Texture& operator=(Texture&& other) noexcept;
 
         void bind(uint32_t slot = 0) const;
 
-        [[nodiscard]] uint32_t id() const { return m_id; }
-        [[nodiscard]] int width() const { return m_width; }
-        [[nodiscard]] int height() const { return m_height; }
+        [[nodiscard]] glm::ivec2 getSize() const;
+        [[nodiscard]] uint32_t getId() const;
+
     private:
-        uint32_t m_id = 0;
-        int m_width = 0;
-        int m_height = 0;
+        uint32_t m_id{0};
+        glm::ivec2 m_size{0};
     };
 
 }

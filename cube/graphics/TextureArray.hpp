@@ -1,9 +1,8 @@
 #ifndef CUBE_TEXTUREARRAY_HPP
 #define CUBE_TEXTUREARRAY_HPP
 
-#include <cstdint>
-#include <string>
-#include <vector>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 #include "glad/gl.h"
 
@@ -11,26 +10,18 @@ namespace cube {
 
     class TextureArray {
     public:
-        TextureArray(int width, int height, int layers, GLenum format = GL_RGBA8);
+        TextureArray();
         ~TextureArray();
 
-        static TextureArray fromDir(const std::string& path);
-        static TextureArray fromFiles(const std::vector<std::string>& list);
+        void bind(uint32_t slot = 0) const;
 
-        TextureArray(const TextureArray&) = delete;
-        TextureArray& operator=(const TextureArray&) = delete;
-        TextureArray(TextureArray&& other) noexcept;
-        TextureArray& operator=(TextureArray&& other) noexcept;
-
-        void bind(int slot = 0) const;
-        [[nodiscard]] uint32_t id() const { return m_id; }
-        [[nodiscard]] int layers() const { return m_layers; }
+        [[nodiscard]] glm::ivec2 getSize() const;
+        [[nodiscard]] int getLength() const;
+        [[nodiscard]] uint32_t getId() const;
 
     private:
         uint32_t m_id = 0;
-        int m_width = 0;
-        int m_height = 0;
-        int m_layers = 0;
+        glm::ivec3 m_size = {0, 0, 0};
     };
 
 }

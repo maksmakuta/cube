@@ -9,7 +9,7 @@ namespace cube {
     MainScreen::~MainScreen() = default;
 
     void MainScreen::onInit() {
-        loadTexture(id);
+        loadTexture();
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -30,7 +30,7 @@ namespace cube {
         r.end();
     }
 
-    void MainScreen::loadTexture(const int id) {
+    void MainScreen::loadTexture() {
         if (id < 0 || id >= 10) return;
         dirt = Texture(getTexture("blocks/" + std::to_string(id) + ".png"));
     }
@@ -46,11 +46,11 @@ namespace cube {
                 if (ke.pressed) {
                     if (ke.key == Key::W) {
                         id++;
-                        loadTexture(id);
+                        loadTexture();
                     }
                     if (ke.key == Key::S) {
                         id--;
-                        loadTexture(id);
+                        loadTexture();
                     }
                 }
             },

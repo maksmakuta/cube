@@ -17,7 +17,7 @@ namespace cube {
         void onEvent(const Event&) override;
     private:
         void onDraw2D(Renderer2D&);
-        void loadTexture(int id);
+        void loadTexture();
 
         Texture dirt;
         int id = 0;
