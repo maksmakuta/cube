@@ -9,6 +9,7 @@
 namespace cube {
 
     class TextureArray {
+        friend class TextureBuilder;
     public:
         TextureArray();
         ~TextureArray();

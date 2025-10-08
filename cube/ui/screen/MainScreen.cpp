@@ -1,5 +1,6 @@
 #include "MainScreen.hpp"
 
+#include "graphics/TextureBuilder.hpp"
 #include "utils/AssetsPaths.hpp"
 #include "utils/LambdaVisitor.hpp"
 
@@ -32,7 +33,9 @@ namespace cube {
 
     void MainScreen::loadTexture() {
         if (id < 0 || id >= 10) return;
-        dirt = Texture(getTexture("blocks/" + std::to_string(id) + ".png"));
+        dirt = TextureBuilder()
+            .setFilter(TextureFilter::Nearest)
+            .build(getTexture("blocks/" + std::to_string(id) + ".png"));
     }
 
     void MainScreen::onTick(float) {

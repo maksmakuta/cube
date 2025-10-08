@@ -63,7 +63,7 @@ namespace cube {
 
         if (m_texture != nullptr) {
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_texture->id());
+            glBindTexture(GL_TEXTURE_2D, m_texture->getId());
             m_shader.setInt("u_Texture", 0);
         }
 
@@ -352,7 +352,7 @@ namespace cube {
 
     struct Segment {
 
-        Segment(const Line& middle, float thick) : top(middle + middle.normal() * thick),
+        Segment(const Line& middle, const float thick) : top(middle + middle.normal() * thick),
             bottom(middle - middle.normal() * thick) , center(middle){}
 
         Line top;
@@ -457,7 +457,7 @@ namespace cube {
 
             const glm::vec2 d1 = s1.center.dir();
             const glm::vec2 d2 = s2.center.dir();
-            const bool left = (d1.x * d2.y - d1.y * d2.x) > 0.f;
+            const bool left = d1.x * d2.y - d1.y * d2.x > 0.f;
 
             Line& outer1 = left ? s1.top : s1.bottom;
             Line& inner1 = left ? s1.bottom : s1.top;

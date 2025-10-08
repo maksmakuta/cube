@@ -8,6 +8,7 @@
 namespace cube {
 
     class Texture {
+        friend class TextureBuilder;
     public:
         Texture();
         ~Texture();
