@@ -49,7 +49,7 @@ namespace cube {
         return *this;
     }
 
-    TextureBuilder& TextureBuilder::setFlipY(bool flip) {
+    TextureBuilder& TextureBuilder::setFlipY(const bool flip) {
         m_flip = flip;
         return *this;
     }
@@ -78,7 +78,7 @@ namespace cube {
         glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
         applyParams(GL_TEXTURE_2D_ARRAY);
 
-        GLenum format = (ch == 4) ? GL_RGBA : GL_RGB;
+        const GLenum format = ch == 4 ? GL_RGBA : GL_RGB;
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, static_cast<GLint>(m_format),
                      w, h, static_cast<GLsizei>(items.size()), 0, format, GL_UNSIGNED_BYTE, nullptr);
 
@@ -141,7 +141,7 @@ namespace cube {
             throw std::runtime_error("Failed to load texture: " + file_path);
         }
 
-        GLenum format = (ch == 4) ? GL_RGBA : GL_RGB;
+        const GLenum format = ch == 4 ? GL_RGBA : GL_RGB;
         GLuint texID;
         glGenTextures(1, &texID);
         glBindTexture(GL_TEXTURE_2D, texID);

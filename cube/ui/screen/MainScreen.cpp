@@ -24,10 +24,12 @@ namespace cube {
         }
     }
 
-    void MainScreen::onDraw2D(Renderer2D &r) {
+    void MainScreen::onDraw2D(Renderer2D &r) const {
+        constexpr auto size = glm::vec2{256,256};
+
         r.begin();
         r.fill(dirt);
-        r.rect({0,0}, {100,100});
+        r.rect(m_view / 2.f - size / 2.f, size);
         r.end();
     }
 
@@ -44,7 +46,9 @@ namespace cube {
 
     void MainScreen::onEvent(const Event& e) {
         std::visit(LambdaVisitor{
-            [](const ResizeEvent& re) {},
+            [this](const ResizeEvent& re) {
+                m_view = {re.width, re.height};
+            },
             [this](const KeyEvent& ke) {
                 if (ke.pressed) {
                     if (ke.key == Key::W) {
@@ -57,9 +61,9 @@ namespace cube {
                     }
                 }
             },
-            [](const MouseEvent& me) {},
-            [](const ScrollEvent& se) {},
-            [](const InputEvent& ie) {}
+            [](const MouseEvent&) {},
+            [](const ScrollEvent&) {},
+            [](const InputEvent&) {}
         }, e);
     }
 

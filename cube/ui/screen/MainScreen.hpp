@@ -16,11 +16,12 @@ namespace cube {
         void onTick(float) override;
         void onEvent(const Event&) override;
     private:
-        void onDraw2D(Renderer2D&);
+        void onDraw2D(Renderer2D&) const;
         void loadTexture();
 
-        Texture dirt;
         int id = 0;
+        Texture dirt;
+        glm::vec2 m_view{0};
     };
 
 }
