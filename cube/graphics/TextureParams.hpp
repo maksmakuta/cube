@@ -9,7 +9,7 @@ namespace cube {
         RGBA8 = GL_RGBA8,
         RGB8  = GL_RGB8,
         RG8   = GL_RG8,
-        R8    = GL_ALPHA,
+        R8    = GL_RED,
         DEPTH = GL_DEPTH_COMPONENT24,
     };
 

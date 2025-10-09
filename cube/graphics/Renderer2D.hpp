@@ -57,7 +57,7 @@ namespace cube {
 
         void path(const std::vector<glm::vec2>&);
 
-        void text(Font&, const std::string&, const glm::vec2& pos);
+        void text(const Font&, const std::string&, const glm::vec2& pos);
 
         void fill(const Color&);
         void fill(const Texture&);
@@ -77,10 +77,11 @@ namespace cube {
         uint32_t m_vbo{0};
         bool is_fill{true};
         bool is_loop{true};
+        bool is_text{false};
         float m_line_width{1.f};
         CapType m_cap = CapType::Flat;
         JoinType m_join = JoinType::Miter;
-        const Texture *m_texture{nullptr};
+        Texture m_texture;
         glm::vec4 m_box{-1};
         std::vector<Vertex2D> m_vertices;
         glm::mat4 m_projection{1.f};

@@ -1,8 +1,10 @@
 #include "Font.hpp"
 
-#include <fstream>
 #include <vector>
-#include <glm/detail/func_geometric.inl>
+#include <ft2build.h>
+#include <stdexcept>
+
+#include FT_FREETYPE_H
 
 #include "TextureBuilder.hpp"
 
@@ -12,23 +14,59 @@ namespace cube {
     Font::~Font() = default;
 
     void Font::load(const std::string& path, int height) {
-        constexpr auto size = glm::ivec2{256,256};
-        constexpr auto center = size / 2;
-        std::vector<unsigned char> data(size.x * size.y,0);
+        m_height = height;
 
-        for (int x = 0; x < size.x; ++x) {
-            for (int y = 0; y < size.y; ++y) {
-                float d = glm::distance(glm::vec2(x, y), glm::vec2(center));
-                d = glm::clamp(d / glm::length(glm::vec2(size) / 2.0f), 0.0f, 1.0f);
-                data[y * size.x + x] = static_cast<unsigned char>(d * 255.0f < 128.0f ? 255 : 0);
+        FT_Library ft;
+        if (FT_Init_FreeType(&ft)) throw std::runtime_error("Failed to init FreeType");
+
+        FT_Face face;
+        if (FT_New_Face(ft, path.c_str(), 0, &face)) throw std::runtime_error("Failed to load font");
+
+        FT_Set_Pixel_Sizes(face, 0, height);
+
+        // Determine atlas size (simple: 16x16 chars)
+        constexpr int ATLAS_COLS = 16;
+        constexpr int ATLAS_ROWS = 16;
+        int atlas_width = ATLAS_COLS * height;
+        int atlas_height = ATLAS_ROWS * height;
+        std::vector<uint8_t> pixels(atlas_width * atlas_height, 0);
+
+        int x = 0, y = 0;
+        for (unsigned char c = 32; c < 128; ++c) {
+            if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+                continue;
+
+            FT_GlyphSlot g = face->glyph;
+
+            // Copy bitmap to atlas
+            for (int i = 0; i < g->bitmap.width; ++i) {
+                for (int j = 0; j < g->bitmap.rows; ++j) {
+                    int atlas_index = (y + j) * atlas_width + (x + i);
+                    pixels[atlas_index] = g->bitmap.buffer[j * g->bitmap.width + i];
+                }
             }
+
+            Glyph glyph{};
+            glyph.size = { (float)g->bitmap.width, (float)g->bitmap.rows };
+            glyph.bearing = { (float)g->bitmap_left, (float)g->bitmap_top };
+            glyph.advance = static_cast<int>(g->advance.x >> 6);
+
+            glyph.uv_min = { (float)x / atlas_width, (float)y / atlas_height };
+            glyph.uv_max = { (float)(x + g->bitmap.width) / atlas_width, (float)(y + g->bitmap.rows) / atlas_height };
+
+            m_glyphs[c] = glyph;
+
+            x += height;
+            if (x + height > atlas_width) { x = 0; y += height; }
         }
-        m_texture.release();
-        m_texture = TextureBuilder()
-            .setFormat(TextureFormat::R8)
-            .setFilter(TextureFilter::Nearest)
-            .setWrap(TextureWrap::ClampEdge)
-            .build(data, size);
+
+        // Build OpenGL texture
+        m_texture = TextureBuilder().setSize({ atlas_width, atlas_height })
+                                   .setFormat(TextureFormat::R8)
+                                   .build(pixels, { atlas_width, atlas_height });
+
+        FT_Done_Face(face);
+        FT_Done_FreeType(ft);
     }
 
     std::optional<Glyph> Font::getGlyph(char c) const {

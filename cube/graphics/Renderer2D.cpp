@@ -42,8 +42,6 @@ namespace cube {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
     }
 
     Renderer2D::~Renderer2D() = default;
@@ -64,16 +62,13 @@ namespace cube {
     void Renderer2D::flush() const {
         if (m_vertices.empty()) return;
 
-        // for (const auto& v : m_vertices) {
-            // std::cout << glm::to_string(v.pos) << " " << glm::to_string(v.uv) << " " << std::hex << v.col << std::endl;
-        // }
-
         m_shader.use();
         m_shader.setMat4("u_Projection", m_projection);
+        m_shader.setBool("u_IsText", is_text);
 
-        if (m_texture != nullptr) {
+        if (m_texture.getId() != 0) {
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_texture->getId());
+            glBindTexture(GL_TEXTURE_2D, m_texture.getId());
             m_shader.setInt("u_Texture", 0);
         }
 
@@ -234,28 +229,60 @@ namespace cube {
             toStroke(p);
     }
 
-    void Renderer2D::text(Font& font, const std::string& str, const glm::vec2& pos) {
+    void Renderer2D::text(const Font& font, const std::string& str, const glm::vec2& pos) {
+        is_text = true;
+        m_texture = font.getTexture();
+        glm::vec2 point = pos;
+        for (const auto& c : str) {
+            if (const auto g = font.getGlyph(c)) {
+                auto x = point.x + g->bearing.x;
+                auto y = point.y - g->bearing.y;
+                auto w = g->size.x;
+                auto h = g->size.y;
 
+                auto p00 = glm::vec2(x  , y  );
+                auto p01 = glm::vec2(x  , y+h);
+                auto p11 = glm::vec2(x+w, y+h);
+                auto p10 = glm::vec2(x+w, y  );
+
+                auto u00 = glm::vec2(g->uv_min.x,g->uv_min.y);
+                auto u01 = glm::vec2(g->uv_min.x,g->uv_max.y);
+                auto u11 = glm::vec2(g->uv_max.x,g->uv_max.y);
+                auto u10 = glm::vec2(g->uv_max.x,g->uv_min.y);
+
+                push(p00, u00);
+                push(p01, u01);
+                push(p10, u10);
+                push(p10, u10);
+                push(p01, u01);
+                push(p11, u11);
+
+                point.x += static_cast<float>(g->advance);
+            }
+        }
     }
 
     void Renderer2D::fill(const Color& c){
+        is_text = false;
         m_color = c;
-        m_texture = nullptr;
+        m_texture = Texture();
         is_fill = true;
     }
 
     void Renderer2D::fill(const Texture& t){
         m_color = Color(0xFFFFFFFF);
-        m_texture = &t;
+        m_texture = t;
         is_fill = true;
+        is_text = false;
     }
 
     void Renderer2D::stroke(const Color& c, const float w, const bool loop){
         is_fill = false;
         m_color = c;
-        m_texture = nullptr;
+        m_texture = Texture();
         m_line_width = w;
         is_loop = loop;
+        is_text = false;
     }
 
     void Renderer2D::setJoin(const JoinType j){
@@ -468,7 +495,7 @@ namespace cube {
             Line& outer2 = left ? s2.top : s2.bottom;
             Line& inner2 = left ? s2.bottom : s2.top;
 
-            if (auto p = intersect(outer1, outer2,true)) {
+            if (const auto p = intersect(outer1, outer2,true)) {
                 outer1.b = *p;
                 outer2.a = *p;
             }
@@ -477,7 +504,7 @@ namespace cube {
                 fan(m_vertices, s1.center.b, outer1.b,
                     inner1.b, inner2.a, !left, static_cast<uint32_t>(m_color));
             }else if (m_join == JoinType::Miter) {
-                if (auto p = intersect(inner1, inner2, true)) {
+                if (const auto p = intersect(inner1, inner2, true)) {
                     inner1.b = *p;
                     inner2.a = *p;
                 }
@@ -496,7 +523,6 @@ namespace cube {
             auto& s2 = segments[i + 1];
             onSegmentPair(s1,s2);
         }
-
 
         for (const auto& s : segments) {
             push(s.top.a);
