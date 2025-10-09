@@ -55,6 +55,9 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
+        cube/graphics/RendererUI.cpp
+        cube/graphics/RendererUI.hpp
+        cube/core/IWidget.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
