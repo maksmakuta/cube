@@ -9,6 +9,12 @@ namespace cube {
         glBindTextureUnit(slot, m_id);
     }
 
+    void Texture::release() {
+        glDeleteTextures(1, &m_id);
+        m_id = 0;
+        m_size = {0, 0};
+    }
+
     glm::ivec2 Texture::getSize() const {
         return m_size;
     }

@@ -1,38 +1,37 @@
 #ifndef CUBE_FONT_HPP
 #define CUBE_FONT_HPP
+
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <glm/vec2.hpp>
 
+#include "Texture.hpp"
+
 namespace cube {
 
     struct Glyph {
-        glm::vec2 uvMin;
-        glm::vec2 uvMax;
-        int width;
-        int height;
-        int bearingX;
-        int bearingY;
+        glm::vec2 size;
+        glm::vec2 bearing;
+        glm::vec2 uv_min;
+        glm::vec2 uv_max;
         int advance;
     };
 
     class Font {
     public:
-        Font() = default;
+        Font();
         ~Font();
 
-        static Font fromFile(const std::string& path, float pixelHeight = 32.0f);
+        void load(const std::string&, int height = 32);
 
-        std::optional<Glyph> getGlyph(char c) const;
-
-        glm::uint getTextureID() const { return texID; }
-        float getPixelHeight() const { return pixelHeight; }
-
+        [[nodiscard]] std::optional<Glyph> getGlyph(char) const;
+        [[nodiscard]] int getSize() const;
+        [[nodiscard]] Texture getTexture() const;
     private:
-        glm::uint texID = 0;
-        float pixelHeight = 0.0f;
-        std::unordered_map<char, Glyph> glyphs;
+        int m_height = 32;
+        Texture m_texture;
+        std::unordered_map<char, Glyph> m_glyphs;
     };
 
 }

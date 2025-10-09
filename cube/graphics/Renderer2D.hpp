@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "Color.hpp"
+#include "Font.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 
@@ -55,6 +56,8 @@ namespace cube {
         void pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range);
 
         void path(const std::vector<glm::vec2>&);
+
+        //void text(Font&, const std::string&, const glm::vec2& pos);
 
         void fill(const Color&);
         void fill(const Texture&);

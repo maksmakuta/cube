@@ -1,5 +1,8 @@
 #include "MainScreen.hpp"
 
+#include <iostream>
+#include <ostream>
+
 #include "graphics/TextureBuilder.hpp"
 #include "utils/AssetsPaths.hpp"
 #include "utils/LambdaVisitor.hpp"
@@ -10,34 +13,26 @@ namespace cube {
     MainScreen::~MainScreen() = default;
 
     void MainScreen::onInit() {
-        loadTexture();
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        std::cout << "MainScreen::onInit" << std::endl;
+        font.load(getFont("Monocraft-Regular.ttf"), 32);
     }
 
-    void MainScreen::onDeinit() {}
+    void MainScreen::onDeinit() {
+        std::cout << "MainScreen::onDeinit" << std::endl;
+    }
 
     void MainScreen::onDraw(Context& ctx) {
-        clear(Color(0xFF202020));
+        clear(Color(0xFFA0A0A0));
         if (const auto ctx2d = ctx.getRenderer2D()) {
             onDraw2D(*ctx2d);
         }
     }
 
-    void MainScreen::onDraw2D(Renderer2D &r) const {
-        constexpr auto size = glm::vec2{256,256};
-
+    void MainScreen::onDraw2D(Renderer2D &r) {
         r.begin();
-        r.fill(dirt);
-        r.rect(m_view / 2.f - size / 2.f, size);
+        r.fill(font.getTexture());
+        r.rect({100,100},{512,512});
         r.end();
-    }
-
-    void MainScreen::loadTexture() {
-        if (id < 0 || id >= 10) return;
-        dirt = TextureBuilder()
-            .setFilter(TextureFilter::Nearest)
-            .build(getTexture("blocks/" + std::to_string(id) + ".png"));
     }
 
     void MainScreen::onTick(float) {
@@ -49,18 +44,7 @@ namespace cube {
             [this](const ResizeEvent& re) {
                 m_view = {re.width, re.height};
             },
-            [this](const KeyEvent& ke) {
-                if (ke.pressed) {
-                    if (ke.key == Key::W) {
-                        id++;
-                        loadTexture();
-                    }
-                    if (ke.key == Key::S) {
-                        id--;
-                        loadTexture();
-                    }
-                }
-            },
+            [](const KeyEvent&) {},
             [](const MouseEvent&) {},
             [](const ScrollEvent&) {},
             [](const InputEvent&) {}

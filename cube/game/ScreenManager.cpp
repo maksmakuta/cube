@@ -44,11 +44,9 @@ namespace cube {
 
     void ScreenManager::push(const std::shared_ptr<IScreen>& s){
         m_screens.push_back(s);
-        m_screens.back()->onInit();
     }
 
     void ScreenManager::pop(){
-        m_screens.back()->onDeinit();
         m_screens.pop_back();
     }
 

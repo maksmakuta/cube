@@ -14,15 +14,15 @@ namespace cube {
     }
 
     inline std::string getTexture(const std::string& filename) {
-        return std::string(ASSETS_PATH) + "/textures/" + filename;
+        return getAssets() + "/textures/" + filename;
     }
 
     inline std::string getShader(const std::string& filename) {
-        return std::string(ASSETS_PATH) + "/shaders/" + filename;
+        return getAssets() + "/shaders/" + filename;
     }
 
     inline std::string getFont(const std::string& filename) {
-        return std::string(ASSETS_PATH) + "/fonts/" + filename;
+        return getAssets() + "/fonts/" + filename;
     }
 
 }

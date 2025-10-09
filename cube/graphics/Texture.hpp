@@ -14,6 +14,7 @@ namespace cube {
         ~Texture();
 
         void bind(uint32_t slot = 0) const;
+        void release();
 
         [[nodiscard]] glm::ivec2 getSize() const;
         [[nodiscard]] uint32_t getId() const;

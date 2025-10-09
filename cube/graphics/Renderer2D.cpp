@@ -38,6 +38,10 @@ namespace cube {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
     }
 
     Renderer2D::~Renderer2D() = default;
@@ -224,6 +228,10 @@ namespace cube {
             toStroke(p);
     }
 
+    // void Renderer2D::text(Font& font, const std::string& str, const glm::vec2& pos) {
+
+    // }
+
     void Renderer2D::fill(const Color& c){
         if (!is_fill || m_texture != nullptr) {
             flush();
@@ -237,6 +245,7 @@ namespace cube {
         if (!is_fill || m_texture == nullptr) {
             flush();
         }
+        m_color = Color(0xFFFFFFFF);
         m_texture = &t;
         is_fill = true;
         m_line_width = 1.f;
