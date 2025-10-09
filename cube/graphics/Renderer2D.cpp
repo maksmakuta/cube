@@ -3,8 +3,10 @@
 #include <functional>
 #include <optional>
 #define GLM_ENABLE_EXPERIMENTAL
+#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "utils/AssetsPaths.hpp"
 
@@ -61,6 +63,10 @@ namespace cube {
 
     void Renderer2D::flush() const {
         if (m_vertices.empty()) return;
+
+        // for (const auto& v : m_vertices) {
+            // std::cout << glm::to_string(v.pos) << " " << glm::to_string(v.uv) << " " << std::hex << v.col << std::endl;
+        // }
 
         m_shader.use();
         m_shader.setMat4("u_Projection", m_projection);
@@ -228,35 +234,26 @@ namespace cube {
             toStroke(p);
     }
 
-    // void Renderer2D::text(Font& font, const std::string& str, const glm::vec2& pos) {
+    void Renderer2D::text(Font& font, const std::string& str, const glm::vec2& pos) {
 
-    // }
+    }
 
     void Renderer2D::fill(const Color& c){
-        if (!is_fill || m_texture != nullptr) {
-            flush();
-        }
         m_color = c;
+        m_texture = nullptr;
         is_fill = true;
-        m_line_width = 1.f;
     }
 
     void Renderer2D::fill(const Texture& t){
-        if (!is_fill || m_texture == nullptr) {
-            flush();
-        }
         m_color = Color(0xFFFFFFFF);
         m_texture = &t;
         is_fill = true;
-        m_line_width = 1.f;
     }
 
     void Renderer2D::stroke(const Color& c, const float w, const bool loop){
-        if (is_fill || m_texture == nullptr) {
-            flush();
-        }
         is_fill = false;
         m_color = c;
+        m_texture = nullptr;
         m_line_width = w;
         is_loop = loop;
     }
@@ -429,7 +426,7 @@ namespace cube {
         }
 
         if (is_loop) {
-            segments.emplace_back(Line(path.front(), path.back()), thick);
+            segments.emplace_back(Line(path.back(), path.front()), thick);
         }else {
             if (m_cap == CapType::Round) {
                 fan(m_vertices, segments.back().center.b, segments.back().center.b,
@@ -446,12 +443,9 @@ namespace cube {
             }
         }
 
-        for (auto i = 0; i + 1 < segments.size(); ++i) {
-            auto& s1 = segments[i];
-            auto& s2 = segments[i + 1];
-
-            auto dir1 = s1.center.dir();
-            auto dir2 = s2.center.dir();
+        auto onSegmentPair = [this](Segment& s1, Segment& s2) {
+            const auto dir1 = s1.center.dir();
+            const auto dir2 = s2.center.dir();
 
             const auto _angle = glm::angle(dir1, dir2);
 
@@ -466,14 +460,15 @@ namespace cube {
 
             const glm::vec2 d1 = s1.center.dir();
             const glm::vec2 d2 = s2.center.dir();
-            const bool left = d1.x * d2.y - d1.y * d2.x > 0.f;
+            const auto _left = d1.x * d2.y - d1.y * d2.x;
+            const bool left = _left > 0.f;
 
             Line& outer1 = left ? s1.top : s1.bottom;
             Line& inner1 = left ? s1.bottom : s1.top;
             Line& outer2 = left ? s2.top : s2.bottom;
             Line& inner2 = left ? s2.bottom : s2.top;
 
-            if (auto p = intersect(outer1, outer2, true)) {
+            if (auto p = intersect(outer1, outer2,true)) {
                 outer1.b = *p;
                 outer2.a = *p;
             }
@@ -486,17 +481,28 @@ namespace cube {
                     inner1.b = *p;
                     inner2.a = *p;
                 }
-            }else if (m_join == JoinType::Bevel) {
+            }else{
                 push(outer1.b);
                 push(inner1.b);
                 push(inner2.a);
             }
+        };
+
+        if (is_loop) {
+            onSegmentPair(segments.back(),segments.front());
         }
+        for (auto i = 0; i + 1 < segments.size(); ++i) {
+            auto& s1 = segments[i];
+            auto& s2 = segments[i + 1];
+            onSegmentPair(s1,s2);
+        }
+
 
         for (const auto& s : segments) {
             push(s.top.a);
             push(s.top.b);
             push(s.bottom.a);
+
             push(s.top.b);
             push(s.bottom.a);
             push(s.bottom.b);

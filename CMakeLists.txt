@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(Freetype REQUIRED)
 
 add_subdirectory(libs/glad)
 add_subdirectory(libs/stb)
@@ -30,14 +31,20 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Font.hpp
         cube/graphics/Shader.cpp
         cube/graphics/Shader.hpp
+        cube/graphics/Renderer2D.cpp
+        cube/graphics/Renderer2D.hpp
         cube/graphics/Texture.cpp
         cube/graphics/Texture.hpp
         cube/graphics/TextureArray.cpp
         cube/graphics/TextureArray.hpp
+        cube/graphics/TextureBuilder.cpp
+        cube/graphics/TextureBuilder.hpp
+        cube/graphics/TextureParams.hpp
 
         cube/ui/screen/MainScreen.cpp
         cube/ui/screen/MainScreen.hpp
 
+        cube/utils/AssetsPaths.hpp
         cube/utils/LambdaVisitor.hpp
 
         cube/window/Window.cpp
@@ -48,12 +55,6 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
-        cube/graphics/Renderer2D.cpp
-        cube/graphics/Renderer2D.hpp
-        cube/utils/AssetsPaths.hpp
-        cube/graphics/TextureBuilder.cpp
-        cube/graphics/TextureBuilder.hpp
-        cube/graphics/TextureParams.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
@@ -64,5 +65,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC cube libs)
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC
-        glfw glm OpenGL::GL glad stb
+        glfw glm OpenGL::GL glad stb Freetype::Freetype
 )

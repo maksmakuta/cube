@@ -57,7 +57,7 @@ namespace cube {
 
         void path(const std::vector<glm::vec2>&);
 
-        //void text(Font&, const std::string&, const glm::vec2& pos);
+        void text(Font&, const std::string&, const glm::vec2& pos);
 
         void fill(const Color&);
         void fill(const Texture&);
@@ -70,7 +70,6 @@ namespace cube {
         void toStroke(const std::vector<glm::vec2>&);
         void toFill(const std::vector<glm::vec2>&);
         void calcBox(const std::vector<glm::vec2>&);
-
 
         Color m_color;
         Shader m_shader;

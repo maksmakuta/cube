@@ -30,6 +30,9 @@ namespace cube {
 
     void MainScreen::onDraw2D(Renderer2D &r) {
         r.begin();
+        // r.stroke(Color(0xFFFF2025), 10);
+        // r.rect({100,100},{512,512});
+        // r.flush();
         r.fill(font.getTexture());
         r.rect({100,100},{512,512});
         r.end();

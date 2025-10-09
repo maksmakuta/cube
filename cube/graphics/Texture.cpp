@@ -10,6 +10,7 @@ namespace cube {
     }
 
     void Texture::release() {
+        if(m_id == 0) return;
         glDeleteTextures(1, &m_id);
         m_id = 0;
         m_size = {0, 0};

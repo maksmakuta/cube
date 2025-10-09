@@ -56,10 +56,10 @@ Voxel rendering engine
  - GLAD ([included](/libs/glad))
  - GLM
  - GLFW 3.x
+ - Freetype 2.x
  - STB ([included](/libs/stb))
    - stb_image
    - stb_image_write
-   - stb_truetype
    - stb_perlin
 
 ### Thanks to
