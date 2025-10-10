@@ -6,13 +6,6 @@
 
 namespace cube {
 
-    enum class WidgetState {
-        Normal,
-        Hovered,
-        Pressed,
-        Disabled
-    };
-
     class IWidget;
 
     using WidgetPtr = std::shared_ptr<IWidget>;
@@ -36,20 +29,12 @@ namespace cube {
             m_size = s;
         }
 
-        void setState(const WidgetState s) {
-            m_state = s;
-        }
-
         [[nodiscard]] glm::vec2 getPos() const {
             return m_pos;
         }
 
         [[nodiscard]] glm::vec2 getSize() const {
             return m_size;
-        }
-
-        [[nodiscard]] WidgetState getState() const {
-            return m_state;
         }
 
         void setVisible(const bool v) { m_visible = v; }
@@ -72,7 +57,6 @@ namespace cube {
         bool m_visible = true;
         bool m_enabled = true;
         WidgetPtr m_parent = nullptr;
-        WidgetState m_state = WidgetState::Normal;
     };
 
 }

@@ -9,7 +9,7 @@
 
 namespace cube {
 
-    class ScreenManager final : public IScreen{
+    class ScreenManager final : public IScreen, public ScreenController{
     public:
         ScreenManager();
         ~ScreenManager() override;
@@ -22,8 +22,8 @@ namespace cube {
         void onTick(float) override;
         void onEvent(const Event &) override;
 
-        void push(const std::shared_ptr<IScreen> &);
-        void pop();
+        void navigate(const ScreenPtr&) override;
+        void navigateBack() override;
         void clear();
     private:
         std::vector<std::shared_ptr<IScreen>> m_screens;

@@ -1,5 +1,5 @@
-//
-// Created by maks on 10/9/25.
-//
+#include "RendererUI.hpp"
 
-#include "UiRenderer.hpp"
+namespace cube {
+
+}

@@ -7,7 +7,7 @@ namespace cube {
 
     class MainScreen final : public IScreen{
     public:
-        MainScreen();
+        explicit MainScreen(const ControllerPtr&);
         ~MainScreen() override;
 
         void onInit() override;

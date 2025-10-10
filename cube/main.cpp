@@ -11,12 +11,11 @@ public:
         m_window    = std::make_shared<cube::Window>("Cube");
         m_context   = std::make_shared<cube::Context>();
         m_context->setRenderer(std::make_shared<cube::Renderer2D>());
-        m_manager   = std::make_unique<cube::ScreenManager>();
-        m_manager->push(std::make_shared<cube::MainScreen>());
+        m_manager   = std::make_shared<cube::ScreenManager>();
+        m_manager->go<cube::MainScreen>();
     }
 
     void run(){
-        m_manager->onInit();
         while(!m_window->isClosed()) {
             const double now = cube::getTime();
             const auto dt = static_cast<float>(now - m_time);
@@ -58,7 +57,7 @@ public:
 private:
     std::shared_ptr<cube::Window> m_window = nullptr;
     std::shared_ptr<cube::Context> m_context = nullptr;
-    std::unique_ptr<cube::ScreenManager> m_manager = nullptr;
+    std::shared_ptr<cube::ScreenManager> m_manager = nullptr;
     double m_time = 0.f;
 };
 

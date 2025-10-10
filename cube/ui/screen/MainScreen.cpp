@@ -9,7 +9,7 @@
 
 namespace cube {
 
-    MainScreen::MainScreen() = default;
+    MainScreen::MainScreen(const ControllerPtr& p) : IScreen(p){}
     MainScreen::~MainScreen() = default;
 
     void MainScreen::onInit() {

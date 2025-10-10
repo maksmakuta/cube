@@ -58,6 +58,18 @@ add_executable(${PROJECT_NAME}
         cube/graphics/RendererUI.cpp
         cube/graphics/RendererUI.hpp
         cube/core/IWidget.hpp
+        cube/ui/widget/Button.cpp
+        cube/ui/widget/Button.hpp
+        cube/ui/widget/Input.cpp
+        cube/ui/widget/Input.hpp
+        cube/ui/widget/Slider.cpp
+        cube/ui/widget/Slider.hpp
+        cube/ui/widget/Image.cpp
+        cube/ui/widget/Image.hpp
+        cube/ui/layout/Row.cpp
+        cube/ui/layout/Row.hpp
+        cube/ui/layout/Column.cpp
+        cube/ui/layout/Column.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

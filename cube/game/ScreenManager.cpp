@@ -2,7 +2,7 @@
 
 namespace cube {
 
-    ScreenManager::ScreenManager() = default;
+    ScreenManager::ScreenManager() : IScreen(nullptr){}
     ScreenManager::~ScreenManager() = default;
 
     std::shared_ptr<IScreen> ScreenManager::current() const {
@@ -42,11 +42,13 @@ namespace cube {
         }
     }
 
-    void ScreenManager::push(const std::shared_ptr<IScreen>& s){
+    void ScreenManager::navigate(const ScreenPtr& s){
         m_screens.push_back(s);
+        onInit();
     }
 
-    void ScreenManager::pop(){
+    void ScreenManager::navigateBack(){
+        onDeinit();
         m_screens.pop_back();
     }
 
