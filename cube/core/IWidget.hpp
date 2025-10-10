@@ -43,10 +43,6 @@ namespace cube {
         [[nodiscard]] bool isVisible() const { return m_visible; }
         [[nodiscard]] bool isEnabled() const { return m_enabled; }
 
-        [[nodiscard]] bool inView(const glm::vec2& p) const {
-            return p.x >= m_pos.x && p.x <= m_pos.x + m_size.x &&
-                   p.y >= m_pos.y && p.y <= m_pos.y + m_size.y;
-        }
 
         void setParent(const WidgetPtr& p) { m_parent = p; }
         [[nodiscard]] WidgetPtr getParent() const { return m_parent; }

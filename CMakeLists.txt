@@ -70,6 +70,10 @@ add_executable(${PROJECT_NAME}
         cube/ui/layout/Row.hpp
         cube/ui/layout/Column.cpp
         cube/ui/layout/Column.hpp
+        cube/ui/Rect.cpp
+        cube/ui/Rect.hpp
+        cube/ui/LayoutParams.cpp
+        cube/ui/LayoutParams.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
