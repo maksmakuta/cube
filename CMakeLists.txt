@@ -74,6 +74,7 @@ add_executable(${PROJECT_NAME}
         cube/ui/Rect.hpp
         cube/ui/LayoutParams.cpp
         cube/ui/LayoutParams.hpp
+        cube/core/ILayout.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
