@@ -16,6 +16,8 @@ add_subdirectory(libs/stb)
 add_executable(${PROJECT_NAME}
         cube/core/IRenderer.hpp
         cube/core/IScreen.hpp
+        cube/core/IWidget.hpp
+        cube/core/ILayout.hpp
 
         cube/data/Block.cpp
         cube/data/Block.hpp
@@ -33,6 +35,8 @@ add_executable(${PROJECT_NAME}
         cube/graphics/Shader.hpp
         cube/graphics/Renderer2D.cpp
         cube/graphics/Renderer2D.hpp
+        cube/graphics/RendererUI.cpp
+        cube/graphics/RendererUI.hpp
         cube/graphics/Texture.cpp
         cube/graphics/Texture.hpp
         cube/graphics/TextureArray.cpp
@@ -41,8 +45,25 @@ add_executable(${PROJECT_NAME}
         cube/graphics/TextureBuilder.hpp
         cube/graphics/TextureParams.hpp
 
+        cube/ui/layout/Row.cpp
+        cube/ui/layout/Row.hpp
+        cube/ui/layout/Column.cpp
+        cube/ui/layout/Column.hpp
+
         cube/ui/screen/MainScreen.cpp
         cube/ui/screen/MainScreen.hpp
+
+        cube/ui/widget/Button.cpp
+        cube/ui/widget/Button.hpp
+        cube/ui/widget/Input.cpp
+        cube/ui/widget/Input.hpp
+        cube/ui/widget/Image.cpp
+        cube/ui/widget/Image.hpp
+
+        cube/ui/LayoutParams.cpp
+        cube/ui/LayoutParams.hpp
+        cube/ui/Rect.cpp
+        cube/ui/Rect.hpp
 
         cube/utils/AssetsPaths.hpp
         cube/utils/LambdaVisitor.hpp
@@ -55,26 +76,7 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
-        cube/graphics/RendererUI.cpp
-        cube/graphics/RendererUI.hpp
-        cube/core/IWidget.hpp
-        cube/ui/widget/Button.cpp
-        cube/ui/widget/Button.hpp
-        cube/ui/widget/Input.cpp
-        cube/ui/widget/Input.hpp
-        cube/ui/widget/Slider.cpp
-        cube/ui/widget/Slider.hpp
-        cube/ui/widget/Image.cpp
-        cube/ui/widget/Image.hpp
-        cube/ui/layout/Row.cpp
-        cube/ui/layout/Row.hpp
-        cube/ui/layout/Column.cpp
-        cube/ui/layout/Column.hpp
-        cube/ui/Rect.cpp
-        cube/ui/Rect.hpp
-        cube/ui/LayoutParams.cpp
-        cube/ui/LayoutParams.hpp
-        cube/core/ILayout.hpp
+
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

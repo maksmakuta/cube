@@ -20,6 +20,7 @@ namespace cube {
         void addChild(const WidgetPtr& w, const LayoutParams& p) {
             if (w) {
                 w->setLayoutParams(p);
+                w->setParent(shared_from_this());
                 m_children.push_back(w);
             }
         }
@@ -52,6 +53,8 @@ namespace cube {
     protected:
         std::vector<WidgetPtr> m_children;
     };
+
+    using LayoutPtr = std::shared_ptr<ILayout>;
 
 }
 

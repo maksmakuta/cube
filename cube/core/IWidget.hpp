@@ -12,7 +12,7 @@ namespace cube {
 
     using WidgetPtr = std::shared_ptr<IWidget>;
 
-    class IWidget {
+    class IWidget : public std::enable_shared_from_this<IWidget>{
     public:
         explicit IWidget(const WidgetPtr& parent = nullptr) {
             setParent(parent);
@@ -25,7 +25,7 @@ namespace cube {
 
         [[nodiscard]] WidgetPtr getParent() const { return m_parent; }
         [[nodiscard]] const LayoutParams& getLayoutParams() const { return m_params; }
-        [[nodiscard]] const Rect& getRect() const { return m_rect; }
+        [[nodiscard]] Rect& getRect() { return m_rect; }
 
         void setParent(const WidgetPtr& p) { m_parent = p; }
         void setLayoutParams(const LayoutParams& p) { m_params = p; }

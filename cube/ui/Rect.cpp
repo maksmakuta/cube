@@ -1,6 +1,7 @@
 #include "Rect.hpp"
 
 namespace cube {
+    Rect::Rect() = default;
 
     Rect::Rect(const glm::vec2& pos, const glm::vec2& size) : m_rect(pos,size) {}
     Rect::Rect(const float x, const float y, const float w, const float h) : m_rect(x,y,w,h) {}
