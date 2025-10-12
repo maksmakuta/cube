@@ -8,13 +8,16 @@ namespace cube {
 
     class Shader {
     public:
-        Shader(const std::string& ver_code ,const std::string& frag_code);
+        Shader();
         ~Shader();
 
-        static Shader fromFiles(const std::string&,const std::string&);
-        static Shader fromName(const std::string&);
+        void fromFiles(const std::string&,const std::string&);
+        void fromName(const std::string&);
+
+        [[nodiscard]] uint getID() const;
 
         void use() const;
+        void release();
 
         void setBool (const std::string&, bool value) const;
         void setInt  (const std::string&, int value) const;
@@ -25,7 +28,7 @@ namespace cube {
         void setMat3 (const std::string&, const glm::mat3& value) const;
         void setMat4 (const std::string&, const glm::mat4& value) const;
     private:
-        uint m_id;
+        uint m_id{0};
     };
 
 }

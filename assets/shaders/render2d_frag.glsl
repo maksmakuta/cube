@@ -1,20 +1,20 @@
 #version 460 core
 
-in vec2 v_UV;
-in vec4 v_Color;
+in vec2 o_tex;
+in vec4 o_col;
 
-uniform sampler2D u_Texture;
-uniform int u_IsText = 0; // 0 = normal texture, 1 = text
+uniform sampler2D image;
+uniform int mode;
 
-out vec4 FragColor;
+out vec4 out_color;
 
 void main() {
-    if(v_UV.x < 0.f || v_UV.y < 0.f){
-        FragColor = v_Color;
+    if(mode == 0 || mode == 2){
+        out_color = o_col;
+    }else if(mode == 1){
+        out_color = texture(image,o_tex);
     }else{
-        vec4 tex = texture(u_Texture, v_UV);
-        if (u_IsText == 1)
-            tex = vec4(1.0, 1.0, 1.0, tex.r);
-        FragColor = tex * v_Color;
+        out_color = vec4(o_col.rgb, o_col.a * texture(image,o_tex).r);
     }
+
 }

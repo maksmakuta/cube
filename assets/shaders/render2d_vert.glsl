@@ -1,13 +1,13 @@
 #version 460 core
 
-layout(location = 0) in vec2 a_Pos;
-layout(location = 1) in vec2 a_UV;
-layout(location = 2) in uint a_Color;
+layout(location = 0) in vec2 pos;
+layout(location = 1) in vec2 tex;
+layout(location = 2) in uint col;
 
-uniform mat4 u_Projection;
+uniform mat4 proj;
 
-out vec2 v_UV;
-out vec4 v_Color;
+out vec2 o_tex;
+out vec4 o_col;
 
 vec4 unpackColor(uint c) {
     return vec4(
@@ -19,7 +19,7 @@ vec4 unpackColor(uint c) {
 }
 
 void main() {
-    v_UV = a_UV;
-    v_Color = unpackColor(a_Color);
-    gl_Position = u_Projection * vec4(a_Pos, 0.0, 1.0);
+    o_tex = tex;
+    o_col = unpackColor(col);
+    gl_Position = proj * vec4(pos, 0.0, 1.0);
 }

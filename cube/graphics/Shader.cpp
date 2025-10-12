@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "glad/gl.h"
+#include "utils/AssetsPaths.hpp"
 
 namespace cube {
 
@@ -31,9 +32,18 @@ namespace cube {
         return shader;
     }
 
-    Shader::Shader(const std::string& vertCode, const std::string& fragCode) {
-        const GLuint vs = compile(GL_VERTEX_SHADER,   vertCode);
-        const GLuint fs = compile(GL_FRAGMENT_SHADER, fragCode);
+    Shader::Shader() = default;
+
+    Shader::~Shader() {
+        if (m_id) glDeleteProgram(m_id);
+    }
+
+    void Shader::fromFiles(const std::string& vertPath, const std::string& fragPath) {
+        const std::string v = readFile(vertPath);
+        const std::string f = readFile(fragPath);
+
+        const GLuint vs = compile(GL_VERTEX_SHADER,   v);
+        const GLuint fs = compile(GL_FRAGMENT_SHADER, f);
 
         m_id = glCreateProgram();
         glAttachShader(m_id, vs);
@@ -52,22 +62,25 @@ namespace cube {
         glDeleteShader(fs);
     }
 
-    Shader::~Shader() {
-        if (m_id) glDeleteProgram(m_id);
+    void Shader::fromName(const std::string& name) {
+        fromFiles(
+            getShader(name + "_vert.glsl"),
+            getShader(name + "_frag.glsl")
+        );
     }
 
-    Shader Shader::fromFiles(const std::string& vertPath, const std::string& fragPath) {
-        const std::string v = readFile(vertPath);
-        const std::string f = readFile(fragPath);
-        return {v, f};
-    }
-
-    Shader Shader::fromName(const std::string& name) {
-        return fromFiles("shaders/" + name + ".vert", "shaders/" + name + ".frag");
+    uint Shader::getID() const {
+        return m_id;
     }
 
     void Shader::use() const {
         glUseProgram(m_id);
+    }
+
+    void Shader::release() {
+        if (m_id)
+            glDeleteProgram(m_id);
+        m_id = 0;
     }
 
     void Shader::setBool(const std::string& name, const bool value) const {
