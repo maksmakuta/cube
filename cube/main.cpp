@@ -10,8 +10,9 @@ class CubeGame {
 public:
     CubeGame() : m_window(std::make_shared<cube::Window>("Cube")) {
         m_renderer = std::make_unique<cube::Renderer2D>();
-        m_font.load(cube::getFont("Monocraft-Regular.ttf"), 16);
+        m_font.load(cube::getFont("Monocraft-Regular.ttf"), 32);
         m_image = cube::TextureBuilder()
+        .setFilter(cube::TextureFilter::Nearest)
             .build(cube::getTexture("blocks/6.png"));
 
     }
@@ -30,17 +31,17 @@ protected:
         cube::clear(0xFF203020);
         r.begin();
 
-        r.stroke(cube::Color(0xFF0000FF), 15.f);
-        r.rect({20,180}, {120,120});
-
         r.fill(0xFF00FFFF);
         r.rect({20,20}, {120,120});
 
-        r.text(m_font, cube::Color(0xFFFFFFFF));
-        r.print("Hello World!", {10,160});
-
         r.fill(m_image);
-        r.rect({130,0}, {120,120});
+        r.rect({130,20}, {120,120});
+
+        r.text(m_font, cube::Color(0xFFFFFFFF));
+        r.print("Hello World!", {10,180});
+
+        r.stroke(cube::Color(0xFF0000FF), 15.f);
+        r.rect({20,200}, {120,120});
 
         r.end();
     }

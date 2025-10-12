@@ -69,7 +69,6 @@ namespace cube {
 
     void RendererState::flush() {
         if (vertices.empty()) return;
-        std::cout << "flushing " << vertices.size() << " vertices" << std::endl;
         if (current_state == State::Image) {
             gl_state.setTexture(image_state.texture);
         } else if (current_state == State::Text) {

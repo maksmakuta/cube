@@ -35,7 +35,6 @@ namespace cube {
 
     void Renderer2D::end() {
         m_state.flush();
-        std::cout << "END" << std::endl;
     }
 
     void Renderer2D::point(const glm::vec2& center){
