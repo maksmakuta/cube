@@ -69,6 +69,22 @@ namespace cube {
         FT_Done_FreeType(ft);
     }
 
+    void Font::unload() {
+        m_texture.release();
+        m_glyphs.clear();
+    }
+
+    glm::vec2 Font::measure(const std::string &text) const {
+        glm::vec2 size(0.0f);
+        for (const auto& c : text) {
+            if (const auto glyph = getGlyph(c)) {
+                size.x += static_cast<float>(glyph->advance);
+                size.y = std::max(size.y, glyph->size.y - glyph->bearing.y);
+            }
+        }
+        return size;
+    }
+
     std::optional<Glyph> Font::getGlyph(char c) const {
         if (m_glyphs.contains(c)) {
             return m_glyphs.at(c);

@@ -24,6 +24,9 @@ namespace cube {
         ~Font();
 
         void load(const std::string&, int height = 32);
+        void unload();
+
+        glm::vec2 measure(const std::string& text) const;
 
         [[nodiscard]] std::optional<Glyph> getGlyph(char) const;
         [[nodiscard]] int getSize() const;
