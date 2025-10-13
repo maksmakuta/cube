@@ -1,7 +1,5 @@
 #include "RendererState.hpp"
 
-#include <iostream>
-#include <ostream>
 #include <glm/ext/matrix_clip_space.hpp>
 
 #include "glad/gl.h"
@@ -9,7 +7,7 @@
 
 namespace cube {
 
-    void RendererGLState::init(const int alloc) {
+    void RendererGLState2D::init(const int alloc) {
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
 
@@ -32,19 +30,19 @@ namespace cube {
         shader.fromName("render2d");
     }
 
-    void RendererGLState::setProjection(const glm::mat4& projection) const {
+    void RendererGLState2D::setProjection(const glm::mat4& projection) const {
         shader.use();
         shader.setMat4("proj", projection);
     }
 
-    void RendererGLState::setTexture(const Texture& texture) const {
+    void RendererGLState2D::setTexture(const Texture& texture) const {
         shader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.getId());
         shader.setInt("image", 0);
     }
 
-    void RendererGLState::flush(const std::vector<Vertex2D>& vertices, const int state) const {
+    void RendererGLState2D::flush(const std::vector<Vertex2D>& vertices, const int state) const {
         shader.use();
         shader.setInt("mode", state);
         glBindVertexArray(vao);
@@ -55,7 +53,7 @@ namespace cube {
         glBindVertexArray(0);
     }
 
-    void RendererGLState::release() {
+    void RendererGLState2D::release() {
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
         shader.release();
@@ -63,11 +61,11 @@ namespace cube {
         vbo = 0;
     }
 
-    void RendererState::init() {
+    void RendererState2D::init() {
         gl_state.init();
     }
 
-    void RendererState::flush() {
+    void RendererState2D::flush() {
         if (vertices.empty()) return;
         if (current_state == State::Image) {
             gl_state.setTexture(image_state.texture);
@@ -78,11 +76,11 @@ namespace cube {
         vertices.clear();
     }
 
-    void RendererState::release() {
+    void RendererState2D::release() {
         gl_state.release();
     }
 
-    void RendererState::resize(const int w, const int h) {
+    void RendererState2D::resize(const int w, const int h) {
         const auto wf = static_cast<float>(w);
         const auto hf = static_cast<float>(h);
         projection = glm::ortho<float>(0.f, wf, hf, 0.f);

@@ -49,7 +49,7 @@ namespace cube {
         void toFill(const std::vector<glm::vec2>&);
         void calcBox(const std::vector<glm::vec2>&);
 
-        RendererState m_state;
+        RendererState2D m_state;
     };
 
     void clear(const Color&);

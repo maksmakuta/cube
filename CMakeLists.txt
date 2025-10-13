@@ -43,6 +43,8 @@ add_executable(${PROJECT_NAME}
         cube/main.cpp
         cube/graphics/RendererState.cpp
         cube/graphics/RendererState.hpp
+        cube/graphics/Renderer3D.cpp
+        cube/graphics/Renderer3D.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

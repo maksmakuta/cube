@@ -60,7 +60,13 @@ namespace cube {
         glm::uint col;
     };
 
-    struct RendererGLState {
+    struct Vertex3D {
+        glm::vec2 pos;
+        glm::vec3 nor;
+        glm::vec2 tex;
+    };
+
+    struct RendererGLState2D {
         uint32_t vao{0};
         uint32_t vbo{0};
         Shader shader;
@@ -74,8 +80,8 @@ namespace cube {
 
     };
 
-    struct RendererState {
-        RendererGLState gl_state;
+    struct RendererState2D {
+        RendererGLState2D gl_state;
         FillRenderState fill_state;
         StrokeRenderState stroke_state;
         ImageRenderState image_state;
