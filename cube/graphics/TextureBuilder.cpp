@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_ONLY_PNG
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <stb_image.h>
@@ -61,43 +62,86 @@ namespace cube {
             if (e.is_regular_file())
                 files.push_back(e.path().string());
         }
+        std::ranges::sort(files);
+        std::cout << "TextureArray: " << files.size() << " files loaded.\n";
         return buildArray(files);
     }
 
-    TextureArray TextureBuilder::buildArray(const std::vector<std::string> &items) {
-        if (items.empty()) throw std::runtime_error("TextureArray: empty file list.");
+  TextureArray TextureBuilder::buildArray(const std::vector<std::string>& items) {
+        if (items.empty()) {
+            throw std::runtime_error("TextureArray: empty file list.");
+        }
 
         stbi_set_flip_vertically_on_load(m_flip);
-        int w, h, ch;
-        unsigned char* first = stbi_load(items[0].c_str(), &w, &h, &ch, 0);
-        if (!first) throw std::runtime_error("Failed to load first texture: " + items[0]);
-        stbi_image_free(first);
+
+        int width, height, channels;
+        unsigned char* firstImg = stbi_load(items[0].c_str(), &width, &height, &channels, 0);
+        if (!firstImg) {
+            throw std::runtime_error("Failed to load first texture: " + items[0]);
+        }
+        stbi_image_free(firstImg);
+
+        const GLenum format = (channels == 4) ? GL_RGBA :
+                              (channels == 3) ? GL_RGB :
+                              (channels == 2) ? GL_RG : GL_RED;
 
         GLuint texID;
         glGenTextures(1, &texID);
         glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
+
         applyParams(GL_TEXTURE_2D_ARRAY);
 
-        const GLenum format = ch == 4 ? GL_RGBA : GL_RGB;
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, static_cast<GLint>(m_format),
-                     w, h, static_cast<GLsizei>(items.size()), 0, format, GL_UNSIGNED_BYTE, nullptr);
+                     width, height, static_cast<GLsizei>(items.size()),
+                     0, format, GL_UNSIGNED_BYTE, nullptr);
 
+        int successfulLayers = 0;
         for (size_t i = 0; i < items.size(); ++i) {
-            int tw, th, tch;
-            unsigned char* data = stbi_load(items[i].c_str(), &tw, &th, &tch, ch);
+            int w, h, ch;
+            unsigned char* data = stbi_load(items[i].c_str(), &w, &h, &ch, channels);
+
             if (!data) {
-                std::cerr << "Warning: skip texture " << items[i] << "\n";
-                m_size.z--;
+                std::cerr << "Warning: Failed to load texture [" << i << "]: "
+                          << items[i] << std::endl;
                 continue;
             }
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, static_cast<GLint>(i),
-                            w, h, 1, format, GL_UNSIGNED_BYTE, data);
+
+            if (w != width || h != height) {
+                std::cerr << "Warning: Texture [" << i << "]: " << items[i]
+                          << " has mismatched dimensions (" << w << "x" << h
+                          << " vs expected " << width << "x" << height << ")" << std::endl;
+                stbi_image_free(data);
+                continue;
+            }
+
+            if (ch != channels) {
+                std::cerr << "Warning: Texture [" << i << "]: " << items[i]
+                          << " has mismatched channels (" << ch
+                          << " vs expected " << channels << ")" << std::endl;
+                stbi_image_free(data);
+                continue;
+            }
+
+            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
+                            0, 0, successfulLayers,
+                            width, height, 1,
+                            format, GL_UNSIGNED_BYTE, data);
+
             stbi_image_free(data);
+            successfulLayers++;
+        }
+
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+        if (successfulLayers == 0) {
+            glDeleteTextures(1, &texID);
+            throw std::runtime_error("TextureArray: No textures were successfully loaded.");
         }
 
         TextureArray arr;
         arr.m_id = texID;
-        arr.m_size = {w, h,m_size.z};
+        arr.m_size = {width, height, successfulLayers};
+
         return arr;
     }
 
