@@ -146,6 +146,26 @@ namespace cube {
         glfwSetWindowTitle(m_window, t.c_str());
     }
 
+    void Window::setCursor(const int mode) const {
+        int value;
+        switch (mode) {
+            case 0:
+                value = GLFW_CURSOR_NORMAL;
+            break;
+            case 1:
+                value = GLFW_CURSOR_HIDDEN;
+            break;
+            case 2:
+                value = GLFW_CURSOR_DISABLED;
+            break;
+            default:
+                error("Invalid cursor mode");
+                value = GLFW_CURSOR_NORMAL;
+            break;
+        }
+        glfwSetInputMode(m_window, GLFW_CURSOR, value);
+    }
+
     void update() {
         glfwPollEvents();
     }

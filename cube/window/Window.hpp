@@ -28,6 +28,8 @@ namespace cube {
         void setPos(const glm::vec2&) const;
         void setTitle(const std::string&) const;
 
+        void setCursor(int mode) const;
+
         void swapBuffers() const;
         void push(const Event&);
         void close() const;

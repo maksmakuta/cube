@@ -5,7 +5,7 @@
 namespace cube {
 
     constexpr auto sensitivity = 0.05f;
-    constexpr auto speed = 50.f;
+    constexpr auto speed = 5.f;
 
     Camera::Camera() :
         position(0,0,0), front(0,0,-1), up(0,1,0),
@@ -56,8 +56,9 @@ namespace cube {
 
     void Camera::rotate(const float deltaX, const float deltaY) {
         yaw   += deltaX * sensitivity;
-        pitch += deltaY * sensitivity;
+        pitch -= deltaY * sensitivity;
         pitch = glm::clamp(pitch, -89.0f, 89.0f);
+        yaw = glm::mod(glm::abs(yaw), 360.0f);
 
         glm::dvec3 dir;
         dir.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

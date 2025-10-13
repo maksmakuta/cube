@@ -62,9 +62,10 @@ namespace cube {
     };
 
     struct Vertex3D {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec3 nor;
         glm::vec2 tex;
+        int       tid;
     };
 
     struct RendererGLState2D {
@@ -87,10 +88,12 @@ namespace cube {
         TextureArray textures;
 
         void init(int alloc = 64*1024);
-        void flush(const std::vector<Vertex2D>&) const;
+        void flush(const std::vector<Vertex3D>&) const;
         void release();
 
         void setProjection(const glm::mat4&) const;
+        void setView(const glm::mat4&) const;
+        void setModel(const glm::mat4&) const;
 
     };
 
@@ -114,6 +117,8 @@ namespace cube {
     struct RendererState3D {
         RendererGLState3D gl_state;
         glm::mat4 projection{1.f};
+        glm::mat4 view{1.f};
+        glm::mat4 model{1.f};
         std::vector<Vertex3D> vertices;
 
         void init();

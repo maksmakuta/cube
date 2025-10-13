@@ -8,6 +8,7 @@ namespace cube {
     class Renderer3D {
     public:
         Renderer3D();
+        ~Renderer3D();
 
     private:
         RendererState3D m_state;
