@@ -89,4 +89,13 @@ namespace cube {
         gl_state.setProjection(projection);
     }
 
+    void clear(const Color& c) {
+        glClearColor(c.rf(), c.gf(), c.bf(), c.af());
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void clear(const uint32_t c) {
+        clear(Color(c));
+    }
+
 }

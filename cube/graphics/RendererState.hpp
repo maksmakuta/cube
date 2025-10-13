@@ -9,6 +9,7 @@
 #include "Font.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "TextureArray.hpp"
 
 namespace cube {
 
@@ -77,6 +78,19 @@ namespace cube {
 
         void setProjection(const glm::mat4&) const;
         void setTexture(const Texture&) const;
+    };
+
+    struct RendererGLState3D {
+        uint32_t vao{0};
+        uint32_t vbo{0};
+        Shader shader;
+        TextureArray textures;
+
+        void init(int alloc = 64*1024);
+        void flush(const std::vector<Vertex2D>&) const;
+        void release();
+
+        void setProjection(const glm::mat4&) const;
 
     };
 
@@ -97,6 +111,20 @@ namespace cube {
         void resize(int w, int h);
     };
 
+    struct RendererState3D {
+        RendererGLState3D gl_state;
+        glm::mat4 projection{1.f};
+        std::vector<Vertex3D> vertices;
+
+        void init();
+        void flush();
+        void release();
+
+        void resize(int w, int h);
+    };
+
+    void clear(const Color&);
+    void clear(uint32_t);
 
 }
 

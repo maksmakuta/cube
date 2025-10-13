@@ -1,8 +1,8 @@
-//
-// Created by maks on 10/13/25.
-//
-
 #include "Renderer3D.hpp"
 
 namespace cube {
-} // cube
+
+    Renderer3D::Renderer3D() = default;
+
+
+}

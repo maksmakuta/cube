@@ -52,9 +52,6 @@ namespace cube {
         RendererState2D m_state;
     };
 
-    void clear(const Color&);
-    void clear(uint32_t);
-
 }
 
 #endif //CUBE_RENDERER2D_HPP

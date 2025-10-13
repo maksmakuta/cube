@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         cube/graphics/RendererState.hpp
         cube/graphics/Renderer3D.cpp
         cube/graphics/Renderer3D.hpp
+        cube/model/primitive/Camera.cpp
+        cube/model/primitive/Camera.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
