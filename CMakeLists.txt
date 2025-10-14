@@ -41,19 +41,6 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
-        cube/graphics/RendererState.cpp
-        cube/graphics/RendererState.hpp
-        cube/graphics/Renderer3D.cpp
-        cube/graphics/Renderer3D.hpp
-        cube/model/primitive/Camera.cpp
-        cube/model/primitive/Camera.hpp
-        cube/model/Chunk.cpp
-        cube/model/Chunk.hpp
-        cube/model/World.cpp
-        cube/model/World.hpp
-        cube/game/Generator.cpp
-        cube/game/Generator.hpp
-        cube/model/Block.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

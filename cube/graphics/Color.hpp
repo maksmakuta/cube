@@ -8,7 +8,7 @@ namespace cube {
     class Color {
     public:
         Color() = default;
-        explicit Color(uint32_t rgba);
+        explicit Color(uint32_t argb);
         Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
         Color(float r, float g, float b, float a = 1.0f);
 
@@ -31,6 +31,9 @@ namespace cube {
     private:
         uint32_t value = 0xFFFFFFFF;
     };
+
+    void clear(const Color&);
+    void clear(uint32_t argb);
 
 }
 

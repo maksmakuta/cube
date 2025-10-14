@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "glad/gl.h"
+
 namespace cube {
 
     Color::Color(const uint32_t argb) : value(argb) {}
@@ -46,5 +48,14 @@ namespace cube {
     float Color::af() const { return static_cast<float>(a()) / 255.0f; }
 
     Color::operator uint32_t() const { return value; }
+
+    void clear(const Color& c) {
+        glClearColor(c.rf(), c.gf(), c.bf(), c.af());
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void clear(const uint32_t argb) {
+        clear(Color(argb));
+    }
 
 }

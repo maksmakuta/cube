@@ -8,54 +8,195 @@
 #include <iostream>
 #include <optional>
 
-#include "utils/AssetsPaths.hpp"
+#include "Shader.hpp"
 
 namespace cube {
 
     constexpr auto maxMiterLength = 50.f;
 
-    Renderer2D::Renderer2D() {
-        m_state.init();
+    enum class State {
+        Fill,
+        Image,
+        Stroke,
+        Text
+    };
+
+    struct FillRenderState {
+        Color       color       {0xFFFFFFFF};
+    };
+
+    struct ImageRenderState {
+        Texture     texture     {};
+        glm::vec4   texture_uv  {0.f, 0.f, 1.f, 1.f};
+        glm::vec4   texture_box {0.f};
+    };
+
+    struct StrokeRenderState {
+        Color       color       {0xFFFFFFFF};
+        float       thickness   {1.f};
+        JoinType    join        {JoinType::Miter};
+        CapType     cap         {CapType::Flat};
+        bool        is_loop     {false};
+    };
+
+    struct TextRenderState {
+        Color       color       {0xFFFFFFFF};
+        Font        font        {};
+    };
+
+    struct Vertex2D {
+        glm::vec2 pos;
+        glm::vec2 uv;
+        glm::uint col;
+    };
+    
+    struct RendererGLState2D {
+        uint32_t vao{0};
+        uint32_t vbo{0};
+        Shader shader;
+
+        void init(const int alloc = 64*1024) {
+            glGenVertexArrays(1, &vao);
+            glGenBuffers(1, &vbo);
+
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(alloc * sizeof(Vertex2D)), nullptr, GL_DYNAMIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, pos)));
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, uv)));
+
+            glEnableVertexAttribArray(2);
+            glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, sizeof(Vertex2D), reinterpret_cast<void *>(offsetof(Vertex2D, col)));
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+
+            shader.fromName("render2d");
+        }
+
+        void setProjection(const glm::mat4& projection) const {
+            shader.use();
+            shader.setMat4("proj", projection);
+        }
+
+        void setTexture(const Texture& texture) const {
+            shader.use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture.getId());
+            shader.setInt("image", 0);
+        }
+
+        void flush(const std::vector<Vertex2D>& vertices, const int state) const {
+            shader.use();
+            shader.setInt("mode", state);
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizei>(vertices.size() * sizeof(Vertex2D)), vertices.data());
+            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size()));
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+        }
+
+        void release() {
+            glDeleteVertexArrays(1, &vao);
+            glDeleteBuffers(1, &vbo);
+            shader.release();
+            vao = 0;
+            vbo = 0;
+        }
+    };
+
+    struct RendererState2D {
+        RendererGLState2D gl_state;
+        FillRenderState fill_state;
+        StrokeRenderState stroke_state;
+        ImageRenderState image_state;
+        TextRenderState text_state;
+        glm::mat4 projection{1.f};
+        std::vector<Vertex2D> vertices;
+        State current_state{State::Fill};
+
+        void init() {
+            gl_state.init();
+        }
+
+        void flush() {
+            if (vertices.empty()) return;
+            if (current_state == State::Image) {
+                gl_state.setTexture(image_state.texture);
+            } else if (current_state == State::Text) {
+                gl_state.setTexture(text_state.font.getTexture());
+            }
+            gl_state.flush(vertices,static_cast<int>(current_state));
+            vertices.clear();
+        }
+
+        void setState(const State s) {
+            if (current_state != s)
+                flush();
+            current_state = s;
+        }
+
+        void release() {
+            gl_state.release();
+        }
+
+        void resize(const int w, const int h) {
+            const auto wf = static_cast<float>(w);
+            const auto hf = static_cast<float>(h);
+            projection = glm::ortho<float>(0.f, wf, hf, 0.f);
+            glViewport(0, 0, w, h);
+
+            gl_state.setProjection(projection);
+        }
+    };
+    
+    Renderer2D::Renderer2D() : m_state(std::make_unique<RendererState2D>()){
+        m_state->init();
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     Renderer2D::~Renderer2D() {
-        m_state.release();
+        m_state->release();
     }
 
-    void Renderer2D::resize(const glm::vec2& view) {
+    void Renderer2D::resize(const glm::vec2& view) const {
         const auto size = glm::ivec2(view);
-        m_state.resize(size.x, size.y);
+        m_state->resize(size.x, size.y);
     }
 
-    void Renderer2D::begin() {
-        m_state.vertices.clear();
+    void Renderer2D::begin() const {
+        m_state->vertices.clear();
     }
 
-    void Renderer2D::end() {
-        m_state.flush();
+    void Renderer2D::end() const {
+        m_state->flush();
     }
 
-    void Renderer2D::point(const glm::vec2& center){
+    void Renderer2D::point(const glm::vec2& center) const {
         rect(center - glm::vec2(0.5f), glm::vec2(1.f));
     }
 
-    void Renderer2D::line(const glm::vec2& a, const glm::vec2& b){
+    void Renderer2D::line(const glm::vec2& a, const glm::vec2& b) const {
         toStroke({a,b});
     }
 
-    void Renderer2D::triangle(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c){
+    void Renderer2D::triangle(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) const {
         const auto path_data = {a,b,c};
         path(path_data);
     }
 
-    void Renderer2D::quad(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d){
+    void Renderer2D::quad(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c, const glm::vec2& d) const {
         const auto path_data = {a,b,c,d};
         path(path_data);
     }
 
-    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size){
+    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size) const {
         quad(
             origin,
             origin + glm::vec2(size.x, 0.f),
@@ -64,11 +205,11 @@ namespace cube {
         );
     }
 
-    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const float r){
+    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const float r) const{
         rect(origin, size, glm::vec4(r));
     }
 
-    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec2& r){
+    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec2& r) const{
         rect(origin, size, glm::vec4(r.x, r.y, r.x, r.y));
     }
 
@@ -82,7 +223,7 @@ namespace cube {
         }
     }
 
-    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec4& r){
+    void Renderer2D::rect(const glm::vec2& origin, const glm::vec2& size, const glm::vec4& r) const {
         const glm::vec4 radii = glm::min(r, glm::vec4(glm::min(size.x, size.y) * 0.5f));
 
         std::vector<glm::vec2> path_data;
@@ -118,11 +259,11 @@ namespace cube {
         path(path_data);
     }
 
-    void Renderer2D::circle(const glm::vec2& center, const float r){
+    void Renderer2D::circle(const glm::vec2& center, const float r) const {
         ellipse(center, glm::vec2(r));
     }
 
-    void Renderer2D::ellipse(const glm::vec2& center, const glm::vec2& r){
+    void Renderer2D::ellipse(const glm::vec2& center, const glm::vec2& r) const {
         constexpr int segments = 32;
         constexpr float step = glm::two_pi<float>() / segments;
         auto path_data = std::vector<glm::vec2>{};
@@ -134,7 +275,7 @@ namespace cube {
         path(path_data);
     }
 
-    void Renderer2D::arc(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range){
+    void Renderer2D::arc(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range) const {
         constexpr int segments = 32;
         const float step = (range.y - range.x) / segments;
         auto path_data = std::vector<glm::vec2>{};
@@ -146,7 +287,7 @@ namespace cube {
         path(path_data);
     }
 
-    void Renderer2D::pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range){
+    void Renderer2D::pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range) const {
         constexpr int segments = 32;
         const float step = (range.y - range.x) / segments;
         auto path_data = std::vector<glm::vec2>{};
@@ -159,15 +300,15 @@ namespace cube {
         path(path_data);
     }
 
-    void Renderer2D::path(const std::vector<glm::vec2>& p) {
-        if (m_state.current_state == State::Fill || m_state.current_state == State::Image)
+    void Renderer2D::path(const std::vector<glm::vec2>& p) const {
+        if (m_state->current_state == State::Fill || m_state->current_state == State::Image)
             toFill(p);
-        if (m_state.current_state == State::Stroke)
+        if (m_state->current_state == State::Stroke)
             toStroke(p);
     }
 
-    void Renderer2D::print(const std::string& str, const glm::vec2& pos){
-        const auto&[color, font] = m_state.text_state;
+    void Renderer2D::print(const std::string& str, const glm::vec2& pos) const {
+        const auto&[color, font] = m_state->text_state;
         glm::vec2 point = pos;
         for (const auto& c : str) {
             if (const auto g = font.getGlyph(c)) {
@@ -198,64 +339,58 @@ namespace cube {
         }
     }
 
-    void Renderer2D::fill(const uint32_t argb) {
+    void Renderer2D::fill(const uint32_t argb) const {
         fill(Color(argb));
     }
 
-    void Renderer2D::fill(const Color& c){
-        setState(State::Fill);
-        m_state.fill_state.color = c;
+    void Renderer2D::fill(const Color& c) const {
+        m_state->setState(State::Fill);
+        m_state->fill_state.color = c;
     }
 
-    void Renderer2D::fill(const Texture& t,const glm::vec2& uv_min, const glm::vec2& uv_max){
-        setState(State::Image);
-        m_state.image_state.texture = t;
-        m_state.image_state.texture_uv = glm::vec4(uv_min, uv_max);
+    void Renderer2D::fill(const Texture& t,const glm::vec2& uv_min, const glm::vec2& uv_max) const {
+        m_state->setState(State::Image);
+        m_state->image_state.texture = t;
+        m_state->image_state.texture_uv = glm::vec4(uv_min, uv_max);
     }
 
-    void Renderer2D::stroke(const Color& c, const float w, const bool loop){
-        setState(State::Stroke);
-        m_state.stroke_state.color = c;
-        m_state.stroke_state.thickness = w / 2.f;
-        m_state.stroke_state.is_loop = loop;
+    void Renderer2D::stroke(const Color& c, const float w, const bool loop) const {
+        m_state->setState(State::Stroke);
+        m_state->stroke_state.color = c;
+        m_state->stroke_state.thickness = w / 2.f;
+        m_state->stroke_state.is_loop = loop;
     }
 
-    void Renderer2D::text(const Font& f, const Color& c) {
-        setState(State::Text);
-        m_state.text_state.color = c;
-        m_state.text_state.font = f;
+    void Renderer2D::text(const Font& f, const Color& c) const {
+        m_state->setState(State::Text);
+        m_state->text_state.color = c;
+        m_state->text_state.font = f;
     }
 
-    void Renderer2D::setJoin(const JoinType j){
-        m_state.stroke_state.join = j;
+    void Renderer2D::setJoin(const JoinType j) const {
+        m_state->stroke_state.join = j;
     }
 
-    void Renderer2D::setCap(const CapType c){
-        m_state.stroke_state.cap = c;
+    void Renderer2D::setCap(const CapType c) const {
+        m_state->stroke_state.cap = c;
     }
 
-    void Renderer2D::setState(const State s) {
-        if (m_state.current_state != s)
-            m_state.flush();
-        m_state.current_state = s;
-    }
-
-    void Renderer2D::push(const glm::vec2& vertex, const glm::vec2& uv) {
+    void Renderer2D::push(const glm::vec2& vertex, const glm::vec2& uv) const {
         uint32_t col = 0xFFFFFFFF;
-        if (m_state.current_state == State::Fill) {
-            col = static_cast<uint32_t>(m_state.fill_state.color);
+        if (m_state->current_state == State::Fill) {
+            col = static_cast<uint32_t>(m_state->fill_state.color);
         }
-        if (m_state.current_state == State::Stroke) {
-            col = static_cast<uint32_t>(m_state.stroke_state.color);
+        if (m_state->current_state == State::Stroke) {
+            col = static_cast<uint32_t>(m_state->stroke_state.color);
         }
-        if (m_state.current_state == State::Text) {
-            col = static_cast<uint32_t>(m_state.text_state.color);
+        if (m_state->current_state == State::Text) {
+            col = static_cast<uint32_t>(m_state->text_state.color);
         }
-        m_state.vertices.emplace_back(vertex, uv, col);
+        m_state->vertices.emplace_back(vertex, uv, col);
     }
 
-    void Renderer2D::toFill(const std::vector<glm::vec2>& path) {
-        if (m_state.current_state == State::Fill) {
+    void Renderer2D::toFill(const std::vector<glm::vec2>& path) const {
+        if (m_state->current_state == State::Fill) {
             for (size_t i = 1; i + 1 < path.size(); ++i) {
                 push(path.front());
                 push(path[i]);
@@ -264,7 +399,7 @@ namespace cube {
             return;
         }
         calcBox(path);
-        const auto img_state = m_state.image_state;
+        const auto img_state = m_state->image_state;
         const float minX = img_state.texture_box.x;
         const float minY = img_state.texture_box.y;
         const float maxX = img_state.texture_box.z;
@@ -283,7 +418,7 @@ namespace cube {
         }
     }
 
-    void Renderer2D::calcBox(const std::vector<glm::vec2> &path) {
+    void Renderer2D::calcBox(const std::vector<glm::vec2> &path) const {
         if (path.empty()) return;
 
         float minX = path[0].x;
@@ -298,7 +433,7 @@ namespace cube {
             if (p.y > maxY) maxY = p.y;
         }
 
-        m_state.image_state.texture_box = glm::vec4(minX, minY, maxX, maxY);
+        m_state->image_state.texture_box = glm::vec4(minX, minY, maxX, maxY);
     }
 
     struct Line {
@@ -406,10 +541,10 @@ namespace cube {
         }
     }
 
-    void Renderer2D::toStroke(const std::vector<glm::vec2>& path) {
+    void Renderer2D::toStroke(const std::vector<glm::vec2>& path) const {
         if (path.size() < 2) return;
 
-        auto& state = m_state.stroke_state;
+        auto& state = m_state->stroke_state;
         const auto color = static_cast<uint32_t>(state.color);
 
         auto segments = std::vector<Segment>();
@@ -421,10 +556,10 @@ namespace cube {
             segments.emplace_back(Line(path.back(), path.front()), state.thickness);
         }else {
             if (state.cap == CapType::Round) {
-                fan(m_state.vertices, segments.back().center.b, segments.back().center.b,
+                fan(m_state->vertices, segments.back().center.b, segments.back().center.b,
                     segments.back().top.b, segments.back().bottom.b, true, color);
 
-                fan(m_state.vertices, segments.front().center.a, segments.front().center.a,
+                fan(m_state->vertices, segments.front().center.a, segments.front().center.a,
                     segments.front().bottom.a, segments.front().top.a, true, color);
             }
             if (state.cap == CapType::Square) {
@@ -466,7 +601,7 @@ namespace cube {
             }
 
             if (state.join == JoinType::Round) {
-                fan(m_state.vertices, s1.center.b, outer1.b,
+                fan(m_state->vertices, s1.center.b, outer1.b,
                     inner1.b, inner2.a, !left, color);
             }else if (state.join == JoinType::Miter) {
                 if (const auto p = intersect(inner1, inner2, true)) {
