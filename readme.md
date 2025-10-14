@@ -15,6 +15,11 @@ Voxel rendering engine
       - [ ] Limited height
     - [ ] Structures
 - [ ] 2D Rendering
+  - [X] Core rendering
+    - [X] Filled shapes
+    - [X] Stroked shapes
+    - [X] Images
+    - [X] Text
   - [ ] UI Rendering
   - [ ] Layouts
     - [ ] Column
@@ -60,7 +65,6 @@ Voxel rendering engine
  - STB ([included](/libs/stb))
    - stb_image
    - stb_image_write
-   - stb_perlin
 
 ### Thanks to
 
