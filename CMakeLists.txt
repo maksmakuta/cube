@@ -41,6 +41,14 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
+        cube/models/Camera.cpp
+        cube/models/Camera.hpp
+        cube/models/world/Block.cpp
+        cube/models/world/Block.hpp
+        cube/models/world/Chunk.cpp
+        cube/models/world/Chunk.hpp
+        cube/models/world/World.cpp
+        cube/models/world/World.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

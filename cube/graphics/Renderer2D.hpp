@@ -23,7 +23,6 @@ namespace cube {
         Round
     };
 
-    struct Vertex2D;
     struct RendererState2D;
 
     class Renderer2D {
@@ -50,13 +49,14 @@ namespace cube {
         void pie(const glm::vec2& center, const glm::vec2& r, const glm::vec2& range) const;
         void path(const std::vector<glm::vec2>&) const;
 
+        void text(const Font&, const Color&) const;
         void print(const std::string&, const glm::vec2& pos) const;
 
         void fill(uint32_t) const;
         void fill(const Color&) const;
         void fill(const Texture&, const glm::vec2& uv_min = {0,0}, const glm::vec2& uv_max = {1,1}) const;
+
         void stroke(const Color&, float w = 1.f, bool loop = true) const;
-        void text(const Font&, const Color&) const;
         void setJoin(JoinType) const;
         void setCap(CapType) const;
 

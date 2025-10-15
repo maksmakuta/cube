@@ -15,6 +15,7 @@ public:
         .setFilter(cube::TextureFilter::Nearest)
             .build(cube::getTexture("blocks/9.png"));
 
+        m_renderer->setJoin(cube::JoinType::Bevel);
     }
 
     void run(){
@@ -27,7 +28,7 @@ public:
 
 protected:
 
-    void onDraw(const cube::Renderer2D& r) {
+    void onDraw(const cube::Renderer2D& r) const {
         cube::clear(0xFF203020);
         r.begin();
 
