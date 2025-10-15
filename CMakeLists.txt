@@ -12,6 +12,7 @@ find_package(Freetype REQUIRED)
 
 add_subdirectory(libs/glad)
 add_subdirectory(libs/stb)
+add_subdirectory(libs/FastNoise2)
 
 add_executable(${PROJECT_NAME}
         cube/graphics/Color.cpp
@@ -59,5 +60,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC cube libs)
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC
-        glfw glm OpenGL::GL glad stb Freetype::Freetype
+        glfw glm OpenGL::GL glad stb Freetype::Freetype FastNoise
 )

@@ -41,7 +41,7 @@ namespace cube {
                    m_velocity = glm::vec3{0.f};
                }
            },
-           [this](const cube::MouseEvent& me) {
+           [this](const MouseEvent& me) {
                const auto a = glm::vec2{ me.x, me.y };
                m_rotation = glm::vec2{m_move.x - a.x, a.y - m_move.y} * CAMERA_SENSITIVITY;
                updateDirection();
