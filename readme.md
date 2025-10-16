@@ -5,14 +5,14 @@ Voxel rendering engine
 ### Features
 
 - [ ] World generation
-  - [ ] Chunk manager system
+  - [X] Chunk manager system
   - [ ] Dynamic loading
   - [ ] Multithreaded generation
-  - [ ] Generator 
+  - [X] Generator 
     - [ ] Multithread support
     - [ ] Biomes support
       - [ ] Based on temperature and humidity
-      - [ ] Limited height
+      - [X] Limited height
     - [ ] Structures
 - [ ] 2D Rendering
   - [X] Core rendering
@@ -62,7 +62,7 @@ Voxel rendering engine
  - GLM
  - GLFW 3.x
  - Freetype 2.x
- - FastNoise2 ([included as submodule](/libs/FastNoise2))
+ - FastNoise2 ([included as submodule](/libs))
  - STB ([included](/libs/stb))
    - stb_image
    - stb_image_write
