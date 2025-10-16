@@ -1,6 +1,7 @@
 #ifndef CUBE_CHUNK_HPP
 #define CUBE_CHUNK_HPP
 
+#include <memory>
 #include <vector>
 #include <glm/vec3.hpp>
 
@@ -23,8 +24,8 @@ namespace cube {
         std::vector<Block> m_blocks;
     };
 
+    using ChunkPtr = std::shared_ptr<Chunk>;
+
 }
-
-
 
 #endif //CUBE_CHUNK_HPP

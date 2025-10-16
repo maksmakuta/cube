@@ -62,6 +62,7 @@ Voxel rendering engine
  - GLM
  - GLFW 3.x
  - Freetype 2.x
+ - FastNoise2 ([included as submodule](/libs/FastNoise2))
  - STB ([included](/libs/stb))
    - stb_image
    - stb_image_write

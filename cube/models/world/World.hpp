@@ -14,7 +14,6 @@
 namespace cube {
 
     using ChunkPos = glm::ivec2;
-    using ChunkPtr = std::shared_ptr<Chunk>;
 
     class World {
     public:
