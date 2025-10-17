@@ -52,6 +52,8 @@ add_executable(${PROJECT_NAME}
         cube/models/world/World.hpp
         cube/game/Generator.cpp
         cube/game/Generator.hpp
+        cube/graphics/ChunkRenderer.cpp
+        cube/graphics/ChunkRenderer.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
