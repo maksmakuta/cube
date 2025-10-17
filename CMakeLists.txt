@@ -54,6 +54,8 @@ add_executable(${PROJECT_NAME}
         cube/game/Generator.hpp
         cube/graphics/ChunkRenderer.cpp
         cube/graphics/ChunkRenderer.hpp
+        cube/utils/ThreadPool.cpp
+        cube/utils/ThreadPool.hpp
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
