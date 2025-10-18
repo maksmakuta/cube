@@ -74,4 +74,4 @@ Voxel rendering engine
 ## Author
 
 Maks Makuta (C) 2025  
-MIT License
+[MIT License](license.md)
