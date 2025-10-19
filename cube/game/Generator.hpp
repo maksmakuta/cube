@@ -15,6 +15,10 @@ namespace cube {
         float getHeight(const glm::vec2& pos) const;
         ChunkPtr generateChunk(const glm::ivec2& pos) const;
 
+        uint32_t getSeed() const {
+            return m_seed;
+        }
+
     private:
         uint32_t m_seed;
         FastNoise::SmartNode<> m_noise;

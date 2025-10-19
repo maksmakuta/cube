@@ -6,7 +6,8 @@ namespace cube {
     TextureArray::~TextureArray() = default;
 
     void TextureArray::bind(const uint32_t slot) const {
-        glBindTextureUnit(slot, m_id);
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
     }
 
     void TextureArray::release() {

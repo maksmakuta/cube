@@ -1,49 +1,41 @@
 #include "Camera.hpp"
 
+#include <algorithm>
 #include <glm/ext/matrix_transform.hpp>
 
 #include "utils/LambdaVisitor.hpp"
 
 namespace cube {
 
-    constexpr float CAMERA_SENSITIVITY = 0.005f;
+    constexpr float CAMERA_SENSITIVITY = 0.1f;
     constexpr float CAMERA_SPEED = 5.f;
 
     void Camera::update(const float dt) {
-        m_position += m_velocity * dt;
+        const auto right = glm::normalize(glm::cross(m_front, m_up));
+        glm::vec3 velocity{0.f};
+
+        if(m_keyState[Key::W]) velocity += m_front;
+        if(m_keyState[Key::S]) velocity -= m_front;
+        if(m_keyState[Key::A]) velocity -= right;
+        if(m_keyState[Key::D]) velocity += right;
+        if(m_keyState[Key::Space]) velocity += m_up;
+        if(m_keyState[Key::Shift]) velocity -= m_up;
+
+        if(glm::length(velocity) > 0.f)
+            velocity = glm::normalize(velocity) * CAMERA_SPEED;
+        m_position += velocity * dt;
     }
 
     void Camera::onEvent(const Event& e) {
         std::visit(LambdaVisitor{
            [this](const KeyEvent& ke) {
-                const auto right = glm::normalize(glm::cross(m_front, m_up));
-
-               if (ke.pressed) {
-                   if (ke.key == Key::W) {
-                       m_velocity += m_front * CAMERA_SPEED;
-                   }
-                   if (ke.key == Key::S) {
-                       m_velocity -= m_front * CAMERA_SPEED;
-                   }
-                   if (ke.key == Key::A) {
-                       m_velocity -= right * CAMERA_SPEED;
-                   }
-                   if (ke.key == Key::D) {
-                       m_velocity += right * CAMERA_SPEED;
-                   }
-                   if (ke.key == Key::Shift) {
-                       m_velocity -= m_up * CAMERA_SPEED;
-                   }
-                   if (ke.key == Key::Space) {
-                       m_velocity += m_up * CAMERA_SPEED;
-                   }
-               }else {
-                   m_velocity = glm::vec3{0.f};
-               }
+               m_keyState[ke.key] = ke.pressed;
            },
            [this](const MouseEvent& me) {
                const auto a = glm::vec2{ me.x, me.y };
-               m_rotation = glm::vec2{m_move.x - a.x, a.y - m_move.y} * CAMERA_SENSITIVITY;
+               m_rotation += glm::vec2{a.x - m_move.x, m_move.y - a.y} * CAMERA_SENSITIVITY;
+               m_rotation.y = std::clamp(m_rotation.y, -89.f, 89.f);
+               m_rotation.x = std::fmod(m_rotation.x + 360.0f, 360.0f);
                updateDirection();
                m_move = a;
            },
@@ -82,8 +74,8 @@ namespace cube {
     }
 
     void Camera::updateDirection() {
-        const float yaw = m_rotation.x;
-        const float pitch = m_rotation.y;
+        const float yaw = glm::radians(m_rotation.x);
+        const float pitch = glm::radians(m_rotation.y);
 
         m_front = glm::normalize(glm::vec3{
             cos(pitch) * cos(yaw),

@@ -15,6 +15,10 @@ add_subdirectory(libs/stb)
 add_subdirectory(libs/FastNoise2)
 
 add_executable(${PROJECT_NAME}
+
+        cube/game/Generator.cpp
+        cube/game/Generator.hpp
+
         cube/graphics/Color.cpp
         cube/graphics/Color.hpp
         cube/graphics/Font.cpp
@@ -31,8 +35,19 @@ add_executable(${PROJECT_NAME}
         cube/graphics/TextureBuilder.hpp
         cube/graphics/TextureParams.hpp
 
+        cube/models/Camera.cpp
+        cube/models/Camera.hpp
+        cube/models/world/Block.cpp
+        cube/models/world/Block.hpp
+        cube/models/world/Chunk.cpp
+        cube/models/world/Chunk.hpp
+        cube/models/world/World.cpp
+        cube/models/world/World.hpp
+
         cube/utils/AssetsPaths.hpp
         cube/utils/LambdaVisitor.hpp
+        cube/utils/ThreadPool.cpp
+        cube/utils/ThreadPool.hpp
 
         cube/window/Window.cpp
         cube/window/Window.hpp
@@ -42,20 +57,7 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
-        cube/models/Camera.cpp
-        cube/models/Camera.hpp
-        cube/models/world/Block.cpp
-        cube/models/world/Block.hpp
-        cube/models/world/Chunk.cpp
-        cube/models/world/Chunk.hpp
-        cube/models/world/World.cpp
-        cube/models/world/World.hpp
-        cube/game/Generator.cpp
-        cube/game/Generator.hpp
-        cube/graphics/ChunkRenderer.cpp
-        cube/graphics/ChunkRenderer.hpp
-        cube/utils/ThreadPool.cpp
-        cube/utils/ThreadPool.hpp
+
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

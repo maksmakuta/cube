@@ -1,6 +1,7 @@
 #ifndef CUBE_CAMERA_HPP
 #define CUBE_CAMERA_HPP
 
+#include <unordered_map>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -27,12 +28,12 @@ namespace cube {
         void updateDirection();
 
         glm::vec3 m_position{0};
-        glm::vec3 m_velocity{0};
         glm::vec3 m_front{0,0,1};
         glm::vec3 m_up{0,1,0};
         glm::vec2 m_rotation{0};
         glm::vec2 m_move{0};
         float m_fov = 45.f;
+        std::unordered_map<Key, bool> m_keyState;
     };
 
 }

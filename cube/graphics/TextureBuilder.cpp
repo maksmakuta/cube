@@ -63,7 +63,6 @@ namespace cube {
                 files.push_back(e.path().string());
         }
         std::ranges::sort(files);
-        std::cout << "TextureArray: " << files.size() << " files loaded.\n";
         return buildArray(files);
     }
 
