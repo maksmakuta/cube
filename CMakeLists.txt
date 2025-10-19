@@ -57,6 +57,10 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
+        cube/graphics/WorldRenderer.cpp
+        cube/graphics/WorldRenderer.hpp
+        cube/graphics/Mesh.cpp
+        cube/graphics/Mesh.hpp
 
 )
 

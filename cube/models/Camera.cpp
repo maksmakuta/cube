@@ -8,21 +8,18 @@
 namespace cube {
 
     constexpr float CAMERA_SENSITIVITY = 0.1f;
-    constexpr float CAMERA_SPEED = 5.f;
+    constexpr float CAMERA_SPEED = 7.5f;
 
     void Camera::update(const float dt) {
         const auto right = glm::normalize(glm::cross(m_front, m_up));
         glm::vec3 velocity{0.f};
 
-        if(m_keyState[Key::W]) velocity += m_front;
-        if(m_keyState[Key::S]) velocity -= m_front;
-        if(m_keyState[Key::A]) velocity -= right;
-        if(m_keyState[Key::D]) velocity += right;
-        if(m_keyState[Key::Space]) velocity += m_up;
-        if(m_keyState[Key::Shift]) velocity -= m_up;
-
-        if(glm::length(velocity) > 0.f)
-            velocity = glm::normalize(velocity) * CAMERA_SPEED;
+        if(m_keyState[Key::W]) velocity += m_front * CAMERA_SPEED;
+        if(m_keyState[Key::S]) velocity -= m_front * CAMERA_SPEED;
+        if(m_keyState[Key::A]) velocity -= right * CAMERA_SPEED;
+        if(m_keyState[Key::D]) velocity += right * CAMERA_SPEED;
+        if(m_keyState[Key::Space]) velocity += m_up * CAMERA_SPEED;
+        if(m_keyState[Key::Shift]) velocity -= m_up * CAMERA_SPEED;
         m_position += velocity * dt;
     }
 
@@ -74,8 +71,8 @@ namespace cube {
     }
 
     void Camera::updateDirection() {
-        const float yaw = glm::radians(m_rotation.x);
-        const float pitch = glm::radians(m_rotation.y);
+        const auto yaw = glm::radians(m_rotation.x);
+        const auto pitch = glm::radians(m_rotation.y);
 
         m_front = glm::normalize(glm::vec3{
             cos(pitch) * cos(yaw),

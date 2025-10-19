@@ -23,7 +23,7 @@ namespace cube {
         m_noise->GenUniformGrid2D(
             heightmap.data(),
             world_pos.x,world_pos.y,
-            world_pos.x + CHUNK_SIZE.x,world_pos.y + CHUNK_SIZE.z,
+            CHUNK_SIZE.x,CHUNK_SIZE.z,
             0.01f,m_seed
         );
         const auto chunk = std::make_shared<Chunk>();
