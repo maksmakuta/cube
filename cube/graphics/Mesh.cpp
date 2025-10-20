@@ -117,7 +117,7 @@ namespace cube {
         },
     };
 
-    const glm::vec2 FACE_UV[4] = {
+    constexpr glm::vec2 FACE_UV[4] = {
         {0,0},
         {0,1},
         {1,1},
@@ -149,7 +149,7 @@ namespace cube {
                                 mesh.vertices.emplace_back(pos + FACE_VERTICES[d][i], DIRECTIONS[d],FACE_UV[i], texture);
                             }
 
-                            for (auto i : FACE_INDICES) {
+                            for (const auto i : FACE_INDICES) {
                                 mesh.indices.emplace_back(current_index + i);
                             }
 
