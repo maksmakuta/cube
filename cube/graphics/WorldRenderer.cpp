@@ -19,7 +19,7 @@ namespace cube {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
+        glFrontFace(GL_CCW);
 
         constexpr auto pos = glm::ivec2{0,0};
         const ChunkPtr chunk = m_generator.generateChunk(pos);
@@ -73,7 +73,7 @@ namespace cube {
     void WorldRenderer::resize(const glm::vec2& size, const float fov){
         const auto wi = static_cast<int>(size.x);
         const auto hi = static_cast<int>(size.y);
-        m_projection = glm::perspective(glm::radians(fov), size.x / size.y, 0.1f, static_cast<float>(CHUNK_SIZE.y));
+        m_projection = glm::perspective(glm::radians(fov), size.x / size.y, 0.1f, static_cast<float>(CHUNK_SIZE.y * VIEW_DISTANCE));
         glViewport(0, 0, wi, hi);
     }
 

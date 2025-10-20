@@ -1,6 +1,5 @@
 #include "Mesh.hpp"
 
-#include <array>
 #include <glm/ext/matrix_transform.hpp>
 
 #include "glad/gl.h"
@@ -70,14 +69,94 @@ namespace cube {
 
     }
 
+    const glm::vec3 DIRECTIONS[6] = {
+        { 1, 0, 0},
+        {-1, 0, 0},
+        { 0, 1, 0},
+        { 0,-1, 0},
+        { 0, 0, 1},
+        { 0, 0,-1},
+    };
+
+    const glm::vec3 FACE_VERTICES[6][4] = {
+        {
+            {1.0f, 0.0f, 0.0f}, // 0
+            {1.0f, 1.0f, 0.0f}, // 1
+            {1.0f, 1.0f, 1.0f}, // 2
+            {1.0f, 0.0f, 1.0f}, // 3
+        },
+        {
+            {0.0f, 0.0f, 1.0f}, // 0
+            {0.0f, 1.0f, 1.0f}, // 1
+            {0.0f, 1.0f, 0.0f}, // 2
+            {0.0f, 0.0f, 0.0f}, // 3
+        },
+        {
+            {0.0f, 1.0f, 0.0f}, // 0
+            {0.0f, 1.0f, 1.0f}, // 1
+            {1.0f, 1.0f, 1.0f}, // 2
+            {1.0f, 1.0f, 0.0f}, // 3
+        },
+        {
+            {0.0f, 0.0f, 1.0f}, // 0
+            {0.0f, 0.0f, 0.0f}, // 1
+            {1.0f, 0.0f, 0.0f}, // 2
+            {1.0f, 0.0f, 1.0f}, // 3
+        },
+        {
+            {0.0f, 0.0f, 1.0f}, // 0
+            {1.0f, 0.0f, 1.0f}, // 1
+            {1.0f, 1.0f, 1.0f}, // 2
+            {0.0f, 1.0f, 1.0f}, // 3
+        },
+      {
+            {1.0f, 0.0f, 0.0f}, // 0
+            {0.0f, 0.0f, 0.0f}, // 1
+            {0.0f, 1.0f, 0.0f}, // 2
+            {1.0f, 1.0f, 0.0f}, // 3
+        },
+    };
+
+    const glm::vec2 FACE_UV[4] = {
+        {0,0},
+        {0,1},
+        {1,1},
+        {1,0},
+    };
+
+    const uint32_t FACE_INDICES[6] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
     Mesh toMesh(const ChunkPtr& c) {
         Mesh mesh{};
         if (!c) return mesh;
 
-        for (int x = 0; x < CHUNK_SIZE.x; x++)
-        for (int z = 0; z < CHUNK_SIZE.z; z++)
-        for (int y = 0; y < CHUNK_SIZE.y; y++) {
+        for (auto x = 0; x < CHUNK_SIZE.x; x++) {
+            for (auto z = 0; z < CHUNK_SIZE.z; z++) {
+                for (auto y = 0; y < CHUNK_SIZE.y; y++) {
+                    const auto pos = glm::vec3{x,y,z};
+                    const auto b = c->getBlock(pos);
+                    if (b == Block::Air) continue;
+                    const auto [top, side,bottom] = getMetadata(b);
+                    for (auto d = 0; d < 6; d++) {
+                        const auto neighbour = c->getBlock(pos + DIRECTIONS[d]);
+                        const auto texture = d == 2 ? top : d == 3 ? bottom : side;
+                        if (neighbour == Block::Air) {
+                            const auto current_index = mesh.vertices.size();
+                            for (auto i = 0; i < 4; i++) {
+                                mesh.vertices.emplace_back(pos + FACE_VERTICES[d][i], DIRECTIONS[d],FACE_UV[i], texture);
+                            }
 
+                            for (auto i : FACE_INDICES) {
+                                mesh.indices.emplace_back(current_index + i);
+                            }
+
+                        }
+                    }
+                }
+            }
         }
 
         return mesh;
