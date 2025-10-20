@@ -31,7 +31,7 @@ public:
             time = now;
 
             m_camera.update(dt);
-            m_renderer->update(m_camera.getPosition());
+            m_renderer->update(m_camera);
 
             cube::update();
             while (m_window->isNextEvent()) {

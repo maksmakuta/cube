@@ -38,10 +38,10 @@ namespace cube {
         m_renderables.clear();
     }
 
-    void WorldRenderer::update(const glm::vec3& center){
+    void WorldRenderer::update(const Camera& cam){
         const glm::ivec2 camChunk{
-            static_cast<int>(std::floor(center.x / CHUNK_SIZE.x)),
-            static_cast<int>(std::floor(center.z / CHUNK_SIZE.z))
+            static_cast<int>(std::floor(cam.getPosition().x / CHUNK_SIZE.x)),
+            static_cast<int>(std::floor(cam.getPosition().z / CHUNK_SIZE.z))
         };
 
         std::unordered_set<ChunkPos> wantedChunks;
@@ -57,15 +57,23 @@ namespace cube {
                         chunk = m_generator.generateChunk(pos);
                         m_world.setChunk(pos, chunk);
                     }
-
-                    const Renderable r = toRenderable(chunk,pos);
+                    Renderable r{};
+                    if (m_free_list.empty()) {
+                        r = toRenderable(chunk,pos);
+                    }else {
+                        r = m_free_list.back();
+                        m_free_list.pop_back();
+                        r.update(toMesh(chunk));
+                        r.model = glm::translate(glm::mat4{1.f}, glm::vec3{CHUNK_SIZE.x * pos.x, 0.f, CHUNK_SIZE.z * pos.y});
+                    }
                     m_renderables[pos] = r;
+
                 }
             }
 
         for(auto it = m_renderables.begin(); it != m_renderables.end(); ){
             if(!wantedChunks.contains(it->first)){
-                it->second.release();
+                m_free_list.emplace_back(it->second);
                 it = m_renderables.erase(it);
             }
             else ++it;
@@ -79,7 +87,7 @@ namespace cube {
         glViewport(0, 0, wi, hi);
     }
 
-    void WorldRenderer::render(const glm::mat4& view){
+    void WorldRenderer::render(const glm::mat4& view) {
         clear(0xFF404040);
         m_shader.use();
         m_shader.setMat4("proj", m_projection);
@@ -88,11 +96,10 @@ namespace cube {
         m_textures.bind();
         m_shader.setInt("textures", 0);
 
-        for (const auto &renderable : m_renderables | std::views::values) {
+        for (const auto& [pos,renderable]: m_renderables) {
             m_shader.setMat4("model", renderable.model);
             glBindVertexArray(renderable.vao);
             glDrawElements(GL_TRIANGLES, renderable.count, GL_UNSIGNED_INT, nullptr);
-
         }
         glBindVertexArray(0);
     }

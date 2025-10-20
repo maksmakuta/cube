@@ -5,6 +5,7 @@
 #include "Shader.hpp"
 #include "TextureArray.hpp"
 #include "game/Generator.hpp"
+#include "models/Camera.hpp"
 #include "models/world/World.hpp"
 
 namespace cube {
@@ -14,7 +15,7 @@ namespace cube {
         explicit WorldRenderer(uint32_t seed = 0);
         ~WorldRenderer();
 
-        void update(const glm::vec3& center);
+        void update(const Camera&);
         void resize(const glm::vec2& size, float fov = 45.f);
         void render(const glm::mat4& view);
 
