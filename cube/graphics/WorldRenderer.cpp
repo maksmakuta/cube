@@ -1,6 +1,7 @@
 #include "WorldRenderer.hpp"
 
 #include <ranges>
+#include <unordered_set>
 
 #include "Color.hpp"
 #include "TextureBuilder.hpp"
@@ -13,7 +14,8 @@ namespace cube {
     WorldRenderer::WorldRenderer(const uint32_t seed) : m_generator(seed){
         m_shader.fromName("render3d");
         m_textures = TextureBuilder()
-                .setFilter(TextureFilter::Nearest)
+                .generateMipmaps(true)
+                .setFilter(TextureFilter::NearestNearest, TextureFilter::Nearest)
                 .buildArray(getTexture("/blocks/"));
 
         glEnable(GL_DEPTH_TEST);
@@ -21,10 +23,10 @@ namespace cube {
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
 
-        constexpr auto pos = glm::ivec2{0,0};
-        const ChunkPtr chunk = m_generator.generateChunk(pos);
-        m_world.setChunk(pos, chunk);
-        m_renderables[pos] = toRenderable(chunk,pos);
+        // constexpr auto pos = glm::ivec2{0,0};
+        // const ChunkPtr chunk = m_generator.generateChunk(pos);
+        // m_world.setChunk(pos, chunk);
+        // m_renderables[pos] = toRenderable(chunk,pos);
     }
 
     WorldRenderer::~WorldRenderer(){
@@ -36,7 +38,7 @@ namespace cube {
         m_renderables.clear();
     }
 
-    void WorldRenderer::update(const glm::vec3& center){/*
+    void WorldRenderer::update(const glm::vec3& center){
         const glm::ivec2 camChunk{
             static_cast<int>(std::floor(center.x / CHUNK_SIZE.x)),
             static_cast<int>(std::floor(center.z / CHUNK_SIZE.z))
@@ -68,7 +70,7 @@ namespace cube {
             }
             else ++it;
         }
-    */}
+    }
 
     void WorldRenderer::resize(const glm::vec2& size, const float fov){
         const auto wi = static_cast<int>(size.x);

@@ -148,11 +148,9 @@ namespace cube {
                             for (auto i = 0; i < 4; i++) {
                                 mesh.vertices.emplace_back(pos + FACE_VERTICES[d][i], DIRECTIONS[d],FACE_UV[i], texture);
                             }
-
                             for (const auto i : FACE_INDICES) {
                                 mesh.indices.emplace_back(current_index + i);
                             }
-
                         }
                     }
                 }

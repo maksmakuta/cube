@@ -13,6 +13,11 @@ namespace cube {
     TextureBuilder::TextureBuilder() = default;
     TextureBuilder::~TextureBuilder() = default;
 
+    TextureBuilder& TextureBuilder::generateMipmaps(const bool m) {
+        m_mipmap = m;
+        return *this;
+    }
+
     TextureBuilder& TextureBuilder::setSize(const glm::ivec2& size) {
         m_size = {size.x, size.y, 1};
         return *this;
@@ -129,6 +134,9 @@ namespace cube {
             stbi_image_free(data);
             successfulLayers++;
         }
+        if (m_mipmap) {
+            glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+        }
 
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
@@ -153,6 +161,10 @@ namespace cube {
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, static_cast<GLint>(m_format),
                      m_size.x, m_size.y, m_size.z, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
+        if (m_mipmap) {
+            glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+        }
+
         TextureArray arr;
         arr.m_id = texID;
         arr.m_size = m_size;
@@ -168,6 +180,10 @@ namespace cube {
 
         glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(m_format),
                      size.x, size.y, 0, static_cast<GLenum>(m_format), GL_UNSIGNED_BYTE, data.data());
+
+        if (m_mipmap) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
         Texture texture;
         texture.m_id = texID;
@@ -191,7 +207,9 @@ namespace cube {
 
         applyParams(GL_TEXTURE_2D);
         glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(m_format), w, h, 0, format, GL_UNSIGNED_BYTE, data);
-
+        if (m_mipmap) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
         stbi_image_free(data);
 
         Texture texture;
@@ -207,6 +225,10 @@ namespace cube {
 
         applyParams(GL_TEXTURE_2D);
         glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(m_format), m_size.x, m_size.y, 0, static_cast<GLenum>(m_format), GL_UNSIGNED_BYTE, nullptr);
+
+        if (m_mipmap) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
         Texture texture;
         texture.m_id = texID;

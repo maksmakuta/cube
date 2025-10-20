@@ -24,6 +24,7 @@ namespace cube {
         Generator m_generator;
         TextureArray m_textures;
         glm::mat4 m_projection{1.f};
+        std::vector<Renderable> m_free_list;
         std::unordered_map<ChunkPos, Renderable> m_renderables;
     };
 

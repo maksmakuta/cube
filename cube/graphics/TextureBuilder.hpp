@@ -22,6 +22,7 @@ namespace cube {
         TextureBuilder& setFilter(const TextureFilter&,const TextureFilter&);
         TextureBuilder& setWrap(const TextureWrap&);
         TextureBuilder& setWrap(const TextureWrap&,const TextureWrap&);
+        TextureBuilder& generateMipmaps(bool);
         TextureBuilder& setFlipY(bool);
 
         TextureArray buildArray(const std::string& dir_path);
@@ -42,6 +43,7 @@ namespace cube {
         TextureWrap m_wrapS = TextureWrap::ClampEdge;
         TextureWrap m_wrapT = TextureWrap::ClampEdge;
         bool m_flip = false;
+        bool m_mipmap = false;
     };
 
 }

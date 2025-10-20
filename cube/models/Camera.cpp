@@ -7,19 +7,26 @@
 
 namespace cube {
 
-    constexpr float CAMERA_SENSITIVITY = 0.1f;
+    constexpr float CAMERA_SENSITIVITY = 0.075f;
     constexpr float CAMERA_SPEED = 7.5f;
+
+    Camera::Camera() {
+        updateDirection();
+    }
 
     void Camera::update(const float dt) {
         const auto right = glm::normalize(glm::cross(m_front, m_up));
         glm::vec3 velocity{0.f};
+        float multiplier = 1.f;
 
-        if(m_keyState[Key::W]) velocity += m_front * CAMERA_SPEED;
-        if(m_keyState[Key::S]) velocity -= m_front * CAMERA_SPEED;
-        if(m_keyState[Key::A]) velocity -= right * CAMERA_SPEED;
-        if(m_keyState[Key::D]) velocity += right * CAMERA_SPEED;
+        if(m_keyState[Key::Control]) multiplier = 3.f;
+        if(m_keyState[Key::W]) velocity += m_front * CAMERA_SPEED * multiplier;
+        if(m_keyState[Key::S]) velocity -= m_front * CAMERA_SPEED * multiplier;
+        if(m_keyState[Key::A]) velocity -= right * CAMERA_SPEED * multiplier;
+        if(m_keyState[Key::D]) velocity += right * CAMERA_SPEED * multiplier;
         if(m_keyState[Key::Space]) velocity += m_up * CAMERA_SPEED;
         if(m_keyState[Key::Shift]) velocity -= m_up * CAMERA_SPEED;
+
         m_position += velocity * dt;
     }
 

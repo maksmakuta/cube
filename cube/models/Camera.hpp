@@ -11,7 +11,7 @@ namespace cube {
 
     class Camera {
     public:
-        Camera() = default;
+        Camera();
 
         void update(float dt);
         void onEvent(const Event&);

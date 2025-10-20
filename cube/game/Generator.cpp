@@ -31,7 +31,12 @@ namespace cube {
         for (auto x = 0; x < CHUNK_SIZE.x; x++) {
             for (auto z = 0; z < CHUNK_SIZE.z; z++) {
                 const float q = heightmap[x + z * CHUNK_SIZE.x];
-                int height = static_cast<int>(q * CHUNK_SIZE.y);
+                int height = BASE_HEIGHT + static_cast<int>(q * (CHUNK_SIZE.y - BASE_HEIGHT));
+                if (height < WATER_LEVEL) {
+                    for (auto y = height; y < WATER_LEVEL; y++) {
+                        chunk->setBlock({x,y,z},Block::Water);
+                    }
+                }
                 for (auto y = 0; y < height; y++) {
                     chunk->setBlock({x,y,z},Block::Stone);
                 }
