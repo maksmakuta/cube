@@ -141,7 +141,27 @@ namespace cube {
                     if (b == Block::Air) continue;
                     const auto [top, side,bottom] = getMetadata(b);
                     for (auto d = 0; d < 6; d++) {
-                        const auto neighbour = c->getBlock(pos + DIRECTIONS[d]);
+                        auto ptr = c;
+                        auto pos2 = pos + DIRECTIONS[d];
+                        if (!inside(pos2)) {
+                            if (pos2.x < 0) {
+                                pos2.x += CHUNK_SIZE.x;
+                                ptr = neighbours[1];
+                            }else if (pos2.x >= CHUNK_SIZE.x) {
+                                pos2.x -= CHUNK_SIZE.x;
+                                ptr = neighbours[0];
+                            }else if (pos2.z < 0) {
+                                pos2.z += CHUNK_SIZE.z;
+                                ptr = neighbours[3];
+                            }else if (pos2.z >= CHUNK_SIZE.z) {
+                                pos2.z -= CHUNK_SIZE.z;
+                                ptr = neighbours[2];
+                            }
+                        }
+                        if (!ptr)
+                            continue;
+
+                        const auto neighbour = ptr->getBlock(pos2);
                         const auto texture = d == 2 ? top : d == 3 ? bottom : side;
                         if (neighbour == Block::Air) {
                             const auto current_index = mesh.vertices.size();

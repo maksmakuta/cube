@@ -1,6 +1,7 @@
 #include "Chunk.hpp"
 
 namespace cube {
+
     Chunk::Chunk() : m_blocks(CHUNK_SIZE.x * CHUNK_SIZE.y * CHUNK_SIZE.z, Block::Air) {}
     Chunk::~Chunk() = default;
 

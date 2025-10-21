@@ -24,6 +24,8 @@ namespace cube {
         std::vector<Block> m_blocks;
     };
 
+    bool inside(const BlockPos& pos);
+
     using ChunkPtr = std::shared_ptr<Chunk>;
 
 }

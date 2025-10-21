@@ -9,7 +9,7 @@
 
 namespace cube {
 
-    constexpr auto VIEW_DISTANCE = 8;
+    constexpr auto VIEW_DISTANCE = 12;
 
     constexpr ChunkPos DIRECTIONS[4] = {
         {  1,  0 },
@@ -29,11 +29,6 @@ namespace cube {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
-
-        // constexpr auto pos = glm::ivec2{0,0};
-        // const ChunkPtr chunk = m_generator.generateChunk(pos);
-        // m_world.setChunk(pos, chunk);
-        // m_renderables[pos] = toRenderable(chunk,pos);
     }
 
     WorldRenderer::~WorldRenderer(){
@@ -45,49 +40,61 @@ namespace cube {
         m_renderables.clear();
     }
 
-    void WorldRenderer::update(const Camera& cam){
+void WorldRenderer::update(const Camera& cam) {
         const glm::ivec2 camChunk{
             static_cast<int>(std::floor(cam.getPosition().x / CHUNK_SIZE.x)),
             static_cast<int>(std::floor(cam.getPosition().z / CHUNK_SIZE.z))
         };
 
         std::unordered_set<ChunkPos> wantedChunks;
+        wantedChunks.reserve((2 * VIEW_DISTANCE + 1) * (2 * VIEW_DISTANCE + 1));
 
-        for(int dx=-VIEW_DISTANCE; dx<=VIEW_DISTANCE; ++dx)
-            for(int dz=-VIEW_DISTANCE; dz<=VIEW_DISTANCE; ++dz){
-                ChunkPos pos = { camChunk.x + dx, camChunk.y + dz };
-                wantedChunks.insert(pos);
+        for (int dx = -VIEW_DISTANCE; dx <= VIEW_DISTANCE; ++dx)
+            for (int dz = -VIEW_DISTANCE; dz <= VIEW_DISTANCE; ++dz)
+                wantedChunks.insert({ camChunk.x + dx, camChunk.y + dz });
 
-                if(!m_renderables.contains(pos)){
-                    ChunkPtr chunk = m_world.getChunk(pos);
-                    if(!chunk){
-                        std::vector<ChunkPtr> neighbours;
-                        for(const auto& dir: DIRECTIONS) {
-                            neighbours.push_back(m_world.getChunk(pos + dir));
-                        }
-                        chunk = m_generator.generateChunk(pos);
-                        m_world.setChunk(pos, chunk);
-                    }
-                    Renderable r{};
-                    if (m_free_list.empty()) {
-                        r = toRenderable(pos, chunk);
-                    }else {
-                        r = m_free_list.back();
-                        m_free_list.pop_back();
-                        r.update(toMesh(chunk));
-                        r.model = glm::translate(glm::mat4{1.f}, glm::vec3{CHUNK_SIZE.x * pos.x, 0.f, CHUNK_SIZE.z * pos.y});
-                    }
-                    m_renderables[pos] = r;
 
+        for (const auto& pos : wantedChunks) {
+            if (!m_renderables.contains(pos)) {
+                if (ChunkPtr chunk = m_world.getChunk(pos); !chunk) {
+                    chunk = m_generator.generateChunk(pos);
+                    m_world.setChunk(pos, chunk);
                 }
             }
+        }
 
-        for(auto it = m_renderables.begin(); it != m_renderables.end(); ){
-            if(!wantedChunks.contains(it->first)){
+        for (auto it = m_renderables.begin(); it != m_renderables.end(); ) {
+            if (!wantedChunks.contains(it->first)) {
                 m_free_list.emplace_back(it->second);
                 it = m_renderables.erase(it);
+            } else {
+                ++it;
             }
-            else ++it;
+        }
+
+        for (const auto& pos : wantedChunks) {
+            if (m_renderables.contains(pos)) {
+                continue;
+            }
+            ChunkPtr chunk = m_world.getChunk(pos);
+
+            std::vector<ChunkPtr> neighbours;
+            neighbours.reserve(4);
+            for (const auto& dir : DIRECTIONS)
+                neighbours.push_back(m_world.getChunk(pos + dir));
+
+            // Allocate renderable
+            Renderable r{};
+            if (m_free_list.empty()) {
+                r = toRenderable(pos, chunk, neighbours);
+            } else {
+                r = m_free_list.back();
+                m_free_list.pop_back();
+                r.update(toMesh(chunk, neighbours));
+                r.model = glm::translate(glm::mat4{1.f}, glm::vec3{CHUNK_SIZE.x * pos.x, 0.f, CHUNK_SIZE.z * pos.y});
+            }
+
+            m_renderables[pos] = r;
         }
     }
 
