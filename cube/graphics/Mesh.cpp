@@ -56,10 +56,10 @@ namespace cube {
         glDeleteBuffers(1, &ebo);
     }
 
-    Renderable toRenderable(const ChunkPtr& c, const glm::ivec2& pos) {
+    Renderable toRenderable(const glm::ivec2& pos,const ChunkPtr& c, const std::vector<ChunkPtr>& neighbours) {
         if (c == nullptr)
             return {};
-        const auto mesh = toMesh(c);
+        const auto mesh = toMesh(c,neighbours);
 
         Renderable renderable{};
         renderable.model = glm::translate(glm::mat4{1.f}, glm::vec3{CHUNK_SIZE.x * pos.x, 0.f, CHUNK_SIZE.z * pos.y});
@@ -129,7 +129,7 @@ namespace cube {
         2, 3, 0
     };
 
-    Mesh toMesh(const ChunkPtr& c) {
+    Mesh toMesh(const ChunkPtr& c, const std::vector<ChunkPtr>& neighbours) {
         Mesh mesh{};
         if (!c) return mesh;
 

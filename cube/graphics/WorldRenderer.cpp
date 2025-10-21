@@ -11,6 +11,13 @@ namespace cube {
 
     constexpr auto VIEW_DISTANCE = 8;
 
+    constexpr ChunkPos DIRECTIONS[4] = {
+        {  1,  0 },
+        { -1,  0 },
+        {  0,  1 },
+        {  0, -1 },
+    };
+
     WorldRenderer::WorldRenderer(const uint32_t seed) : m_generator(seed){
         m_shader.fromName("render3d");
         m_textures = TextureBuilder()
@@ -54,12 +61,16 @@ namespace cube {
                 if(!m_renderables.contains(pos)){
                     ChunkPtr chunk = m_world.getChunk(pos);
                     if(!chunk){
+                        std::vector<ChunkPtr> neighbours;
+                        for(const auto& dir: DIRECTIONS) {
+                            neighbours.push_back(m_world.getChunk(pos + dir));
+                        }
                         chunk = m_generator.generateChunk(pos);
                         m_world.setChunk(pos, chunk);
                     }
                     Renderable r{};
                     if (m_free_list.empty()) {
-                        r = toRenderable(chunk,pos);
+                        r = toRenderable(pos, chunk);
                     }else {
                         r = m_free_list.back();
                         m_free_list.pop_back();

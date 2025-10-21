@@ -35,8 +35,8 @@ namespace cube {
         void release() const;
     };
 
-    Mesh toMesh(const ChunkPtr&);
-    Renderable toRenderable(const ChunkPtr&, const glm::ivec2&);
+    Mesh toMesh(const ChunkPtr&, const std::vector<ChunkPtr>& = {});
+    Renderable toRenderable(const glm::ivec2&, const ChunkPtr&, const std::vector<ChunkPtr>& = {});
 
 }
 
