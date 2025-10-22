@@ -21,14 +21,17 @@ namespace cube {
     struct Mesh {
         std::vector<CubeVertex> vertices;
         std::vector<uint32_t> indices;
+
+        void clear();
+        void reserve(size_t v, size_t i);
     };
 
     struct Renderable {
-        uint32_t vao;
-        uint32_t vbo;
-        uint32_t ebo;
-        int count;
-        glm::mat4 model;
+        uint32_t vao{0};
+        uint32_t vbo{0};
+        uint32_t ebo{0};
+        int count{0};
+        glm::mat4 model{1.f};
 
         void init(int vertices = 2048, int indices = 4096);
         void update(const Mesh&);

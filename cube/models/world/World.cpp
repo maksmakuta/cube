@@ -6,7 +6,7 @@ namespace cube {
     World::~World() = default;
 
     ChunkPtr World::getChunk(const ChunkPos& p) {
-        if (m_chunks.contains(p)) {
+        if (!m_chunks.empty() && m_chunks.contains(p)) {
             return m_chunks.at(p);
         }
         return nullptr;
@@ -19,6 +19,12 @@ namespace cube {
     void World::removeChunk(const ChunkPos& p) {
         if (m_chunks.contains(p)) {
             m_chunks.erase(p);
+        }
+    }
+
+    void World::forEachChunk(const std::function<void(const ChunkPos &, const ChunkPtr &)>& func) {
+        for (const auto& [pos, chunk] : m_chunks) {
+            func(pos, chunk);
         }
     }
 

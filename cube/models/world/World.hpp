@@ -4,7 +4,6 @@
 #include <memory>
 #include <unordered_map>
 #include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -23,6 +22,8 @@ namespace cube {
         ChunkPtr getChunk(const ChunkPos&);
         void setChunk(const ChunkPos&, ChunkPtr);
         void removeChunk(const ChunkPos&);
+
+        void forEachChunk(const std::function<void(const ChunkPos&, const ChunkPtr&)>&);
 
     private:
         std::unordered_map<ChunkPos, ChunkPtr> m_chunks;

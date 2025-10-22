@@ -13,6 +13,7 @@ public:
     {
         m_renderer = std::make_unique<cube::WorldRenderer>(12345);
         m_window->setCursor(2);
+        m_camera.setPosition({0,cube::CHUNK_SIZE.y, 0});
     }
 
     void run(){

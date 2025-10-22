@@ -6,6 +6,16 @@
 
 namespace cube {
 
+    void Mesh::clear() {
+        vertices.clear();
+        indices.clear();
+    }
+
+    void Mesh::reserve(const size_t v, const size_t i) {
+        vertices.reserve(v);
+        indices.reserve(i);
+    }
+
     void Renderable::init(const int vertices, const int indices){
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);

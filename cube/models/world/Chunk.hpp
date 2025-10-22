@@ -19,7 +19,7 @@ namespace cube {
         ~Chunk();
 
         void setBlock(const BlockPos& pos, Block);
-        Block getBlock(const BlockPos&) const;
+        [[nodiscard]] Block getBlock(const BlockPos&) const;
     private:
         std::vector<Block> m_blocks;
     };
