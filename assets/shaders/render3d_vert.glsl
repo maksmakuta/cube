@@ -10,10 +10,12 @@ uniform mat4 view;
 uniform mat4 proj;
 
 out vec2 o_tex;
+out vec3 o_norm;
 flat out int o_id;
 
 void main(){
     gl_Position = proj * view * model * vec4(pos, 1.0);
     o_tex = tex;
     o_id = id;
+    o_norm = nor;
 }
