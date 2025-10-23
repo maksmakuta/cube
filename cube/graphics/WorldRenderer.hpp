@@ -1,9 +1,6 @@
 #ifndef CUBE_WORLDRENDERER_HPP
 #define CUBE_WORLDRENDERER_HPP
 
-#include <unordered_set>
-
-#include "Mesh.hpp"
 #include "Shader.hpp"
 #include "TextureArray.hpp"
 #include "game/Generator.hpp"
@@ -14,7 +11,7 @@ namespace cube {
 
     class WorldRenderer {
     public:
-        explicit WorldRenderer(uint32_t seed = 0);
+        explicit WorldRenderer(int seed = 0);
         ~WorldRenderer();
 
         void update(const Camera&);

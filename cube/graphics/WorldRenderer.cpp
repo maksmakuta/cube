@@ -15,7 +15,7 @@ namespace cube {
         {  0, -1 },
     };
 
-    WorldRenderer::WorldRenderer(const uint32_t seed) : m_generator(seed){
+    WorldRenderer::WorldRenderer(const int seed) : m_generator(seed){
         m_shader.fromName("render3d");
         m_textures = TextureBuilder()
                 .generateMipmaps(true)

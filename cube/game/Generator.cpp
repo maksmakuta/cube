@@ -5,16 +5,17 @@ namespace cube {
     constexpr auto BASE_HEIGHT = 72;
     constexpr auto WATER_LEVEL = 64;
 
-    Generator::Generator(const uint32_t seed) : m_seed(seed) {
+    Generator::Generator(const int seed) : m_seed(seed) {
         const auto baseNode = FastNoise::New<FastNoise::Perlin>();
         const auto noise = FastNoise::New<FastNoise::FractalFBm>();
         noise->SetSource(baseNode);
         noise->SetOctaveCount(3);
+        noise->SetLacunarity(0.1);
         m_noise = noise;
     }
 
     float Generator::getHeight(const glm::vec2& pos) const {
-        return m_noise->GenSingle2D(pos.x,pos.y,static_cast<int>(m_seed));
+        return m_noise->GenSingle2D(pos.x,pos.y,m_seed);
     }
 
     ChunkPtr Generator::generateChunk(const glm::ivec2& pos) const {
@@ -24,7 +25,7 @@ namespace cube {
             heightmap.data(),
             world_pos.x,world_pos.y,
             CHUNK_SIZE.x,CHUNK_SIZE.z,
-            0.01f,static_cast<int>(m_seed)
+            0.01f,m_seed
         );
         const auto chunk = std::make_shared<Chunk>();
 

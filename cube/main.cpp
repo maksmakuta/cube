@@ -21,14 +21,6 @@ public:
         while(!m_window->isClosed()) {
             const double now = cube::getTime();
             const auto dt = static_cast<float>(now - time);
-            const auto fps = 1.f / dt;
-            if (fps < 0.01f) {
-                m_fps = fps;
-            }else {
-                m_fps += fps;
-                m_fps /= 2;
-            }
-            m_window->setTitle(std::format("Cube - FPS: {}", m_fps));
             time = now;
 
             m_camera.update(dt);
@@ -65,7 +57,6 @@ protected:
     }
 
 private:
-    float m_fps = 0.f;
     cube::Camera m_camera{};
     std::unique_ptr<cube::WorldRenderer> m_renderer = nullptr;
     std::unique_ptr<cube::Window> m_window = nullptr;
