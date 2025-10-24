@@ -62,6 +62,10 @@ add_executable(${PROJECT_NAME}
         cube/game/render/ChunkVertex.hpp
         cube/game/render/ChunkObject.cpp
         cube/game/render/ChunkObject.hpp
+        cube/game/render/ChunkRenderer.cpp
+        cube/game/render/ChunkRenderer.hpp
+        cube/game/Cube.cpp
+        cube/game/Cube.hpp
 
 )
 
