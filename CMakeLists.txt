@@ -57,10 +57,11 @@ add_executable(${PROJECT_NAME}
         cube/window/Key.hpp
 
         cube/main.cpp
-        cube/graphics/WorldRenderer.cpp
-        cube/graphics/WorldRenderer.hpp
-        cube/graphics/Mesh.cpp
-        cube/graphics/Mesh.hpp
+        cube/game/render/ChunkMesh.cpp
+        cube/game/render/ChunkMesh.hpp
+        cube/game/render/ChunkVertex.hpp
+        cube/game/render/ChunkObject.cpp
+        cube/game/render/ChunkObject.hpp
 
 )
 
