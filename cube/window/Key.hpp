@@ -13,6 +13,11 @@ namespace cube {
         Alt = 3,
         Space = 4,
 
+        F1,
+        F2,
+        F3,
+        F4,
+
         W,
         S,
         A,

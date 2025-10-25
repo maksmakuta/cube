@@ -44,6 +44,14 @@ namespace cube {
                 return Key::MouseLeft;
             case GLFW_MOUSE_BUTTON_RIGHT:
                 return Key::MouseRight;
+            case GLFW_KEY_F1:
+                return Key::F1;
+            case GLFW_KEY_F2:
+                return Key::F2;
+            case GLFW_KEY_F3:
+                return Key::F3;
+            case GLFW_KEY_F4:
+                return Key::F4;
             default:
                 return Key::Unknown;
         }

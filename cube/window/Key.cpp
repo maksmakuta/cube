@@ -26,6 +26,14 @@ namespace cube {
                 return "MouseL";
             case Key::MouseRight:
                 return "MouseR";
+            case Key::F1:
+                return "F1";
+            case Key::F2:
+                return "F2";
+            case Key::F3:
+                return "F3";
+            case Key::F4:
+                return "F4";
             default:
                 return "Unknown";
         }
