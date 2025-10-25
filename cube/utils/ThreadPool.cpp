@@ -207,10 +207,10 @@ namespace cube {
     }
 
     void ThreadPool::waitAll() const {
-        for (size_t i = 0; i < m_queues.size(); ++i) {
-            std::unique_lock lock(m_queues[i]->mutex);
-            m_queues[i]->cv.wait(lock, [this, i] {
-                return m_queues[i]->tasks.empty() && m_activeWorkers.load() == 0;
+        for (const auto & m_queue : m_queues) {
+            std::unique_lock lock(m_queue->mutex);
+            m_queue->cv.wait(lock, [this, &m_queue] {
+                return m_queue->tasks.empty() && m_activeWorkers.load() == 0;
             });
         }
     }

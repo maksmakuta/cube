@@ -4,6 +4,7 @@
 #include "utils/AssetsPaths.hpp"
 
 namespace cube {
+
     ChunkRenderer::ChunkRenderer() {
         m_shader.fromName("render3d");
         m_textures = TextureBuilder()
@@ -11,6 +12,11 @@ namespace cube {
             .setWrap(TextureWrap::Repeat)
             .setFilter(TextureFilter::Nearest)
             .buildArray(getTexture("blocks/"));
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
     }
 
     ChunkRenderer::~ChunkRenderer() {
@@ -22,16 +28,26 @@ namespace cube {
         return m_chunks.contains(pos);
     }
 
-    void ChunkRenderer::add(const ChunkPos& pos, const ChunkObject& obj) {
-        m_chunks.insert_or_assign(pos,obj);
+    void ChunkRenderer::add(const ChunkPos& pos, const ChunkMesh& obj) {
+        if (m_chunks.contains(pos)) return;
+        if (m_pool.empty()) {
+            m_chunks.insert_or_assign(pos,toObject(obj));
+        }else {
+            auto& object = m_pool.back();
+            object.update(obj);
+            m_chunks.insert_or_assign(pos,object);
+            m_pool.pop_back();
+        }
     }
 
     void ChunkRenderer::remove(const ChunkPos& pos) {
+        if (!m_chunks.contains(pos)) return;
+        m_pool.push_back(m_chunks.at(pos));
         m_chunks.erase(pos);
     }
 
     void ChunkRenderer::resize(const glm::vec2& v, const float fov) {
-        m_projection = glm::perspective(glm::radians(fov), v.x / v.y, 0.1f, CHUNK_SIZE.x * 8.f);
+        m_projection = glm::perspective(glm::radians(fov), v.x / v.y, 0.1f, CHUNK_SIZE.y * 8.f);
         const auto size = glm::ivec2(v);
         glViewport(0, 0, size.x, size.y);
     }

@@ -14,7 +14,7 @@ namespace cube {
         ~ChunkRenderer();
 
         bool exists(const ChunkPos&) const;
-        void add(const ChunkPos&, const ChunkObject&);
+        void add(const ChunkPos&, const ChunkMesh&);
         void remove(const ChunkPos&);
 
         void resize(const glm::vec2&, float fov = 45.f);
@@ -24,6 +24,7 @@ namespace cube {
         Shader m_shader;
         TextureArray m_textures;
         glm::mat4 m_projection{1.f};
+        std::vector<ChunkObject> m_pool;
         std::unordered_map<ChunkPos, ChunkObject> m_chunks;
     };
 }
