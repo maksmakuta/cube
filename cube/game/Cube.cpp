@@ -30,6 +30,12 @@ namespace cube {
         m_window(window)
     {
         m_font.load(getFont("Monocraft-Regular.ttf"),24);
+        //
+        // const auto pos = glm::ivec2{0,0};
+        // auto chunk = m_gen.generateChunk(pos);
+        // m_world.setChunk(pos,chunk);
+        // const auto mesh = toMesh(chunk, std::vector<ChunkPtr>{4,nullptr});
+        // m_renderer->add(pos,mesh);
     }
 
     Cube::~Cube() = default;

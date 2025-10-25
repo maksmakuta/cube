@@ -3,14 +3,15 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace cube {
 
     struct ChunkVertex {
-        glm::vec3 pos;
-        glm::vec3 nor;
-        glm::vec2 tex;
-        uint32_t   id;
+        glm::u8vec3 pos;
+        glm::u8vec4 nor;
+        glm::u8vec2 tex;
+        uint8_t      id;
     };
 
 }

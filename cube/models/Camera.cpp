@@ -8,7 +8,7 @@
 namespace cube {
 
     constexpr float CAMERA_SENSITIVITY = 0.075f;
-    constexpr float CAMERA_SPEED = 7.5f;
+    constexpr float CAMERA_SPEED = 10.f;
 
     Camera::Camera() {
         updateDirection();
@@ -19,7 +19,7 @@ namespace cube {
         glm::vec3 velocity{0.f};
         float multiplier = 1.f;
 
-        if(m_keyState[Key::Control]) multiplier = 3.f;
+        if(m_keyState[Key::Control]) multiplier = 5.f;
         if(m_keyState[Key::W]) velocity += m_front * CAMERA_SPEED * multiplier;
         if(m_keyState[Key::S]) velocity -= m_front * CAMERA_SPEED * multiplier;
         if(m_keyState[Key::A]) velocity -= right * CAMERA_SPEED * multiplier;

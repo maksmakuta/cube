@@ -20,10 +20,10 @@ namespace cube {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size,nullptr, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, pos)));
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, nor)));
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, tex)));
-        glVertexAttribIPointer(3, 1, GL_INT,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, id)));
+        glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, pos)));
+        glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, nor)));
+        glVertexAttribPointer(2, 2, GL_UNSIGNED_BYTE, GL_FALSE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, tex)));
+        glVertexAttribIPointer(3, 1, GL_UNSIGNED_BYTE,sizeof(ChunkVertex), reinterpret_cast<void *>(offsetof(ChunkVertex, id)));
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
