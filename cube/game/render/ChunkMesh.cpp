@@ -180,24 +180,8 @@ namespace cube {
                                     mesh.vertices.emplace_back(pos + FACES[i][j], glm::vec4(DIRECTIONS[i],ao[j]), TEXTURE_UV[j], tex);
                                 }
                                 const auto baseVertex = mesh.vertices.size();
-
-                                // Add indices with proper winding
-                                if (ao[0] + ao[2] > ao[1] + ao[3]) {
-                                    // Flipped winding: splits along 1-3 diagonal
-                                    mesh.indices.push_back(baseVertex + 1);
-                                    mesh.indices.push_back(baseVertex + 2);
-                                    mesh.indices.push_back(baseVertex + 3);
-                                    mesh.indices.push_back(baseVertex + 3);
-                                    mesh.indices.push_back(baseVertex + 0);
-                                    mesh.indices.push_back(baseVertex + 1);
-                                } else {
-                                    // Normal winding: splits along 0-2 diagonal
-                                    mesh.indices.push_back(baseVertex + 0);
-                                    mesh.indices.push_back(baseVertex + 1);
-                                    mesh.indices.push_back(baseVertex + 2);
-                                    mesh.indices.push_back(baseVertex + 2);
-                                    mesh.indices.push_back(baseVertex + 3);
-                                    mesh.indices.push_back(baseVertex + 0);
+                                for (const auto& ind : INDICES) {
+                                    mesh.indices.emplace_back(baseVertex + ind);
                                 }
                             }
                         }
