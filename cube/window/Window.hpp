@@ -13,7 +13,7 @@ namespace cube {
 
     class Window {
     public:
-        explicit Window(const std::string& title, const glm::ivec2& size = {640,480});
+        explicit Window(const std::string& title, const glm::ivec2& size = {640,480}, int vsync = 0);
         ~Window();
 
         [[nodiscard]] glm::vec2 getSize() const;

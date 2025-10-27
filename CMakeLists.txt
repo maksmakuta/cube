@@ -46,8 +46,6 @@ add_executable(${PROJECT_NAME}
 
         cube/utils/AssetsPaths.hpp
         cube/utils/LambdaVisitor.hpp
-        cube/utils/ThreadPool.cpp
-        cube/utils/ThreadPool.hpp
 
         cube/window/Window.cpp
         cube/window/Window.hpp
@@ -66,6 +64,7 @@ add_executable(${PROJECT_NAME}
         cube/game/render/ChunkRenderer.hpp
         cube/game/Cube.cpp
         cube/game/Cube.hpp
+        cube/utils/ThreadPool.h
 
 )
 

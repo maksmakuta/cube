@@ -87,7 +87,7 @@ namespace cube {
         }
     }
 
-    Window::Window(const std::string& title, const glm::ivec2& size) : m_window(nullptr){
+    Window::Window(const std::string& title, const glm::ivec2& size, int vsync) : m_window(nullptr){
         if (!glfwInit()) {
             error("Failed to initialize GLFW");
         }
@@ -105,6 +105,7 @@ namespace cube {
         if (!gladLoadGL(glfwGetProcAddress)) {
             error("Failed to load OpenGL functions");
         }
+        glfwSwapInterval(vsync);
         glfwSetWindowUserPointer(m_window, this);
 
         glfwSetFramebufferSizeCallback(m_window, glfwFramebufferSizeCallback);

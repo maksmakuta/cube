@@ -49,7 +49,7 @@ Voxel rendering engine
   - [ ] Lighting
     - [ ] Ambient light
     - [ ] Directional light
-    - [ ] Spot light
+    - [ ] Spotlight
 - [x] Window
   - [x] Resizeable
   - [x] Load OpenGL functions
