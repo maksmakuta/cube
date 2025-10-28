@@ -2,7 +2,6 @@
 
 #include <format>
 #include <random>
-#include <unordered_set>
 
 #include "graphics/Color.hpp"
 #include "utils/AssetsPaths.hpp"

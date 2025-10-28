@@ -38,7 +38,7 @@ Voxel rendering engine
       - [ ] Flat
       - [ ] Detailed
   - [ ] Block Rendering
-    - [ ] Filled
+    - [X] Filled
     - [ ] X-shaped
     - [ ] #-shaped
   - [ ] Support for chunk rendering
@@ -47,7 +47,7 @@ Voxel rendering engine
     - [ ] First person camera
     - [ ] Third person camera
   - [ ] Lighting
-    - [ ] Ambient light
+    - [X] Ambient Occlusion
     - [ ] Directional light
     - [ ] Spotlight
 - [x] Window
