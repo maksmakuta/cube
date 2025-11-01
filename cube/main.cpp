@@ -10,13 +10,15 @@ int main(){
     cube->onInit();
     auto time = cube::getTime();
     while (!window->isClosed()) {
-        auto now = cube::getTime();
-        cube->onTick(static_cast<float>(now - time));
-        time = now;
         cube::update();
         while(window->isNextEvent()){
             cube->onEvent(window->getEvent());
         }
+
+        auto now = cube::getTime();
+        cube->onTick(static_cast<float>(now - time));
+        time = now;
+
         cube->onDraw();
         window->swapBuffers();
     }

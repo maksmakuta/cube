@@ -47,6 +47,14 @@ add_executable(${PROJECT_NAME}
         cube/game/Cube.h
         cube/utils/Assets.cpp
         cube/graphics/FontStyle.h
+        cube/game/gen/Generator.cpp
+        cube/game/gen/Generator.h
+        cube/game/models/Chunk.cpp
+        cube/game/models/Chunk.h
+        cube/game/models/Block.cpp
+        cube/game/models/Block.h
+        cube/game/gen/pipeline/IPipeline.cpp
+        cube/game/gen/pipeline/IPipeline.h
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
