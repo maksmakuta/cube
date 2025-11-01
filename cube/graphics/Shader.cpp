@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "glad/gl.h"
-#include "utils/AssetsPaths.hpp"
+#include "utils/Assets.hpp"
 
 namespace cube {
 
@@ -63,10 +63,11 @@ namespace cube {
     }
 
     void Shader::fromName(const std::string& name) {
+        const auto shaders_paths = Assets::getShader(name);
         fromFiles(
-            getShader(name + "_vert.glsl"),
-            getShader(name + "_frag.glsl")
-        );
+            shaders_paths[0],
+            shaders_paths[1]
+            );
     }
 
     uint Shader::getID() const {

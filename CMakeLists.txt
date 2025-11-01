@@ -32,7 +32,7 @@ add_executable(${PROJECT_NAME}
         cube/graphics/TextureBuilder.hpp
         cube/graphics/TextureParams.hpp
 
-        cube/utils/AssetsPaths.hpp
+        cube/utils/Assets.hpp
         cube/utils/LambdaVisitor.hpp
 
         cube/window/Window.cpp
@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         cube/main.cpp
         cube/game/Cube.cpp
         cube/game/Cube.h
+        cube/utils/Assets.cpp
+        cube/graphics/FontStyle.h
 )
 
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")

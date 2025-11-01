@@ -1,6 +1,8 @@
 #include "Cube.h"
 #include "utils/LambdaVisitor.hpp"
-#include "utils/AssetsPaths.hpp"
+#include "utils/Assets.hpp"
+
+#include <format>
 
 namespace cube{
 
@@ -9,7 +11,7 @@ namespace cube{
     }
 
     void Cube::onInit(){
-        m_font.load(getFont("Monocraft-Regular.ttf"),24);
+        m_font.load(Assets::getFont(Italic),24);
     }
 
     void Cube::onDeinit(){
@@ -24,7 +26,7 @@ namespace cube{
     }
 
     void Cube::onTick(float dt){
-
+        m_fps = 1.0f / dt;
     }
 
     void Cube::onEvent(const Event& e){
@@ -41,10 +43,11 @@ namespace cube{
         },e);
     }
 
-
     void Cube::onRender(Renderer2D& ctx){
+        const auto line = m_font.getSize();
         ctx.text(m_font,Color(0xFFFFFFFF));
-        ctx.print("Hello, World", mouse);
+        ctx.print("Hello, World", {0,line});
+        ctx.print(std::format("FPS: {}",m_fps), {0,line*2});
     }
 
 }

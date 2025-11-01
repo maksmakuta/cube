@@ -20,6 +20,7 @@ namespace cube{
     private:
         void onRender(Renderer2D&);
 
+        float m_fps{0};
         Font m_font;
         glm::vec2 mouse{0};
         std::unique_ptr<Renderer2D> m_renderer;

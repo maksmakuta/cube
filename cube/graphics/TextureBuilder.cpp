@@ -1,4 +1,5 @@
 #include "TextureBuilder.hpp"
+#include "utils/Assets.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_ONLY_PNG
@@ -61,14 +62,7 @@ namespace cube {
     }
 
     TextureArray TextureBuilder::buildArray(const std::string& dir_path) {
-        namespace fs = std::filesystem;
-        std::vector<std::string> files;
-        for (auto& e : fs::directory_iterator(dir_path)) {
-            if (e.is_regular_file())
-                files.push_back(e.path().string());
-        }
-        std::ranges::sort(files);
-        return buildArray(files);
+        return buildArray(Assets::getTextures(dir_path));
     }
 
   TextureArray TextureBuilder::buildArray(const std::vector<std::string>& items) {
