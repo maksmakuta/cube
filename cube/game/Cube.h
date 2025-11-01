@@ -2,6 +2,8 @@
 #define CUBE_CUBE_H
 
 #include "window/Event.hpp"
+#include "graphics/Font.hpp"
+#include "graphics/Renderer2D.hpp"
 
 namespace cube{
 
@@ -14,6 +16,13 @@ namespace cube{
         void onDraw();
         void onTick(float dt);
         void onEvent(const Event& e);
+
+    private:
+        void onRender(Renderer2D&);
+
+        Font m_font;
+        glm::vec2 mouse{0};
+        std::unique_ptr<Renderer2D> m_renderer;
     };
 
 }
