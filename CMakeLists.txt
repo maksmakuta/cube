@@ -12,7 +12,9 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES}
+        include/cube/window/Window.hpp
+        src/cube/window/Window.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD
