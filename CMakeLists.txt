@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(libs/glad)
+add_subdirectory(libs/libspng-0.7.4)
 
 find_package(SDL3 REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -22,9 +23,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         SDL3::SDL3
         glm::glm
         OpenGL::GL
+        spng
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
         include
         libs/glad/include
+        libs/libspng-0.7.4/spng
 )
