@@ -13,10 +13,9 @@ find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCES}
-        include/cube/window/Window.hpp
-        src/cube/window/Window.cpp
-        include/cube/graphics/Camera.hpp
-        src/cube/graphics/Camera.cpp)
+        include/cube/graphics/Vertex.hpp
+        include/cube/graphics/Shader.hpp
+        src/cube/graphics/Shader.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD

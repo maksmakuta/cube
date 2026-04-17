@@ -2,8 +2,9 @@
 #define CUBE_WINDOW_HPP
 
 #include <string>
-#include <SDL3/SDL_video.h>
+
 #include <glm/vec2.hpp>
+#include <SDL3/SDL_video.h>
 
 namespace cube {
 
