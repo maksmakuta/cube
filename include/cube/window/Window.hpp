@@ -25,6 +25,8 @@ namespace cube {
 
         [[nodiscard]] bool isOpen() const;
 
+        void setRelativeMouseMode(bool cond) const;
+
     private:
         bool m_is_open = false;
         SDL_Window* m_window = nullptr;

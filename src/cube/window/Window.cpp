@@ -78,4 +78,8 @@ namespace cube {
         return m_is_open;
     }
 
+    void Window::setRelativeMouseMode(const bool cond) const {
+        if (m_window)
+            SDL_SetWindowRelativeMouseMode(m_window,cond);
+    }
 }
