@@ -16,21 +16,36 @@ namespace cube {
     }
 
     void RenderSystem::update(World& world) {
-        // 1. Get all chunks currently loaded in the world
+        // 1. Process 1 new mesh per frame (as we did before)
+        int meshedThisFrame = 0;
         for (auto& [pos, chunk] : world.getChunks()) {
             auto& mesh = m_meshes[pos];
             if (mesh.dirty) {
-                // Pass the REAL chunk by reference
                 buildMesh(pos, chunk, mesh);
+                mesh.dirty = false;
+                if (++meshedThisFrame >= 1) break;
             }
         }
+
+        // 2. THE FIX: Remove meshes that no longer exist in the world
+        // This is the missing link that will stop the count from growing forever.
         std::erase_if(m_meshes, [&](const auto& pair) {
-            return world.getChunk(pair.first) == nullptr;
+            const glm::ivec3& pos = pair.first;
+
+            // If the world doesn't have this chunk anymore,
+            // it's time to destroy the GPU buffers.
+            if (world.getChunk(pos) == nullptr) {
+                // pair.second is the ChunkMesh.
+                // We need to free the VAO/VBO/EBO before removing it from the map.
+                const_cast<ChunkMesh&>(pair.second).clear();
+                return true; // Remove from m_meshes
+            }
+            return false; // Keep it
         });
     }
 
 
-    void RenderSystem::render(World& world, const Camera& camera, const glm::mat4& projection) {
+    void RenderSystem::render(const Camera& camera, const glm::mat4& projection) {
         m_shader->use();
 
         // Bind the Texture Array to unit 0

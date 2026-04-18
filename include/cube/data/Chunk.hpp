@@ -8,7 +8,7 @@
 
 namespace cube {
 
-    static constexpr int CHUNK_SIZE = 16;
+    static constexpr int CHUNK_SIZE = 8;
     using BlockArray = std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>;
 
     class Chunk final {

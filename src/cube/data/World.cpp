@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cube/data/World.hpp>
 
 namespace cube {
@@ -11,11 +12,7 @@ namespace cube {
         if (it != m_chunks.end()) {
             return &it->second;
         }
-
-        // Lazy Generation: If chunk doesn't exist, create it
-        auto [newIt, inserted] = m_chunks.emplace(chunkPos, Chunk());
-        generateChunkData(chunkPos, newIt->second);
-        return &newIt->second;
+        return nullptr;
     }
 
     bool World::putChunk(const glm::ivec3& chunkPos, Chunk&& chunk) {
@@ -79,6 +76,33 @@ namespace cube {
             static_cast<int>(std::floor(pos.y / static_cast<float>(CHUNK_SIZE))),
             static_cast<int>(std::floor(pos.z / static_cast<float>(CHUNK_SIZE)))
         };
+    }
+
+    void World::enqueueChunk(const glm::ivec3& pos) {
+        if (!m_chunks.contains(pos) && !m_inQueue.contains(pos)) {
+            m_loadQueue.push_back(pos);
+            m_inQueue.insert(pos);
+        }
+    }
+
+    void World::processQueue(const glm::vec3& playerPos) {
+        if (m_loadQueue.empty()) return;
+
+        // 1. Sort queue so the closest chunk is at the back (O(1) pop)
+        // You can do this once every few frames instead of every frame for performance
+        std::sort(m_loadQueue.begin(), m_loadQueue.end(), [&](const auto& a, const auto& b) {
+            return glm::distance(glm::vec3(a), playerPos / 16.0f) >
+                   glm::distance(glm::vec3(b), playerPos / 16.0f);
+        });
+
+        // 2. Process exactly one chunk
+        glm::ivec3 pos = m_loadQueue.back();
+        m_loadQueue.pop_back();
+        m_inQueue.erase(pos);
+
+        // This triggers your generation logic
+        auto [newIt, inserted] = m_chunks.emplace(pos, Chunk());
+        generateChunkData(pos, newIt->second);
     }
 
 }

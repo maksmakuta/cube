@@ -26,7 +26,7 @@ namespace cube {
 
     void Cube::run() {
 
-        glDisable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
         m_render_system = std::make_unique<RenderSystem>();
@@ -60,7 +60,7 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-        m_render_system->render(m_world, m_camera, m_projection);
+        m_render_system->render(m_camera, m_projection);
     }
 
     void Cube::onEvent(const SDL_Event &event) {
@@ -87,11 +87,31 @@ namespace cube {
 
         m_camera.setPosition(newPos);
 
-        m_window.setTitle(std::format("Cube | FPS: {:3.2f}", dt > 0 ? 1.0f / dt : 144.f));
+        m_window.setTitle(std::format("Cube | FPS: {:3.2f} | {},{},{}", dt > 0 ? 1.0f / dt : 144.f, newPos.x, newPos.y, newPos.z));
 
-        m_world.unloadDistantChunks( worldToChunkPos(m_camera.getPosition()),8);
+        static glm::ivec3 lastPlayerChunk = {999, 999, 999};
+        const glm::vec3 playerPos = m_camera.getPosition();
+        const glm::ivec3 pChunk = worldToChunkPos(playerPos);
+        constexpr auto viewDist = 8;
+
+        if (pChunk != lastPlayerChunk) {
+            for (int x = -viewDist; x <= viewDist; ++x) {
+                for (int z = -viewDist; z <= viewDist; ++z) {
+                    for (int y = -2; y <= 2; ++y) {
+                        const auto pos = pChunk + glm::ivec3(x, y, z);
+                        if (pos.y >= 0) {
+                            m_world.enqueueChunk(pos);
+                        }
+
+                    }
+                }
+            }
+            lastPlayerChunk = pChunk;
+        }
+
+        m_world.processQueue(playerPos);
+        m_world.unloadDistantChunks(pChunk, viewDist + 2);
         m_render_system->update(m_world);
-
     }
 
     void Cube::onResize(const int w, const int h) {

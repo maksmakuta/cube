@@ -2,10 +2,10 @@
 #define CUBE_WORLD_HPP
 #pragma once
 
-#include <optional>
-#include <memory>
 #include <unordered_map>
 #include <glm/vec3.hpp>
+#include <deque>
+#include <unordered_set>
 
 // Required for hashing glm::ivec3 in unordered_map
 #define GLM_ENABLE_EXPERIMENTAL
@@ -39,12 +39,17 @@ namespace cube {
         // Helper to convert world float position to chunk integer position
         static glm::ivec3 worldToChunkPos(const glm::vec3& pos) noexcept;
 
+        void enqueueChunk(const glm::ivec3& pos);
+        void processQueue(const glm::vec3& playerPos);
+
     private:
         static void generateChunkData(const glm::ivec3& chunkPos, Chunk& chunk);
 
         int m_seed;
         // Storing by value is okay ONLY if Chunk is move-friendly and you return by reference
         std::unordered_map<glm::ivec3, Chunk> m_chunks;
+        std::deque<glm::ivec3> m_loadQueue;
+        std::unordered_set<glm::ivec3> m_inQueue;
     };
 
 }

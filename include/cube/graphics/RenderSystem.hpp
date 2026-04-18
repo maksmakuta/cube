@@ -40,7 +40,7 @@ namespace cube {
         void update(World& world);
 
         // Draws everything to the screen
-        void render(World& world, const Camera& camera, const glm::mat4& projection);
+        void render(const Camera& camera, const glm::mat4& projection);
 
     private:
         std::unordered_map<glm::ivec3, ChunkMesh> m_meshes;
