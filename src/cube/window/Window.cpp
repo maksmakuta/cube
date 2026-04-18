@@ -82,4 +82,5 @@ namespace cube {
         if (m_window)
             SDL_SetWindowRelativeMouseMode(m_window,cond);
     }
+
 }
