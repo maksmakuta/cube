@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2)
-project(cube VERSION 0.1.0 LANGUAGES CXX C)
+project(cube VERSION 0.2.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,16 +14,7 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES}
-        include/cube/data/Chunk.hpp
-        include/cube/Cube.hpp
-        src/cube/Cube.cpp
-        include/cube/data/Blocks.hpp
-        src/cube/data/Chunk.cpp
-        include/cube/data/World.hpp
-        src/cube/data/World.cpp
-        include/cube/graphics/RenderSystem.hpp
-        src/cube/graphics/RenderSystem.cpp)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD

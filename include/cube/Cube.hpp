@@ -3,10 +3,7 @@
 
 #include <SDL3/SDL_events.h>
 
-#include "data/World.hpp"
-#include "glad/glad.h"
 #include "graphics/Camera.hpp"
-#include "graphics/RenderSystem.hpp"
 #include "window/Window.hpp"
 
 namespace cube {
@@ -25,8 +22,6 @@ namespace cube {
 
         Window m_window;
         Camera m_camera;
-        World m_world;
-        std::unique_ptr<RenderSystem> m_render_system;
         glm::mat4 m_projection{1.f};
     };
 

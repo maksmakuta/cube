@@ -4,21 +4,12 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_timer.h>
 
-#include "cube/data/Chunk.hpp"
 #include "cube/graphics/Vertex.hpp"
 #include "glad/glad.h"
 
 namespace cube {
 
     constexpr auto CAMERA_SPEED = 5.0f;
-
-    glm::ivec3 worldToChunkPos(const glm::vec3& pos) {
-        return {
-            static_cast<int>(std::floor(pos.x / CHUNK_SIZE)),
-            static_cast<int>(std::floor(pos.y / CHUNK_SIZE)),
-            static_cast<int>(std::floor(pos.z / CHUNK_SIZE))
-        };
-    }
 
     Cube::Cube() : m_window("Cube"){
 
@@ -29,17 +20,12 @@ namespace cube {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
-        m_render_system = std::make_unique<RenderSystem>();
         m_window.setRelativeMouseMode(true);
         onResize(m_window.getSize().x, m_window.getSize().y);
         uint64_t lastTime = SDL_GetTicks();
 
         m_camera.setPosition(glm::vec3(8.0f, 40.0f, 8.0f));
 
-        for (int y = 0; y < 4; ++y) {
-            m_world.getChunk(glm::ivec3(0, y, 0));
-        }
-        m_render_system->update(m_world);
         while (m_window.isOpen()) {
             const uint64_t currentTime = SDL_GetTicks();
             const auto deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
@@ -60,7 +46,7 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-        m_render_system->render(m_camera, m_projection);
+
     }
 
     void Cube::onEvent(const SDL_Event &event) {
@@ -88,30 +74,6 @@ namespace cube {
         m_camera.setPosition(newPos);
 
         m_window.setTitle(std::format("Cube | FPS: {:3.2f} | {},{},{}", dt > 0 ? 1.0f / dt : 144.f, newPos.x, newPos.y, newPos.z));
-
-        static glm::ivec3 lastPlayerChunk = {999, 999, 999};
-        const glm::vec3 playerPos = m_camera.getPosition();
-        const glm::ivec3 pChunk = worldToChunkPos(playerPos);
-        constexpr auto viewDist = 8;
-
-        if (pChunk != lastPlayerChunk) {
-            for (int x = -viewDist; x <= viewDist; ++x) {
-                for (int z = -viewDist; z <= viewDist; ++z) {
-                    for (int y = -2; y <= 2; ++y) {
-                        const auto pos = pChunk + glm::ivec3(x, y, z);
-                        if (pos.y >= 0) {
-                            m_world.enqueueChunk(pos);
-                        }
-
-                    }
-                }
-            }
-            lastPlayerChunk = pChunk;
-        }
-
-        m_world.processQueue(playerPos);
-        m_world.unloadDistantChunks(pChunk, viewDist + 2);
-        m_render_system->update(m_world);
     }
 
     void Cube::onResize(const int w, const int h) {
