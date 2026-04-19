@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(libs/glad)
-add_subdirectory(libs/libspng-0.7.4)
+add_subdirectory(libs/libspng)
+add_subdirectory(libs/FastNoise2)
 
 find_package(SDL3 REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -30,10 +31,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glm::glm
         OpenGL::GL
         spng
+        FastNoise2
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
         include
         libs/glad/include
-        libs/libspng-0.7.4/spng
+        libs/libspng/spng
+        libs/FastNoise2/include
 )
