@@ -11,38 +11,8 @@ namespace cube {
 
     constexpr auto CAMERA_SPEED = 5.0f;
 
-    Cube::Cube() : m_window("Cube"){
+    Cube::Cube(){
 
-    }
-
-    void Cube::run() {
-
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-
-        m_window.setRelativeMouseMode(true);
-        onResize(m_window.getSize().x, m_window.getSize().y);
-        uint64_t lastTime = SDL_GetTicks();
-
-        m_camera.setPosition(glm::vec3(8.0f, 40.0f, 8.0f));
-
-        while (m_window.isOpen()) {
-            const uint64_t currentTime = SDL_GetTicks();
-            const auto deltaTime = static_cast<float>(currentTime - lastTime) / 1000.0f;
-            lastTime = currentTime;
-            onUpdate(deltaTime);
-
-            SDL_Event event;
-            while (SDL_PollEvent(&event)) {
-                onEvent(event);
-            }
-
-            glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            onDraw();
-            m_window.swapBuffers();
-        }
     }
 
     void Cube::onDraw() {
@@ -50,15 +20,7 @@ namespace cube {
     }
 
     void Cube::onEvent(const SDL_Event &event) {
-        if(event.type == SDL_EVENT_QUIT) {
-            m_window.close();
-        }
-        if (event.type == SDL_EVENT_MOUSE_MOTION) {
-            m_camera.rotate(event.motion.xrel, -event.motion.yrel);
-        }
-        if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
-            onResize(event.window.data1, event.window.data2);
-        }
+
     }
 
     void Cube::onUpdate(const float dt) {
@@ -72,9 +34,6 @@ namespace cube {
         if (keys[SDL_SCANCODE_LSHIFT]   ) { newPos -= m_camera.getUp() * dt * CAMERA_SPEED; }
 
         m_camera.setPosition(newPos);
-
-        const auto ipos = glm::ivec3(newPos);
-        m_window.setTitle(std::format("Cube | FPS: {:3.2f} | {:3},{:3},{:3}", dt > 0 ? 1.0f / dt : 144.f, ipos.x, ipos.y, ipos.z));
     }
 
     void Cube::onResize(const int w, const int h) {

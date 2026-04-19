@@ -12,15 +12,12 @@ namespace cube {
     public:
         Cube();
 
-        void run();
-
-    private:
         void onDraw();
         void onUpdate(float dt);
         void onResize(int w, int h);
         void onEvent(const SDL_Event &event);
 
-        Window m_window;
+    private:
         Camera m_camera;
         glm::mat4 m_projection{1.f};
     };

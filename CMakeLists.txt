@@ -14,7 +14,14 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES}
+        include/cube/core/BlockData.hpp
+        include/cube/data/Chunk.hpp
+        include/cube/data/World.hpp
+        src/cube/data/World.cpp
+        include/cube/data/Generator.hpp
+        src/cube/data/Generator.cpp
+        include/cube/core/Block.hpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD

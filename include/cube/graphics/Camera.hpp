@@ -31,6 +31,7 @@ namespace cube {
         glm::vec2 rotationAngles{-90.0f, 0.0f};
         float sensitivity{0.1f};
     };
+
 }
 
 #endif //CUBE_CAMERA_HPP
