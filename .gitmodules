@@ -1,0 +1,6 @@
+[submodule "libs/libspng"]
+	path = libs/libspng
+	url = https://github.com/randy408/libspng.git
+[submodule "libs/FastNoise2"]
+	path = libs/FastNoise2
+	url = https://github.com/Auburn/FastNoise2.git

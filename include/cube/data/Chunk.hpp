@@ -14,7 +14,7 @@ namespace cube {
     class Chunk final {
     public:
         Chunk() {
-            m_blocks.fill(Air); // Ensure EVERY block is Air initially
+            m_blocks.fill(Air);
         }
 
         [[nodiscard]] auto getView() const {
