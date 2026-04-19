@@ -73,7 +73,8 @@ namespace cube {
 
         m_camera.setPosition(newPos);
 
-        m_window.setTitle(std::format("Cube | FPS: {:3.2f} | {},{},{}", dt > 0 ? 1.0f / dt : 144.f, newPos.x, newPos.y, newPos.z));
+        const auto ipos = glm::ivec3(newPos);
+        m_window.setTitle(std::format("Cube | FPS: {:3.2f} | {:3},{:3},{:3}", dt > 0 ? 1.0f / dt : 144.f, ipos.x, ipos.y, ipos.z));
     }
 
     void Cube::onResize(const int w, const int h) {
