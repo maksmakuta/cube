@@ -7,7 +7,7 @@
 
 namespace cube {
 
-    constexpr auto CHUNK_SIZE = glm::ivec3(16,16,16);
+    constexpr auto CHUNK_SIZE = glm::ivec3(16);
     constexpr auto CHUNK_FLAT_SIZE = CHUNK_SIZE.x * CHUNK_SIZE.y * CHUNK_SIZE.z;
 
     struct Chunk {

@@ -11,7 +11,6 @@ namespace cube {
         uint32_t texture_side;
         uint32_t texture_bottom;
         uint32_t animation_frames;
-        float animation_speed;
     };
 
     struct BlockMetadata {

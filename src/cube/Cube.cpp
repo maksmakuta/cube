@@ -1,10 +1,7 @@
-#include <format>
 #include <cube/Cube.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <SDL3/SDL_events.h>
-#include <SDL3/SDL_timer.h>
 
-#include "cube/graphics/Vertex.hpp"
 #include "glad/glad.h"
 
 namespace cube {

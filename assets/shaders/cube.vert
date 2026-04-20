@@ -1,23 +1,41 @@
 #version 460 core
+layout (location = 0) in uint packedData;
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aUV;
-layout (location = 2) in vec3 aTint;
-
-// Outputs to Fragment Shader
-layout (location = 0) out vec3 vUV;   // x, y = UV, z = Layer
-layout (location = 1) out vec3 vTint;
-
-// Uniforms
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float u_Time;
+
+out vec2 v_UV;
+out float v_AO;
+out float v_Light;
+flat out uint v_BlockID;
 
 void main() {
-    // Standard MVP transformation
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    uint x =  packedData        & 0x0Fu;
+    uint y = (packedData >> 4)  & 0x0Fu;
+    uint z = (packedData >> 8)  & 0x0Fu;
 
-    // Pass data to fragment shader
-    vUV = vec3(aUV.x, 1.0 - aUV.y, aUV.z);
-    vTint = aTint;
+    uint ao    = (packedData >> 12) & 0x03u;
+    uint u     = (packedData >> 14) & 0x01u;
+    uint v     = (packedData >> 15) & 0x01u;
+    uint norm  = (packedData >> 16) & 0x07u;
+
+    uint light = (packedData >> 19) & 0x0Fu;
+    uint sway  = (packedData >> 23) & 0x01u;
+    v_BlockID  = (packedData >> 24) & 0xFFu;
+
+    v_UV = vec2(float(u), float(v));
+    v_AO = 0.4 + (float(ao) / 3.0) * 0.6;
+    v_Light = float(light) / 15.0;
+
+    vec4 localPos = vec4(float(x), float(y), float(z), 1.0);
+
+    if (sway == 1u && v > 0u) {
+        float wave = sin(u_Time * 2.0 + (model[3].x + localPos.x) + (model[3].z + localPos.z)) * 0.15;
+        localPos.x += wave;
+        localPos.z += wave;
+    }
+
+    gl_Position = projection * view * model * localPos;
 }
