@@ -19,7 +19,9 @@ add_executable(${PROJECT_NAME} ${SOURCES}
         include/cube/task/Meshing.hpp
         include/cube/task/ThreadWorker.hpp
         src/cube/task/ThreadWorker.cpp
-        src/cube/task/Meshing.cpp)
+        src/cube/task/Meshing.cpp
+        include/cube/graphics/Renderer.hpp
+        src/cube/graphics/Renderer.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD
