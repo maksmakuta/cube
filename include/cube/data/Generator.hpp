@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 
 #include "Chunk.hpp"
-#include "FastNoise/Generators/Fractal.h"
+#include <FastNoise/FastNoise.h>
 
 namespace cube {
 

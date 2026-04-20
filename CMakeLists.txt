@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2)
-project(cube VERSION 0.2.0 LANGUAGES CXX C)
+project(cube VERSION 0.3.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,14 +14,7 @@ find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES}
-        src/cube/graphics/Vertex.cpp
-        include/cube/task/Meshing.hpp
-        include/cube/task/ThreadWorker.hpp
-        src/cube/task/ThreadWorker.cpp
-        src/cube/task/Meshing.cpp
-        include/cube/graphics/Renderer.hpp
-        src/cube/graphics/Renderer.cpp)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD
@@ -29,12 +22,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         glm::glm
         OpenGL::GL
         spng
-        FastNoise2
+        FastNoise
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
         include
         libs/glad/include
         libs/libspng/spng
-        libs/FastNoise2/include
 )

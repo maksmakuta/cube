@@ -19,7 +19,7 @@ namespace cube {
         int priority;
     };
 
-    static MeshResult mesh(World&, MeshTask);
+    MeshResult mesh(World&, MeshTask);
 
 }
 
