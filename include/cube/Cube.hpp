@@ -3,7 +3,10 @@
 
 #include <SDL3/SDL_events.h>
 
+#include "data/Generator.hpp"
+#include "data/World.hpp"
 #include "graphics/Camera.hpp"
+#include "task/ThreadWorker.hpp"
 #include "window/Window.hpp"
 
 namespace cube {
@@ -18,7 +21,10 @@ namespace cube {
         void onEvent(const SDL_Event &event);
 
     private:
+        World m_world;
         Camera m_camera;
+        Generator m_generator;
+        ThreadWorker m_worker;
         glm::mat4 m_projection{1.f};
     };
 

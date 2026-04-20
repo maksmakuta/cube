@@ -88,4 +88,16 @@ namespace cube {
         mark_chunk_dirty(chunk_pos);
     }
 
+    bool World::is_ready_to_mesh(const glm::ivec3 &pos) const {
+        for (int x = -1; x <= 1; ++x) {
+            for (int y = -1; y <= 1; ++y) {
+                for (int z = -1; z <= 1; ++z) {
+                    if (!this->has_chunk(pos + glm::ivec3(x, y, z))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 }

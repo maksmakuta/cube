@@ -8,7 +8,7 @@ namespace cube {
 
     constexpr auto CAMERA_SPEED = 5.0f;
 
-    Cube::Cube(){
+    Cube::Cube() : m_generator(0), m_worker(m_world){
 
     }
 

@@ -15,7 +15,11 @@ find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCES}
-        src/cube/graphics/Vertex.cpp)
+        src/cube/graphics/Vertex.cpp
+        include/cube/task/Meshing.hpp
+        include/cube/task/ThreadWorker.hpp
+        src/cube/task/ThreadWorker.cpp
+        src/cube/task/Meshing.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         GLAD

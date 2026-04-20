@@ -1,12 +1,11 @@
 #ifndef CUBE_WORLD_HPP
 #define CUBE_WORLD_HPP
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include <unordered_map>
 #include <memory>
 #include <shared_mutex>
 #include <unordered_set>
-
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <glm/vec3.hpp>
 
@@ -26,6 +25,8 @@ namespace cube {
 
         bool has_chunk(glm::ivec3 chunk_pos) const;
         void add_chunk(glm::ivec3 chunk_pos, std::unique_ptr<Chunk> chunk);
+
+        bool is_ready_to_mesh(const glm::ivec3& pos) const;
 
     private:
         ChunkMap m_chunks;
