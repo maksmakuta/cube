@@ -13,6 +13,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
+message("Files: ${SOURCES}")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
