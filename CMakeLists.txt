@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2)
-project(cube VERSION 0.3.0 LANGUAGES CXX C)
+project(cube VERSION 0.4.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,7 +13,6 @@ find_package(glm CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-message("Files: ${SOURCES}")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

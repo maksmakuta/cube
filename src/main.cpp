@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 
+#include "cube/Cube.hpp"
 #include "cube/utils/Logger.hpp"
 #include "glad/glad.h"
 
@@ -39,6 +40,8 @@ int main() {
         return -1;
     }
 
+    auto cube = Cube();
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
@@ -51,6 +54,7 @@ int main() {
         frames++;
         const auto now = SDL_GetTicks();
         const auto dt = static_cast<float>(now - last_tick) / 1000.f;
+        cube.onUpdate(dt);
         last_tick = now;
 
         time += dt;
@@ -65,9 +69,11 @@ int main() {
                 glViewport(0, 0, event.window.data1, event.window.data2);
                 Log::info("Resize window to {}x{}", event.window.data1, event.window.data2);
             }
+            cube.onEvent(event);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        cube.onDraw();
         SDL_GL_SwapWindow(window);
 
         if (time > 1.f) {
