@@ -40,6 +40,7 @@ int main() {
         return -1;
     }
 
+    SDL_SetWindowRelativeMouseMode(window,true);
     auto cube = Cube();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
