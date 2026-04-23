@@ -1,8 +1,8 @@
-#include <SDL3/SDL.h>
+#include <cube/Cube.hpp>
+#include <cube/utils/Logger.hpp>
 
-#include "cube/Cube.hpp"
-#include "cube/utils/Logger.hpp"
-#include "glad/glad.h"
+#include <SDL3/SDL.h>
+#include <glad/glad.h>
 
 using namespace cube;
 

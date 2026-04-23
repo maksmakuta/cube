@@ -3,7 +3,9 @@
 
 #include <SDL3/SDL_events.h>
 
-#include "cube/graphics/Camera.hpp"
+#include <cube/data/Chunk.hpp>
+#include <cube/graphics/Camera.hpp>
+#include <cube/graphics/Renderer.hpp>
 
 namespace cube {
 
@@ -17,7 +19,13 @@ namespace cube {
         void onEvent(const SDL_Event&);
 
     private:
+        void generateChunk();
+        void meshChunk();
+
+        Chunk m_chunk;
         Camera m_camera;
+        Renderer m_renderer;
+        glm::mat4 m_projection{1.0f};
     };
 
 }

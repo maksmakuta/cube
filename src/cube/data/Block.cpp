@@ -4,10 +4,10 @@
 namespace cube {
 
     const auto BLOCK_INFO = std::vector<BlockInfo>{
-        {"Air",      {0,0,0,0}},
-        {"Grass",    {0,0,0,0}},
-        {"Dirt",     {0,0,0,0}},
-        {"Stone",    {0,0,0,0}},
+        {"Air",      {0,0,0,1}},
+        {"Grass",    {0,1,2,1}},
+        {"Dirt",     {2,2,2,1}},
+        {"Stone",    {3,3,3,1}},
     };
 
     BlockInfo getBlockInfo(const Block& block) {
