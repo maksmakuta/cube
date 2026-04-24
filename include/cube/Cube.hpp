@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL_events.h>
 
-#include <cube/data/Chunk.hpp>
+#include <cube/data/World.hpp>
 #include <cube/graphics/Camera.hpp>
 #include <cube/graphics/Renderer.hpp>
 
@@ -19,11 +19,7 @@ namespace cube {
         void onEvent(const SDL_Event&);
 
     private:
-        void generateChunk(const glm::ivec3&);
-        void meshChunk(const glm::ivec3&);
-
-        int m_seed;
-        Chunk m_chunk;
+        World m_world;
         Camera m_camera;
         Renderer m_renderer;
         glm::mat4 m_projection{1.0f};
