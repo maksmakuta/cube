@@ -98,10 +98,12 @@ namespace cube {
 
     void Renderer::loadTextures() {
         const std::vector<std::string> textures = {
+            "grass_block_side_overlay.png",
             "grass_block_top.png",
             "grass_block_side.png",
             "dirt.png",
-            "stone.png"
+            "stone.png",
+            "sand.png"
         };
 
         constexpr int width = 16;
@@ -157,7 +159,7 @@ namespace cube {
         }
     }
 
-    void Renderer::render(const glm::mat4& projection, const glm::mat4& view) {
+    void Renderer::render(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& cameraPos) {
         glUseProgram(m_shader);
 
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -165,10 +167,27 @@ namespace cube {
 
         glBindTextureUnit(0, m_texture);
 
-        for (const auto &r: m_renderables | std::views::values) {
-            glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, &r.model[0][0]);
-            glBindVertexArray(r.vao);
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(r.count), GL_UNSIGNED_INT, nullptr);
+        std::vector<glm::ivec3> sortedRenderables;
+        for (const auto &pos: m_renderables | std::views::keys) {
+            sortedRenderables.push_back(pos);
+        }
+
+        std::sort(sortedRenderables.begin(), sortedRenderables.end(),
+            [&cameraPos](const glm::ivec3& a, const glm::ivec3& b) {
+                const float distA = glm::distance(cameraPos,glm::vec3(a * 16));
+                const float distB = glm::distance(cameraPos,glm::vec3(b * 16));
+                return distA < distB;
+        });
+
+        // 3. Render in sorted order
+        for (const auto& r : sortedRenderables) {
+            if (!m_renderables.contains(r)) {
+                continue;
+            }
+            const auto renderable = m_renderables[r];
+            glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, &renderable.model[0][0]);
+            glBindVertexArray(renderable.vao);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(renderable.count), GL_UNSIGNED_INT, nullptr);
         }
     }
 

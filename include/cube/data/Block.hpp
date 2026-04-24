@@ -10,7 +10,8 @@ namespace cube {
         Air = 0,
         Grass,
         Dirt,
-        Stone
+        Stone,
+        Sand
     };
 
     struct BlockData {

@@ -35,7 +35,7 @@ namespace cube {
         ~Renderer();
 
         void put(const glm::ivec3& pos, const RenderableMesh& mesh);
-        void render(const glm::mat4& projection, const glm::mat4& view);
+        void render(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& cameraPos);
 
     private:
         void loadShader();

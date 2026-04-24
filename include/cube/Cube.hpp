@@ -19,9 +19,10 @@ namespace cube {
         void onEvent(const SDL_Event&);
 
     private:
-        void generateChunk();
-        void meshChunk();
+        void generateChunk(const glm::ivec3&);
+        void meshChunk(const glm::ivec3&);
 
+        int m_seed;
         Chunk m_chunk;
         Camera m_camera;
         Renderer m_renderer;
