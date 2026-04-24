@@ -20,13 +20,20 @@ namespace cube {
             return std::mdspan<Block, std::extents<size_t, CHUNK_SIZE.x, CHUNK_SIZE.y, CHUNK_SIZE.z>>(m_blocks.data());
         }
 
-        auto view() const {
+        [[nodiscard]] auto view() const {
             return std::mdspan<const Block, std::extents<size_t, CHUNK_SIZE.x, CHUNK_SIZE.y, CHUNK_SIZE.z>>(m_blocks.data());
         }
 
     private:
         std::vector<Block> m_blocks{CHUNK_LENGTH, Air};
     };
+
+    inline int dist(const glm::ivec3& a, const glm::ivec3& b) {
+        const int dx = a.x - b.x;
+        const int dy = a.y - b.y;
+        const int dz = a.z - b.z;
+        return dx * dx + dy * dy + dz * dz;
+    }
 
 }
 

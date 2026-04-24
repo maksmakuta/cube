@@ -22,7 +22,7 @@ namespace cube {
 
         m_terrainNoise->GenUniformGrid2D(heightMap.data(),
                                          chunkPos.x * CHUNK_SIZE.x, chunkPos.z * CHUNK_SIZE.z,
-                                         CHUNK_SIZE.x, CHUNK_SIZE.z, 0.005f, 0.005f, m_seed);
+                                         CHUNK_SIZE.x, CHUNK_SIZE.z, 1.f, 1.f, m_seed);
 
         m_tempNoise->GenUniformGrid2D(tempMap.data(),
                                       chunkPos.x * CHUNK_SIZE.x, chunkPos.z * CHUNK_SIZE.z,

@@ -11,6 +11,8 @@
 
 #include <cube/utils/Logger.hpp>
 
+#include "cube/data/Chunk.hpp"
+
 namespace cube {
 
     Renderer::Renderer() {
@@ -162,6 +164,18 @@ namespace cube {
     }
 
     void Renderer::render(const glm::mat4& projection, const glm::mat4& view) {
+        {
+            std::lock_guard lock(m_trashMutex);
+            for (const auto& pos : m_removed) {
+                auto& r = m_renderables[pos];
+                glDeleteVertexArrays(1, &r.vao);
+                glDeleteBuffers(1, &r.vbo);
+                glDeleteBuffers(1, &r.ebo);
+                m_renderables.erase(pos);
+            }
+            m_removed.clear();
+        }
+
         glUseProgram(m_shader);
 
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projection"), 1, GL_FALSE, &projection[0][0]);
@@ -180,7 +194,7 @@ namespace cube {
         }
     }
 
-    void Renderer::put(const glm::ivec3& pos, const RenderableMesh& mesh) {
+    void Renderer::put(const RenderableMesh& mesh) {
         if (mesh.vertices.empty()) return;
 
         Renderable r{};
@@ -209,16 +223,9 @@ namespace cube {
         glVertexArrayAttribBinding(r.vao, 1, 0);
         glVertexArrayAttribBinding(r.vao, 2, 0);
 
-        r.model = glm::translate(glm::mat4(1.0f), glm::vec3(pos * 16));
+        r.model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.pos * 16));
 
-        m_renderables[pos] = r;
-    }
-
-    int dist(const glm::ivec3& a, const glm::ivec3& b) {
-        const int dx = a.x - b.x;
-        const int dy = a.y - b.y;
-        const int dz = a.z - b.z;
-        return dx * dx + dy * dy + dz * dz;
+        m_renderables[mesh.pos] = r;
     }
 
     void Renderer::sortChunks(const glm::vec3 &pos) {
@@ -237,7 +244,8 @@ namespace cube {
     }
 
     void Renderer::remove(const glm::ivec3& pos) {
-        m_renderables.erase(pos);
+        std::lock_guard lock(m_trashMutex);
+        m_removed.push_back(pos);
     }
 
 }
