@@ -178,7 +178,7 @@ namespace cube {
 
                         bool shouldDrawFace = false;
 
-                        if (neighbor == Air) {
+                        if (neighbor == Air || neighbor == Cactus) {
                             shouldDrawFace = true;
                         } else {
                             BlockData neighborData = getBlockData(neighbor);
@@ -207,6 +207,12 @@ namespace cube {
                                 glm::vec3 vertPos = faceVertices[f][v];
                                 if (shape == BlockShape::Liquid && f == 2) {
                                     vertPos.y -= 0.1f;
+                                }
+
+                                if (shape == BlockShape::Cube && current == Cactus) {
+                                    constexpr float INSET = 1.0f / 16.0f;
+                                    if (f != 2)
+                                        vertPos -= glm::vec3(dirs[f]) * INSET;
                                 }
 
                                 currentVertices.push_back({
