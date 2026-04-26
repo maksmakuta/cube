@@ -5,11 +5,11 @@
 
 namespace cube {
 
-    constexpr int RENDER_DISTANCE = 8;
+    constexpr int RENDER_DISTANCE = 12;
     constexpr int UNLOAD_DISTANCE = RENDER_DISTANCE + 2;
 
     inline glm::ivec3 getChunkPos(const glm::vec3& worldPos) {
-        return glm::ivec3(glm::floor(worldPos / static_cast<float>(CHUNK_SIZE.x)));
+        return {glm::floor(worldPos / static_cast<float>(CHUNK_SIZE.x))};
     }
 
     int randomSeed() {

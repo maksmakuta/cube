@@ -1,18 +1,24 @@
 #version 460 core
-
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec3 aTexCoord;
+layout (location = 2) in vec4 aTex;
+layout (location = 3) in vec4 aColor;
 
-layout (location = 0) out vec3 TexCoord;
-layout (location = 1) out vec3 Normal;
+out vec3 TexCoord;
+out float OverlayTexID;
+out vec4 BiomeColor;
+out vec3 Normal;
 
 uniform ivec3 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
-    gl_Position = projection * view * vec4(model + aPos, 1.0);
-    TexCoord = aTexCoord;
+    TexCoord = aTex.xyz;
+    OverlayTexID = aTex.w;
+    BiomeColor = aColor;
     Normal = aNormal;
+
+    vec3 worldPos = aPos + vec3(model);
+    gl_Position = projection * view * vec4(worldPos, 1.0);
 }

@@ -14,10 +14,16 @@ namespace cube {
 
     struct Renderable final {
         glm::ivec3 model;
-        uint32_t vao;
-        uint32_t vbo;
-        uint32_t ebo;
-        uint32_t count;
+
+        uint32_t solidVao{0};
+        uint32_t solidVbo{0};
+        uint32_t solidEbo{0};
+        uint32_t solidCount{0};
+
+        uint32_t transVao{0};
+        uint32_t transVbo{0};
+        uint32_t transEbo{0};
+        uint32_t transCount{0};
     };
 
     class Renderer final {

@@ -8,12 +8,64 @@ namespace cube {
 
     enum Block : uint8_t {
         Air = 0,
-        Grass,
+        GrassBlock,
         Dirt,
+        SnowDirt,
+        Snow,
         Stone,
         Sand,
+        Clay,
+        Gravel,
+        Diorite,
+        Tuff,
+        Ice,
+
+        OreCoal,
+        OreCopper,
+        OreIron,
+        OreGold,
+
+        CoralBubble,
+
+        BirchLeaves,
+        BirchLog,
+        JungleLeaves,
+        JungleLog,
+        OakLeaves,
+        OakLog,
+        SpruceLeaves,
+        SpruceLog,
+
+        Melon,
+        Pumpkin,
+        Cactus,
+        CactusFlower,
+
+        MushroomBrown,
+        MushroomRed,
+
+        Fern,
+        Bush,
+        Grass,
+        Tallgrass,
+        Sugarcane,
+        Kelp,
+
+        Dandelion,
+        Poppy,
+        Tulip,
+
+        Vine,
+        Water,
 
         COUNT
+    };
+
+    enum class BlockShape : uint8_t {
+        Cube,
+        Cross,
+        Panel,
+        Liquid
     };
 
     struct BlockData {
@@ -21,6 +73,9 @@ namespace cube {
         uint8_t side;
         uint8_t bottom;
         uint8_t count;
+        int8_t  sideOverlay;
+        bool isTinted;
+        BlockShape shape;
     };
 
     struct BlockInfo {

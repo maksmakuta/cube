@@ -10,8 +10,12 @@ namespace cube {
 
     struct RenderableMesh final {
         glm::ivec3 pos;
-        std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
+
+        std::vector<Vertex> solidVertices;
+        std::vector<uint32_t> solidIndices;
+
+        std::vector<Vertex> transVertices;
+        std::vector<uint32_t> transIndices;
     };
 
 }

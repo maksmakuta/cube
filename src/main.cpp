@@ -65,8 +65,6 @@ int main() {
     auto cube = Cube();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
     float time = 0.0f;
     int frames = 0;
