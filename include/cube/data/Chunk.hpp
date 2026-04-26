@@ -1,7 +1,7 @@
 #ifndef CUBE_CHUNK_HPP
 #define CUBE_CHUNK_HPP
 
-#include <vector>
+#include <array>
 #include <mdspan>
 #include <glm/vec3.hpp>
 
@@ -11,6 +11,14 @@ namespace cube {
 
     constexpr auto CHUNK_SIZE = glm::ivec3(16);
     constexpr auto CHUNK_LENGTH = CHUNK_SIZE.x * CHUNK_SIZE.y * CHUNK_SIZE.z;
+
+    enum class ChunkState {
+        Unloaded,
+        Generating,
+        Generated,
+        Meshing,
+        Renderable,
+    };
 
     class Chunk final {
     public:
@@ -24,16 +32,18 @@ namespace cube {
             return std::mdspan<const Block, std::extents<size_t, CHUNK_SIZE.x, CHUNK_SIZE.y, CHUNK_SIZE.z>>(m_blocks.data());
         }
 
-    private:
-        std::vector<Block> m_blocks{CHUNK_LENGTH, Air};
-    };
+        [[nodiscard]] ChunkState state() const {
+            return m_state;
+        }
 
-    inline int dist(const glm::ivec3& a, const glm::ivec3& b) {
-        const int dx = a.x - b.x;
-        const int dy = a.y - b.y;
-        const int dz = a.z - b.z;
-        return dx * dx + dy * dy + dz * dz;
-    }
+        void setState(const ChunkState state) {
+            m_state = state;
+        }
+
+    private:
+        ChunkState m_state = ChunkState::Unloaded;
+        std::array<Block, CHUNK_LENGTH> m_blocks{};
+    };
 
 }
 

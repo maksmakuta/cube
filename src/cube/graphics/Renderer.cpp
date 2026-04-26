@@ -16,7 +16,6 @@
 namespace cube {
 
     Renderer::Renderer() {
-        m_sorted.reserve(256);
         loadShader();
         loadTextures();
     }
@@ -94,6 +93,10 @@ namespace cube {
             glGetProgramInfoLog(m_shader, 512, nullptr, infoLog);
             Log::error("Linking shader program Error: {}",infoLog);
         }
+
+        m_projLoc = glGetUniformLocation(m_shader, "projection");
+        m_viewLoc = glGetUniformLocation(m_shader, "view");
+        m_modelLoc = glGetUniformLocation(m_shader, "model");
 
         glDeleteShader(*vShader);
         glDeleteShader(*fShader);
@@ -178,19 +181,15 @@ namespace cube {
 
         glUseProgram(m_shader);
 
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "projection"), 1, GL_FALSE, &projection[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "view"), 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, &projection[0][0]);
+        glUniformMatrix4fv(m_viewLoc, 1, GL_FALSE, &view[0][0]);
 
         glBindTextureUnit(0, m_texture);
 
-        for (const auto& r : m_sorted) {
-            if (!m_renderables.contains(r)) {
-                continue;
-            }
-            const auto renderable = m_renderables[r];
-            glUniformMatrix4fv(glGetUniformLocation(m_shader, "model"), 1, GL_FALSE, &renderable.model[0][0]);
-            glBindVertexArray(renderable.vao);
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(renderable.count), GL_UNSIGNED_INT, nullptr);
+        for (const auto &r: m_renderables | std::views::values) {
+            glUniform3iv(m_modelLoc, 1, &r.model[0]);
+            glBindVertexArray(r.vao);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(r.count), GL_UNSIGNED_INT, nullptr);
         }
     }
 
@@ -223,25 +222,10 @@ namespace cube {
         glVertexArrayAttribBinding(r.vao, 1, 0);
         glVertexArrayAttribBinding(r.vao, 2, 0);
 
-        r.model = glm::translate(glm::mat4(1.0f), glm::vec3(mesh.pos * 16));
-
+        r.model = mesh.pos * CHUNK_SIZE;
         m_renderables[mesh.pos] = r;
     }
 
-    void Renderer::sortChunks(const glm::vec3 &pos) {
-        m_sorted.clear();
-        if (m_renderables.empty()) { return; }
-        for (const auto &p: m_renderables | std::views::keys) {
-            m_sorted.push_back(p);
-        }
-
-        std::sort(m_sorted.begin(), m_sorted.end(),
-            [&pos](const glm::ivec3& a, const glm::ivec3& b) {
-                const auto distA = dist(pos,glm::vec3(a * 16));
-                const auto distB = dist(pos,glm::vec3(b * 16));
-                return distA < distB;
-        });
-    }
 
     void Renderer::remove(const glm::ivec3& pos) {
         std::lock_guard lock(m_trashMutex);

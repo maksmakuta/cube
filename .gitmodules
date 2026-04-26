@@ -6,4 +6,4 @@
 	url = https://github.com/Auburn/FastNoise2.git
 [submodule "libs/glad"]
 	path = libs/glad
-	url = https://github.com/maksmakuta/glad-cmake
+	url = https://github.com/maksmakuta/glad-cmake.git

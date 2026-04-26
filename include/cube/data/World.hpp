@@ -8,33 +8,52 @@
 #include <functional>
 #include <memory>
 #include <shared_mutex>
+#include <unordered_set>
 
 #include <cube/data/Chunk.hpp>
 #include <cube/data/Generator.hpp>
 
 #include "Mesh.hpp"
+#include "cube/graphics/Renderer.hpp"
+#include "cube/utils/ResultQueue.hpp"
+#include "cube/utils/ThreadPool.hpp"
 
 namespace cube {
 
     using UnloadCallback = std::function<void(const glm::ivec3 &)>;
 
+    struct ChunkResult {
+        glm::ivec3 pos;
+        Chunk chunk;
+    };
+
     class World {
     public:
         explicit World(int seed);
 
-        Chunk* getChunk(const glm::ivec3& chunkPos);
+        std::shared_ptr<Chunk> getChunk(const glm::ivec3& chunkPos);
         Block getBlock(const glm::ivec3& worldPos);
-        ChunkNeighbors getNeighbors(const glm::ivec3 & pos);
-        std::vector<glm::ivec3> loadArea(const glm::ivec3& centerChunk, int radius);
 
+        ChunkNeighbors getNeighbors(const glm::ivec3 & pos);
+
+        std::vector<glm::ivec3> loadArea(const glm::ivec3& centerChunk, int radius);
         void unloadFarChunks(const glm::ivec3& centerChunk, int radius, const UnloadCallback& onUnload);
+
+        void processAsyncResults(Renderer &renderer);
 
     private:
         void ensureChunkExists(const glm::ivec3& pos);
 
-        std::unordered_map<glm::ivec3, std::unique_ptr<Chunk>> m_chunks;
+        std::unordered_map<glm::ivec3, std::shared_ptr<Chunk>> m_chunks;
         std::shared_mutex m_mapMutex;
         Generator m_generator;
+
+        ThreadPool m_threadPool{4};
+
+        std::unordered_set<glm::ivec3> m_generating;
+
+        ResultQueue<ChunkResult> m_chunkQueue;
+        ResultQueue<RenderableMesh> m_meshQueue;
     };
 
 }

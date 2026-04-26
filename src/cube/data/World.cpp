@@ -2,58 +2,20 @@
 
 #include <mutex>
 
-#include "cube/utils/Logger.hpp"
+#include <cube/graphics/Renderer.hpp>
+#include <cube/utils/Logger.hpp>
 
 namespace cube {
 
-    World::World(const int seed) : m_generator(seed) {}
+    World::World(const int seed) : m_generator(seed), m_threadPool(std::thread::hardware_concurrency()) {}
 
-    Chunk* World::getChunk(const glm::ivec3& chunkPos) {
+    std::shared_ptr<Chunk> World::getChunk(const glm::ivec3& chunkPos) {
         std::shared_lock lock(m_mapMutex);
         const auto it = m_chunks.find(chunkPos);
         if (it != m_chunks.end()) {
-            return it->second.get();
+            return it->second;
         }
         return nullptr;
-    }
-
-    std::vector<glm::ivec3> World::loadArea(const glm::ivec3& centerChunk, const int radius) {
-        std::vector<glm::ivec3> new_chunks;
-
-        std::unique_lock lock(m_mapMutex);
-
-        for (int x = -radius; x <= radius; ++x) {
-            for (int z = -radius; z <= radius; ++z) {
-                for (int y = 0; y < 16; ++y) {
-                    glm::ivec3 targetPos = {centerChunk.x + x, y, centerChunk.z + z};
-
-                    if (m_chunks.find(targetPos) == m_chunks.end()) {
-                        m_chunks[targetPos] = std::make_unique<Chunk>(m_generator.generate(targetPos));
-                        new_chunks.push_back(targetPos);
-                    }
-                }
-            }
-        }
-        return new_chunks;
-    }
-
-    void World::unloadFarChunks(const glm::ivec3 &centerChunk, const int radiusSq, const std::function<void(const glm::ivec3 &)>& onUnload) {
-        int removedCount = 0;
-        std::unique_lock lock(m_mapMutex);
-
-        for (auto it = m_chunks.begin(); it != m_chunks.end(); ) {
-            if (dist(it->first, centerChunk) > radiusSq) {
-                if (onUnload) onUnload(it->first);
-                it = m_chunks.erase(it);
-                removedCount++;
-            } else {
-                ++it;
-            }
-        }
-
-        if (removedCount > 0) {
-            Log::info("Removed {} chunks", removedCount);
-        }
     }
 
     Block World::getBlock(const glm::ivec3& worldPos) {
@@ -72,27 +34,148 @@ namespace cube {
         ChunkNeighbors neighbors{};
         std::shared_lock lock(m_mapMutex);
 
-        if (const auto it = m_chunks.find(pos); it != m_chunks.end()) neighbors.center = it->second.get();
-        if (const auto i = m_chunks.find(pos + glm::ivec3(1,0,0)); i != m_chunks.end()) neighbors.px = i->second.get();
-        if (const auto i = m_chunks.find(pos + glm::ivec3(0,1,0)); i != m_chunks.end()) neighbors.py = i->second.get();
-        if (const auto i = m_chunks.find(pos + glm::ivec3(0,0,1)); i != m_chunks.end()) neighbors.pz = i->second.get();
-        if (const auto i = m_chunks.find(pos - glm::ivec3(1,0,0)); i != m_chunks.end()) neighbors.nx = i->second.get();
-        if (const auto i = m_chunks.find(pos - glm::ivec3(0,1,0)); i != m_chunks.end()) neighbors.ny = i->second.get();
-        if (const auto i = m_chunks.find(pos - glm::ivec3(0,0,1)); i != m_chunks.end()) neighbors.nz = i->second.get();
+        if (const auto it = m_chunks.find(pos); it != m_chunks.end()) neighbors.center = it->second;
+        if (const auto i = m_chunks.find(pos + glm::ivec3(1,0,0)); i != m_chunks.end()) neighbors.px = i->second;
+        if (const auto i = m_chunks.find(pos + glm::ivec3(0,1,0)); i != m_chunks.end()) neighbors.py = i->second;
+        if (const auto i = m_chunks.find(pos + glm::ivec3(0,0,1)); i != m_chunks.end()) neighbors.pz = i->second;
+        if (const auto i = m_chunks.find(pos - glm::ivec3(1,0,0)); i != m_chunks.end()) neighbors.nx = i->second;
+        if (const auto i = m_chunks.find(pos - glm::ivec3(0,1,0)); i != m_chunks.end()) neighbors.ny = i->second;
+        if (const auto i = m_chunks.find(pos - glm::ivec3(0,0,1)); i != m_chunks.end()) neighbors.nz = i->second;
 
         return neighbors;
     }
 
-    void World::ensureChunkExists(const glm::ivec3& pos) {
-        {
-            std::shared_lock lock(m_mapMutex);
-            if (m_chunks.contains(pos)) return;
+    std::vector<glm::ivec3> World::loadArea(const glm::ivec3& centerChunk, const int radius) {
+        std::vector<glm::ivec3> new_chunks;
+        std::unique_lock lock(m_mapMutex);
+
+        const int radiusSq = radius * radius;
+
+        for (int x = -radius; x <= radius; ++x) {
+            for (int z = -radius; z <= radius; ++z) {
+                if (x * x + z * z > radiusSq) continue;
+
+                for (int y = 0; y < 16; ++y) {
+                    const glm::ivec3 targetPos = {centerChunk.x + x, y, centerChunk.z + z};
+
+                    if (!m_chunks.contains(targetPos) && !m_generating.contains(targetPos)) {
+                        m_generating.insert(targetPos);
+                        new_chunks.push_back(targetPos);
+
+                        m_threadPool.enqueue([this, targetPos]() {
+                            Chunk generatedChunk = m_generator.generate(targetPos);
+                            m_chunkQueue.push(ChunkResult{targetPos, generatedChunk});
+                        });
+                    }
+                }
+            }
+        }
+        return new_chunks;
+    }
+
+    inline int distXZ(const glm::ivec3& a, const glm::ivec3& b) {
+        const int dx = a.x - b.x;
+        const int dz = a.z - b.z;
+        return dx * dx + dz * dz;
+    }
+
+    void World::unloadFarChunks(const glm::ivec3 &centerChunk, const int radiusSq, const UnloadCallback& onUnload) {
+        int removedCount = 0;
+        std::unique_lock lock(m_mapMutex);
+
+        for (auto it = m_chunks.begin(); it != m_chunks.end(); ) {
+            if (distXZ(it->first, centerChunk) > radiusSq) {
+                if (onUnload) onUnload(it->first);
+                it = m_chunks.erase(it);
+                removedCount++;
+            } else {
+                ++it;
+            }
         }
 
+        if (removedCount > 0) {
+            Log::info("Unloaded {} chunks", removedCount);
+        }
+    }
+
+    void World::ensureChunkExists(const glm::ivec3& pos) {
         std::unique_lock lock(m_mapMutex);
-        if (!m_chunks.contains(pos)) {
-            //Log::info("Chunk [{},{},{}] is generating", pos.x, pos.y, pos.z);
-            m_chunks[pos] = std::make_unique<Chunk>(m_generator.generate(pos));
+        if (!m_chunks.contains(pos) && !m_generating.contains(pos)) {
+            m_generating.insert(pos);
+            m_threadPool.enqueue([this, pos] {
+                const Chunk generatedChunk = m_generator.generate(pos);
+                m_chunkQueue.push(ChunkResult{pos, generatedChunk});
+            });
+        }
+    }
+
+    void World::processAsyncResults(Renderer& renderer) {
+        if (const auto newChunks = m_chunkQueue.pop_all(); !newChunks.empty()) {
+            std::unique_lock lock(m_mapMutex);
+
+            for (auto [pos, chunk] : newChunks) {
+                const auto chunkPtr = std::make_shared<Chunk>(chunk);
+                chunkPtr->setState(ChunkState::Generated);
+                m_chunks[pos] = chunkPtr;
+                m_generating.erase(pos);
+            }
+
+            auto tryQueueMesh = [&](const glm::ivec3& p) {
+                const auto it = m_chunks.find(p);
+                if (it == m_chunks.end()) return;
+
+                const auto& chunk = it->second;
+                if (chunk->state() != ChunkState::Generated) return;
+
+                ChunkNeighbors n{};
+                n.center = chunk;
+                if (const auto i = m_chunks.find(p + glm::ivec3(1,0,0)); i != m_chunks.end()) n.px = i->second;
+                if (const auto i = m_chunks.find(p - glm::ivec3(1,0,0)); i != m_chunks.end()) n.nx = i->second;
+                if (const auto i = m_chunks.find(p + glm::ivec3(0,1,0)); i != m_chunks.end()) n.py = i->second;
+                if (const auto i = m_chunks.find(p - glm::ivec3(0,1,0)); i != m_chunks.end()) n.ny = i->second;
+                if (const auto i = m_chunks.find(p + glm::ivec3(0,0,1)); i != m_chunks.end()) n.pz = i->second;
+                if (const auto i = m_chunks.find(p - glm::ivec3(0,0,1)); i != m_chunks.end()) n.nz = i->second;
+
+                if (n.isValid()) {
+                    chunk->setState(ChunkState::Meshing);
+
+                    m_threadPool.enqueue([this, p, n] {
+                        RenderableMesh mesh = getMesh(n, p);
+                        m_meshQueue.push(std::move(mesh));
+                    });
+                }
+            };
+
+            for (const auto&[pos, chunk] : newChunks) {
+                tryQueueMesh(pos);                         // Check the chunk itself
+                tryQueueMesh(pos + glm::ivec3(1, 0, 0));   // Check +X neighbor
+                tryQueueMesh(pos - glm::ivec3(1, 0, 0));   // Check -X neighbor
+                tryQueueMesh(pos + glm::ivec3(0, 1, 0));   // Check +Y neighbor
+                tryQueueMesh(pos - glm::ivec3(0, 1, 0));   // Check -Y neighbor
+                tryQueueMesh(pos + glm::ivec3(0, 0, 1));   // Check +Z neighbor
+                tryQueueMesh(pos - glm::ivec3(0, 0, 1));   // Check -Z neighbor
+            }
+        }
+
+        auto newMeshes = m_meshQueue.pop_all();
+
+        constexpr int uploadLimit = 4;
+        int uploaded = 0;
+
+        for (auto& mesh : newMeshes) {
+            if (uploaded >= uploadLimit) {
+                m_meshQueue.push(std::move(mesh));
+                continue;
+            }
+
+            {
+                std::shared_lock lock(m_mapMutex);
+                if (auto it = m_chunks.find(mesh.pos); it != m_chunks.end()) {
+                    it->second->setState(ChunkState::Renderable);
+                    renderer.put(mesh);
+                    uploaded++;
+                }
+            }
         }
     }
 

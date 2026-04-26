@@ -2,7 +2,7 @@
 #define CUBE_BLOCK_HPP
 
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 namespace cube {
 
@@ -11,7 +11,9 @@ namespace cube {
         Grass,
         Dirt,
         Stone,
-        Sand
+        Sand,
+
+        COUNT
     };
 
     struct BlockData {
@@ -22,12 +24,12 @@ namespace cube {
     };
 
     struct BlockInfo {
-        std::string name;
+        std::string_view name;
         BlockData data;
     };
 
-    BlockInfo getBlockInfo(const Block& block);
-    BlockData getBlockData(const Block& block);
+    const BlockInfo& getBlockInfo(Block block);
+    BlockData getBlockData(Block block);
 
 }
 

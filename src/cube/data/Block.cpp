@@ -1,22 +1,23 @@
-#include <vector>
 #include <cube/data/Block.hpp>
+
+#include <array>
 
 namespace cube {
 
-    const auto BLOCK_INFO = std::vector<BlockInfo>{
-        {"Air",      {0,0,0,1}},
-        {"Grass",    {1,2,3,1}},
-        {"Dirt",     {3,3,3,1}},
-        {"Stone",    {4,4,4,1}},
-        {"Sand",     {5,5,5,1}},
-    };
+    static constexpr std::array<BlockInfo, COUNT> BLOCK_REGISTRY = {{
+        {"Air",   {0, 0, 0, 0}},
+        {"Grass", {1, 2, 3, 1}},
+        {"Dirt",  {3, 3, 3, 1}},
+        {"Stone", {4, 4, 4, 1}},
+        {"Sand",  {5, 5, 5, 1}}
+    }};
 
-    BlockInfo getBlockInfo(const Block& block) {
-        return BLOCK_INFO[block];
+    const BlockInfo& getBlockInfo(Block block) {
+        return BLOCK_REGISTRY[block];
     }
 
-    BlockData getBlockData(const Block& block) {
-        return getBlockInfo(block).data;
+    BlockData getBlockData(Block block) {
+        return BLOCK_REGISTRY[block].data;
     }
 
 }

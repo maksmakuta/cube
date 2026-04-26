@@ -13,7 +13,7 @@
 namespace cube {
 
     struct Renderable final {
-        glm::mat4 model;
+        glm::ivec3 model;
         uint32_t vao;
         uint32_t vbo;
         uint32_t ebo;
@@ -26,7 +26,6 @@ namespace cube {
         ~Renderer();
 
         void remove(const glm::ivec3& pos);
-        void sortChunks(const glm::vec3& pos);
         void put(const RenderableMesh& mesh);
         void render(const glm::mat4& projection, const glm::mat4& view);
 
@@ -34,10 +33,13 @@ namespace cube {
         void loadShader();
         void loadTextures();
 
+        int m_projLoc{-1};
+        int m_viewLoc{-1};
+        int m_modelLoc{-1};
+
         uint32_t m_shader{0};
         uint32_t m_texture{0};
         std::shared_mutex m_trashMutex;
-        std::vector<glm::ivec3> m_sorted;
         std::vector<glm::ivec3> m_removed;
         std::unordered_map<glm::ivec3, Renderable> m_renderables;
     };

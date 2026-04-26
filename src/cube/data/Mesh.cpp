@@ -1,9 +1,10 @@
 #include <cube/data/Mesh.hpp>
+#include <glm/vec2.hpp>
 
 namespace cube {
 
     bool ChunkNeighbors::isValid() const {
-        return center != nullptr;
+        return center && px && nx && py && ny && pz && nz;
     }
 
     Block ChunkNeighbors::getBlock(const glm::ivec3& pos) const {
@@ -22,11 +23,8 @@ namespace cube {
         return Air;
     }
 
-    const glm::vec2 faceUVs[4] = {
-        {0.0f, 0.0f}, // Bottom-left
-        {1.0f, 0.0f}, // Bottom-right
-        {1.0f, 1.0f}, // Top-right
-        {0.0f, 1.0f}  // Top-left
+   const glm::vec2 faceUVs[4] = {
+        {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f}
     };
 
     const glm::vec3 faceVertices[6][4] = {
@@ -38,42 +36,61 @@ namespace cube {
         {{0,0,0}, {0,0,1}, {0,1,1}, {0,1,0}}  // Left  (-X)
     };
 
+    // HOISTED: Moved out of the loop so it isn't recreated 24,000 times per chunk
+    const glm::ivec3 dirs[6] = {
+        {0,0,1}, {0,0,-1}, {0,1,0}, {0,-1,0}, {1,0,0}, {-1,0,0}
+    };
+
     RenderableMesh getMesh(const ChunkNeighbors& n, const glm::ivec3& chunkPos) {
         RenderableMesh mesh;
         mesh.pos = chunkPos;
 
+        mesh.vertices.reserve(4096);
+        mesh.indices.reserve(6144);
+
         uint32_t vertexCount = 0;
+
+        const auto centerView = n.center->view();
 
         for (int x = 0; x < 16; ++x) {
             for (int y = 0; y < 16; ++y) {
                 for (int z = 0; z < 16; ++z) {
 
-                    Block current = n.center->view()[x, y, z];
+                    const Block current = centerView[x, y, z];
                     if (current == Air) continue;
 
                     BlockData data = getBlockData(current);
 
                     for (int f = 0; f < 6; ++f) {
-                        const glm::ivec3 dirs[6] = {
-                            {0,0,1}, {0,0,-1}, {0,1,0}, {0,-1,0}, {1,0,0}, {-1,0,0}
-                        };
+                        int nx = x + dirs[f].x;
+                        int ny = y + dirs[f].y;
+                        int nz = z + dirs[f].z;
 
-                        if (const Block neighbor = n.getBlock({x + dirs[f].x, y + dirs[f].y, z + dirs[f].z}); neighbor == Air) {
+                        Block neighbor = Air;
+
+                        if (nx >= 0 && nx < 16 && ny >= 0 && ny < 16 && nz >= 0 && nz < 16) {
+                            neighbor = centerView[nx, ny, nz];
+                        } else {
+                            neighbor = n.getBlock({nx, ny, nz});
+                        }
+
+                        if (neighbor == Air) {
                             const float texID = (dirs[f].y > 0) ? data.top : (dirs[f].y < 0) ? data.bottom : data.side;
 
                             for (int v = 0; v < 4; ++v) {
-                                glm::vec2 uv = faceUVs[v];
                                 mesh.vertices.push_back({
                                     glm::vec3(x, y, z) + faceVertices[f][v],
                                     glm::vec3(dirs[f]),
-                                    glm::vec3(uv, texID)
+                                    glm::vec3(faceUVs[v], texID)
                                 });
                             }
 
-                            mesh.indices.insert(mesh.indices.end(), {
-                                vertexCount + 0, vertexCount + 1, vertexCount + 2,
-                                vertexCount + 0, vertexCount + 2, vertexCount + 3
-                            });
+                            mesh.indices.push_back(vertexCount + 0);
+                            mesh.indices.push_back(vertexCount + 1);
+                            mesh.indices.push_back(vertexCount + 2);
+                            mesh.indices.push_back(vertexCount + 0);
+                            mesh.indices.push_back(vertexCount + 2);
+                            mesh.indices.push_back(vertexCount + 3);
 
                             vertexCount += 4;
                         }
@@ -81,6 +98,10 @@ namespace cube {
                 }
             }
         }
+
+        mesh.vertices.shrink_to_fit();
+        mesh.indices.shrink_to_fit();
+
         return mesh;
     }
 
