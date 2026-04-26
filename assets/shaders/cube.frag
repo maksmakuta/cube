@@ -1,15 +1,24 @@
-#version 460 core
+#version 450 core
 out vec4 FragColor;
 
 in vec3 TexCoord;
 in float OverlayTexID;
-in vec4 BiomeColor; // CHANGE to vec4
+in vec4 BiomeColor;
 in vec3 Normal;
+in float Frames;
 
 uniform sampler2DArray texArray;
+uniform float uTime;
 
 void main() {
-    vec4 baseColor = texture(texArray, TexCoord);
+    float currentLayer = TexCoord.z;
+
+    if (Frames > 1.0) {
+        int currentFrameOffset = int(uTime * 4.0) % int(Frames);
+        currentLayer += float(currentFrameOffset);
+    }
+
+    vec4 baseColor = texture(texArray, vec3(TexCoord.xy, currentLayer));
 
     if (OverlayTexID >= 0.0) {
         vec4 overlay = texture(texArray, vec3(TexCoord.xy, OverlayTexID));

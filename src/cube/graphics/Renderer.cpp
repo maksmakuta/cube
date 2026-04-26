@@ -8,10 +8,10 @@
 
 #include <glad/glad.h>
 #include <spng.h>
+#include <SDL3/SDL_timer.h>
 
 #include <cube/utils/Logger.hpp>
-
-#include "cube/data/Chunk.hpp"
+#include <cube/data/Chunk.hpp>
 
 namespace cube {
     Renderer::Renderer() {
@@ -195,7 +195,7 @@ namespace cube {
                 continue;
             }
 
-            int frames = ihdr.height / TEX_WIDTH;
+            int frames = static_cast<int>(ihdr.height) / TEX_WIDTH;
             totalLayers += frames;
 
             size_t out_size;
@@ -263,6 +263,8 @@ namespace cube {
 
         glUseProgram(m_shader);
 
+        const float timeSeconds = static_cast<float>(SDL_GetTicks()) / 1000.0f;
+        glUniform1f(glGetUniformLocation(m_shader, "uTime"), timeSeconds);
         glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, &projection[0][0]);
         glUniformMatrix4fv(m_viewLoc, 1, GL_FALSE, &view[0][0]);
 
@@ -275,7 +277,7 @@ namespace cube {
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
 
-        for (const auto& [pos, r] : m_renderables) {
+        for (const auto &r: m_renderables | std::views::values) {
             if (r.solidCount > 0) {
                 glUniform3iv(m_modelLoc, 1, &r.model[0]);
                 glBindVertexArray(r.solidVao);
@@ -288,7 +290,7 @@ namespace cube {
 
         glDepthMask(GL_FALSE);
 
-        for (const auto& [pos, r] : m_renderables) {
+        for (const auto &r: m_renderables | std::views::values) {
             if (r.transCount > 0) {
                 glUniform3iv(m_modelLoc, 1, &r.model[0]);
                 glBindVertexArray(r.transVao);
@@ -314,8 +316,8 @@ namespace cube {
             glCreateBuffers(1, &vbo);
             glCreateBuffers(1, &ebo);
 
-            glNamedBufferStorage(vbo, verts.size() * sizeof(Vertex), verts.data(), 0);
-            glNamedBufferStorage(ebo, inds.size() * sizeof(uint32_t), inds.data(), 0);
+            glNamedBufferStorage(vbo, static_cast<GLsizeiptr>(verts.size() * sizeof(Vertex)), verts.data(), 0);
+            glNamedBufferStorage(ebo, static_cast<GLsizeiptr>(inds.size() * sizeof(uint32_t)), inds.data(), 0);
 
             glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
             glVertexArrayElementBuffer(vao, ebo);
@@ -324,16 +326,19 @@ namespace cube {
             glEnableVertexArrayAttrib(vao, 1);
             glEnableVertexArrayAttrib(vao, 2);
             glEnableVertexArrayAttrib(vao, 3);
+            glEnableVertexArrayAttrib(vao, 4);
 
             glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
             glVertexArrayAttribFormat(vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
             glVertexArrayAttribFormat(vao, 2, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex, texture));
             glVertexArrayAttribFormat(vao, 3, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
+            glVertexArrayAttribFormat(vao, 4, 1, GL_FLOAT, GL_FALSE, offsetof(Vertex, frames));
 
             glVertexArrayAttribBinding(vao, 0, 0);
             glVertexArrayAttribBinding(vao, 1, 0);
             glVertexArrayAttribBinding(vao, 2, 0);
             glVertexArrayAttribBinding(vao, 3, 0);
+            glVertexArrayAttribBinding(vao, 4, 0);
         };
 
         uploadSubMesh(mesh.solidVertices, mesh.solidIndices, r.solidVao, r.solidVbo, r.solidEbo, r.solidCount);

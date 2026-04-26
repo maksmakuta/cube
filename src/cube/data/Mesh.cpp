@@ -30,19 +30,19 @@ namespace cube {
     };
 
     const glm::vec3 faceVertices[6][4] = {
-        {{0,0,1}, {1,0,1}, {1,1,1}, {0,1,1}}, // Front (+Z) [0]
-        {{1,0,0}, {0,0,0}, {0,1,0}, {1,1,0}}, // Back  (-Z) [1]
-        {{0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}}, // Top   (+Y) [2]
-        {{0,0,0}, {1,0,0}, {1,0,1}, {0,0,1}}, // Bottom(-Y) [3]
-        {{1,0,1}, {1,0,0}, {1,1,0}, {1,1,1}}, // Right (+X) [4]
-        {{0,0,0}, {0,0,1}, {0,1,1}, {0,1,0}}  // Left  (-X) [5]
+        {{0,0,1}, {1,0,1}, {1,1,1}, {0,1,1}},
+        {{1,0,0}, {0,0,0}, {0,1,0}, {1,1,0}},
+        {{0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}},
+        {{0,0,0}, {1,0,0}, {1,0,1}, {0,0,1}},
+        {{1,0,1}, {1,0,0}, {1,1,0}, {1,1,1}},
+        {{0,0,0}, {0,0,1}, {0,1,1}, {0,1,0}}
     };
 
     constexpr glm::vec3 crossVertices[4][4] = {
-        {{0,0,0}, {1,0,1}, {1,1,1}, {0,1,0}}, // Diag 1 Front
-        {{1,0,1}, {0,0,0}, {0,1,0}, {1,1,1}}, // Diag 1 Back
-        {{1,0,0}, {0,0,1}, {0,1,1}, {1,1,0}}, // Diag 2 Front
-        {{0,0,1}, {1,0,0}, {1,1,0}, {0,1,1}}  // Diag 2 Back
+        {{0,0,0}, {1,0,1}, {1,1,1}, {0,1,0}},
+        {{1,0,1}, {0,0,0}, {0,1,0}, {1,1,1}},
+        {{1,0,0}, {0,0,1}, {0,1,1}, {1,1,0}},
+        {{0,0,1}, {1,0,0}, {1,1,0}, {0,1,1}}
     };
 
     const glm::ivec3 dirs[6] = {
@@ -69,9 +69,9 @@ namespace cube {
                     const Block current = centerView[x, y, z];
                     if (current == Air) continue;
 
-                    BlockData data = getBlockData(current);
+                    auto [top, side, bottom, count, sideOverlay, isTinted, shape] = getBlockData(current);
 
-                    bool isTranslucent = data.shape == BlockShape::Liquid;
+                    bool isTranslucent = shape == BlockShape::Liquid;
 
                     auto& currentVertices = isTranslucent ? mesh.transVertices : mesh.solidVertices;
                     auto& currentIndices = isTranslucent ? mesh.transIndices : mesh.solidIndices;
@@ -79,7 +79,7 @@ namespace cube {
 
 
                     glm::vec4 tintColor(1.0f);
-                    if (data.isTinted) {
+                    if (isTinted) {
                         const int index2D = x + z * 16;
                         const float temp = n.center->biomeData[index2D].temp;
                         const float moist = n.center->biomeData[index2D].moisture;
@@ -96,18 +96,19 @@ namespace cube {
                         glm::vec4 mixCold = glm::mix(colorColdDry, colorColdWet, m);
 
                         tintColor = glm::mix(mixCold, mixHot, t);
-                    }else if (data.shape == BlockShape::Liquid) {
+                    }else if (shape == BlockShape::Liquid) {
                         tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.65f);
                     }
 
-                    if (data.shape == BlockShape::Cross) {
+                    if (shape == BlockShape::Cross) {
                         for (const auto & crossVertice : crossVertices) {
                             for (int v = 0; v < 4; ++v) {
                                 currentVertices.push_back({
                                     glm::vec3(x, y, z) + crossVertice[v],
                                     glm::vec3(0.0f, 1.0f, 0.0f),
-                                    glm::vec4(faceUVs[v], data.side, -1.0f),
-                                    tintColor
+                                    glm::vec4(faceUVs[v], side, -1.0f),
+                                    tintColor,
+                                    static_cast<float>(count)
                                 });
                             }
                             currentIndices.push_back(currentVertexCount + 0);
@@ -121,7 +122,7 @@ namespace cube {
                         continue;
                     }
 
-                    if (data.shape == BlockShape::Panel) {
+                    if (shape == BlockShape::Panel) {
                         for (constexpr int horizontalFaces[4] = {0, 1, 4, 5}; int f : horizontalFaces) {
                             int nx = x + dirs[f].x;
                             int ny = y + dirs[f].y;
@@ -145,8 +146,9 @@ namespace cube {
                                     currentVertices.push_back({
                                         glm::vec3(x, y, z) + shiftedVert + pushInward,
                                         -glm::vec3(dirs[f]),
-                                        glm::vec4(faceUVs[v], data.side, -1.0f),
-                                        tintColor
+                                        glm::vec4(faceUVs[v], side, -1.0f),
+                                        tintColor,
+                                        static_cast<float>(count)
                                     });
                                 }
                                 currentIndices.push_back(currentVertexCount + 0);
@@ -181,8 +183,12 @@ namespace cube {
                         } else {
                             BlockData neighborData = getBlockData(neighbor);
 
-                            if (data.shape == BlockShape::Liquid) {
-                                shouldDrawFace = neighborData.shape != BlockShape::Cube && neighbor != current;
+                            if (shape == BlockShape::Liquid) {
+                                if (dirs[f].y > 0 && neighbor != current && neighborData.shape != BlockShape::Cube) {
+                                    shouldDrawFace = true;
+                                } else {
+                                    shouldDrawFace = false;
+                                }
                             }
                             else {
                                 shouldDrawFace = neighborData.shape != BlockShape::Cube;
@@ -190,16 +196,16 @@ namespace cube {
                         }
 
                         if (shouldDrawFace) {
-                            const float texID = dirs[f].y > 0 ? data.top : dirs[f].y < 0 ? data.bottom : data.side;
+                            const float texID = dirs[f].y > 0 ? top : dirs[f].y < 0 ? bottom : side;
 
                             float overlayID = -1.0f;
-                            if (data.sideOverlay != -1 && dirs[f].y == 0) {
-                                overlayID = static_cast<float>(data.sideOverlay);
+                            if (sideOverlay != -1 && dirs[f].y == 0) {
+                                overlayID = static_cast<float>(sideOverlay);
                             }
 
                             for (int v = 0; v < 4; ++v) {
                                 glm::vec3 vertPos = faceVertices[f][v];
-                                if (data.shape == BlockShape::Liquid && f == 2) {
+                                if (shape == BlockShape::Liquid && f == 2) {
                                     vertPos.y -= 0.1f;
                                 }
 
@@ -207,7 +213,8 @@ namespace cube {
                                     glm::vec3(x, y, z) + vertPos,
                                     glm::vec3(dirs[f]),
                                     glm::vec4(faceUVs[v], texID, overlayID),
-                                    tintColor
+                                    tintColor,
+                                    static_cast<float>(count)
                                 });
                             }
 

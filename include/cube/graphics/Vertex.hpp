@@ -11,6 +11,7 @@ namespace cube {
         glm::vec3 normal;
         glm::vec4 texture;
         glm::vec4 color;
+        float frames;
     };
 
 }
