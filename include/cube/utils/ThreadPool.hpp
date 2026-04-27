@@ -10,64 +10,76 @@
 
 namespace cube {
 
+    enum class TaskPriority {
+        Background = 0,
+        Normal = 1,
+        Urgent = 2
+    };
+
+    struct PrioritizedTask {
+        TaskPriority priority;
+        uint64_t sequence;
+        std::move_only_function<void()> work;
+
+        bool operator<(const PrioritizedTask& other) const {
+            if (priority != other.priority)
+                return priority < other.priority;
+            return sequence > other.sequence;
+        }
+    };
+
     class ThreadPool final {
     public:
-        explicit ThreadPool(size_t num_threads = std::thread::hardware_concurrency()) {
-            const size_t actual_threads = num_threads > 0 ? num_threads : 1;
-            
-            for (size_t i = 0; i < actual_threads; ++i) {
-                m_workers.emplace_back([this](const std::stop_token &st) {
+        explicit ThreadPool(const size_t num_threads = std::thread::hardware_concurrency()) {
+            for (size_t i = 0; i < num_threads; ++i) {
+                m_workers.emplace_back([this](const std::stop_token& st) {
                     while (!st.stop_requested()) {
                         std::move_only_function<void()> task;
                         {
-                            std::unique_lock lock(m_queueMutex);
-                            
+                            std::unique_lock lock(m_mutex);
                             m_cv.wait(lock, st, [this] { return !m_tasks.empty(); });
-                            
-                            if (st.stop_requested() && m_tasks.empty()) {
-                                return;
-                            }
 
-                            task = std::move(m_tasks.front());
+                            if (st.stop_requested()) return;
+
+                            task = std::move(const_cast<PrioritizedTask&>(m_tasks.top()).work);
                             m_tasks.pop();
                         }
-
-                        if (task) {
-                            task();
-                        }
+                        if (task) task();
                     }
                 });
             }
         }
 
-        ThreadPool(const ThreadPool&) = delete;
-        ThreadPool& operator=(const ThreadPool&) = delete;
-        ThreadPool(ThreadPool&&) = delete;
-        ThreadPool& operator=(ThreadPool&&) = delete;
-
         ~ThreadPool() {
-            for (auto& worker : m_workers) {
-                worker.request_stop();
-            }
+            for (auto& worker : m_workers) worker.request_stop();
             m_cv.notify_all();
         }
 
-        void enqueue(std::move_only_function<void()> task) {
+        void enqueue(std::move_only_function<void()> work, const TaskPriority p = TaskPriority::Normal) {
             {
-                std::scoped_lock lock(m_queueMutex);
-                m_tasks.push(std::move(task));
+                std::scoped_lock lock(m_mutex);
+                m_tasks.push({p, m_counter++, std::move(work)});
             }
+            m_cv.notify_one();
         }
 
-        void notifyAll() {
+        void enqueue_batch(std::vector<PrioritizedTask>& batch) {
+            {
+                std::scoped_lock lock(m_mutex);
+                for (auto& task : batch) {
+                    task.sequence = m_counter++;
+                    m_tasks.push(std::move(task));
+                }
+            }
             m_cv.notify_all();
         }
 
     private:
         std::vector<std::jthread> m_workers;
-        std::queue<std::move_only_function<void()>> m_tasks;
-        std::mutex m_queueMutex;
+        std::priority_queue<PrioritizedTask> m_tasks;
+        std::mutex m_mutex;
         std::condition_variable_any m_cv;
+        uint64_t m_counter = 0;
     };
 
 }
