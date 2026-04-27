@@ -20,11 +20,6 @@ namespace cube {
         Renderable,
     };
 
-    struct NoiseValues {
-        float temp;
-        float moisture;
-    };
-
     class Chunk final {
     public:
         Chunk() = default;
@@ -44,8 +39,6 @@ namespace cube {
         void setState(const ChunkState state) {
             m_state = state;
         }
-
-        std::array<NoiseValues, 256> biomeData{};
 
     private:
         ChunkState m_state = ChunkState::Unloaded;

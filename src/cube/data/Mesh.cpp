@@ -79,24 +79,25 @@ namespace cube {
 
 
                     glm::vec4 tintColor(1.0f);
-                    if (isTinted) {
-                        const int index2D = x + z * 16;
-                        const float temp = n.center->biomeData[index2D].temp;
-                        const float moist = n.center->biomeData[index2D].moisture;
-
-                        constexpr glm::vec4 colorHotWet(0.1f, 0.8f, 0.1f,1.f);
-                        constexpr glm::vec4 colorHotDry(0.7f, 0.8f, 0.2f,1.f);
-                        constexpr glm::vec4 colorColdWet(0.2f, 0.5f, 0.3f,1.f);
-                        constexpr glm::vec4 colorColdDry(0.6f, 0.6f, 0.6f,1.f);
-
-                        float t = glm::clamp((temp + 1.0f) * 0.5f, 0.0f, 1.0f);
-                        float m = glm::clamp((moist + 1.0f) * 0.5f, 0.0f, 1.0f);
-
-                        glm::vec4 mixHot = glm::mix(colorHotDry, colorHotWet, m);
-                        glm::vec4 mixCold = glm::mix(colorColdDry, colorColdWet, m);
-
-                        tintColor = glm::mix(mixCold, mixHot, t);
-                    }else if (shape == BlockShape::Liquid) {
+                    // if (isTinted) {
+                    //     const int index2D = x + z * 16;
+                    //     const float temp = n.center->biomeData[index2D].temp;
+                    //     const float moist = n.center->biomeData[index2D].moisture;
+                    //
+                    //     constexpr glm::vec4 colorHotWet(0.1f, 0.8f, 0.1f,1.f);
+                    //     constexpr glm::vec4 colorHotDry(0.7f, 0.8f, 0.2f,1.f);
+                    //     constexpr glm::vec4 colorColdWet(0.2f, 0.5f, 0.3f,1.f);
+                    //     constexpr glm::vec4 colorColdDry(0.6f, 0.6f, 0.6f,1.f);
+                    //
+                    //     float t = glm::clamp((temp + 1.0f) * 0.5f, 0.0f, 1.0f);
+                    //     float m = glm::clamp((moist + 1.0f) * 0.5f, 0.0f, 1.0f);
+                    //
+                    //     glm::vec4 mixHot = glm::mix(colorHotDry, colorHotWet, m);
+                    //     glm::vec4 mixCold = glm::mix(colorColdDry, colorColdWet, m);
+                    //
+                    //     tintColor = glm::mix(mixCold, mixHot, t);
+                    // }else
+                    if (shape == BlockShape::Liquid) {
                         tintColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.65f);
                     }
 

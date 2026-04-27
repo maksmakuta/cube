@@ -11,8 +11,7 @@ namespace cube {
 
     std::shared_ptr<Chunk> World::getChunk(const glm::ivec3& chunkPos) {
         std::shared_lock lock(m_mapMutex);
-        const auto it = m_chunks.find(chunkPos);
-        if (it != m_chunks.end()) {
+        if (const auto it = m_chunks.find(chunkPos); it != m_chunks.end()) {
             return it->second;
         }
         return nullptr;
@@ -46,31 +45,43 @@ namespace cube {
     }
 
     std::vector<glm::ivec3> World::loadArea(const glm::ivec3& centerChunk, const int radius) {
-        std::vector<glm::ivec3> new_chunks;
-        std::unique_lock lock(m_mapMutex);
-
+        std::vector<glm::ivec3> pending_coords;
+        pending_coords.reserve(16 * 2 * radius);
         const int radiusSq = radius * radius;
 
-        for (int x = -radius; x <= radius; ++x) {
-            for (int z = -radius; z <= radius; ++z) {
-                if (x * x + z * z > radiusSq) continue;
+        {
+            std::unique_lock lock(m_mapMutex);
 
-                for (int y = 0; y < 16; ++y) {
-                    const glm::ivec3 targetPos = {centerChunk.x + x, y, centerChunk.z + z};
+            for (int x = -radius; x <= radius; ++x) {
+                for (int z = -radius; z <= radius; ++z) {
+                    if (x * x + z * z > radiusSq) continue;
 
-                    if (!m_chunks.contains(targetPos) && !m_generating.contains(targetPos)) {
-                        m_generating.insert(targetPos);
-                        new_chunks.push_back(targetPos);
+                    for (int y = 0; y < 16; ++y) {
+                        const glm::ivec3 targetPos = {centerChunk.x + x, y, centerChunk.z + z};
 
-                        m_threadPool.enqueue([this, targetPos]() {
-                            Chunk generatedChunk = m_generator.generate(targetPos);
-                            m_chunkQueue.push(ChunkResult{targetPos, generatedChunk});
-                        });
+                        if (!m_chunks.contains(targetPos) && !m_generating.contains(targetPos)) {
+                            m_generating.insert(targetPos);
+                            pending_coords.push_back(targetPos);
+                        }
                     }
                 }
             }
         }
-        return new_chunks;
+
+        std::ranges::sort(pending_coords,
+            [&centerChunk](const glm::ivec3& a, const glm::ivec3& b) {
+                return glm::distance(glm::vec3(a), glm::vec3(centerChunk)) <
+                       glm::distance(glm::vec3(b), glm::vec3(centerChunk));
+            });
+
+        for (const auto& targetPos : pending_coords) {
+            m_threadPool.enqueue([this, targetPos] {
+                const Chunk generatedChunk = m_generator.generate(targetPos);
+                m_chunkQueue.push(ChunkResult{targetPos, generatedChunk});
+            });
+        }
+
+        return pending_coords;
     }
 
     inline int distXZ(const glm::ivec3& a, const glm::ivec3& b) {
@@ -79,12 +90,12 @@ namespace cube {
         return dx * dx + dz * dz;
     }
 
-    void World::unloadFarChunks(const glm::ivec3 &centerChunk, const int radiusSq, const UnloadCallback& onUnload) {
+    void World::unloadFarChunks(const glm::ivec3 &centerChunk, const int radius, const UnloadCallback& onUnload) {
         int removedCount = 0;
         std::unique_lock lock(m_mapMutex);
 
         for (auto it = m_chunks.begin(); it != m_chunks.end(); ) {
-            if (distXZ(it->first, centerChunk) > radiusSq) {
+            if (distXZ(it->first, centerChunk) > radius) {
                 if (onUnload) onUnload(it->first);
                 it = m_chunks.erase(it);
                 removedCount++;
@@ -158,12 +169,9 @@ namespace cube {
         }
 
         auto newMeshes = m_meshQueue.pop_all();
-
-        constexpr int uploadLimit = 4;
         int uploaded = 0;
-
         for (auto& mesh : newMeshes) {
-            if (uploaded >= uploadLimit) {
+            if (constexpr int uploadLimit = 8; uploaded >= uploadLimit) {
                 m_meshQueue.push(std::move(mesh));
                 continue;
             }
