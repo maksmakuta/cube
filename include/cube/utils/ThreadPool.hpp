@@ -10,20 +10,11 @@
 
 namespace cube {
 
-    enum class TaskPriority {
-        Background = 0,
-        Normal = 1,
-        Urgent = 2
-    };
-
     struct PrioritizedTask {
-        TaskPriority priority;
         uint64_t sequence;
         std::move_only_function<void()> work;
 
         bool operator<(const PrioritizedTask& other) const {
-            if (priority != other.priority)
-                return priority < other.priority;
             return sequence > other.sequence;
         }
     };
@@ -55,10 +46,10 @@ namespace cube {
             m_cv.notify_all();
         }
 
-        void enqueue(std::move_only_function<void()> work, const TaskPriority p = TaskPriority::Normal) {
+        void enqueue(std::move_only_function<void()> work) {
             {
                 std::scoped_lock lock(m_mutex);
-                m_tasks.push({p, m_counter++, std::move(work)});
+                m_tasks.push({m_counter++, std::move(work)});
             }
             m_cv.notify_one();
         }

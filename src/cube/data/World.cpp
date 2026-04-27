@@ -47,9 +47,16 @@ namespace cube {
         return neighbors;
     }
 
+    inline int distXZ(const glm::ivec3& a, const glm::ivec3& b) {
+        const int dx = a.x - b.x;
+        const int dz = a.z - b.z;
+        return dx * dx + dz * dz;
+    }
+
     std::vector<glm::ivec3> World::loadArea(const glm::ivec3& centerChunk, const int radius) {
-        std::vector<glm::ivec3> pending_coords;
-        pending_coords.reserve(16 * 2 * radius);
+        std::vector<glm::ivec3> newly_queued;
+        std::vector<PrioritizedTask> batch;
+
         const int radiusSq = radius * radius;
 
         {
@@ -59,39 +66,42 @@ namespace cube {
                 for (int z = -radius; z <= radius; ++z) {
                     if (x * x + z * z > radiusSq) continue;
 
-                    for (int y = 0; y < 16; ++y) {
-                        const glm::ivec3 targetPos = {centerChunk.x + x, y, centerChunk.z + z};
+                    const int worldX = centerChunk.x + x;
+                    const int worldZ = centerChunk.z + z;
 
+                    bool columnNeedsWork = false;
+                    for (int y = 0; y < 16; ++y) {
+                        const glm::ivec3 targetPos = {worldX, y, worldZ};
                         if (!m_chunks.contains(targetPos) && !m_generating.contains(targetPos)) {
+                            columnNeedsWork = true;
                             m_generating.insert(targetPos);
-                            pending_coords.push_back(targetPos);
+                            newly_queued.push_back(targetPos);
                         }
                     }
+
+                    if (!columnNeedsWork) continue;
+
+                    batch.push_back({
+                        0,
+                        [this, worldX, worldZ] {
+                        for (int y = 0; y < 16; ++y) {
+                            glm::ivec3 pos = {worldX, y, worldZ};
+                            const Chunk generatedChunk = m_generator.generate(pos);
+                            m_chunkQueue.push(ChunkResult{pos, generatedChunk});
+                        }
+                    }});
                 }
             }
         }
 
-        std::ranges::sort(pending_coords,
-            [&centerChunk](const glm::ivec3& a, const glm::ivec3& b) {
-                return glm::distance2(glm::vec3(a), glm::vec3(centerChunk)) <
-                       glm::distance2(glm::vec3(b), glm::vec3(centerChunk));
+        if (!batch.empty()) {
+            std::ranges::sort(batch, [](const PrioritizedTask& a, const PrioritizedTask& b) {
+                return a.sequence < b.sequence;
             });
-
-        for (const auto& targetPos : pending_coords) {
-            m_threadPool.enqueue([this, targetPos] {
-                const Chunk generatedChunk = m_generator.generate(targetPos);
-                m_chunkQueue.push(ChunkResult{targetPos, generatedChunk});
-            });
+            m_threadPool.enqueue_batch(batch);
         }
 
-        m_threadPool.notifyAll();
-        return pending_coords;
-    }
-
-    inline int distXZ(const glm::ivec3& a, const glm::ivec3& b) {
-        const int dx = a.x - b.x;
-        const int dz = a.z - b.z;
-        return dx * dx + dz * dz;
+        return newly_queued;
     }
 
     void World::unloadFarChunks(const glm::ivec3 &centerChunk, const int radius, const UnloadCallback& onUnload) {

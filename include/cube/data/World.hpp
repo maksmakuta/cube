@@ -20,6 +20,8 @@
 
 namespace cube {
 
+    constexpr int RENDER_DISTANCE = 24;
+
     using UnloadCallback = std::function<void(const glm::ivec3 &)>;
 
     struct ChunkResult {
