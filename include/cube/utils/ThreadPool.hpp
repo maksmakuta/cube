@@ -57,7 +57,10 @@ namespace cube {
                 std::scoped_lock lock(m_queueMutex);
                 m_tasks.push(std::move(task));
             }
-            m_cv.notify_one();
+        }
+
+        void notifyAll() {
+            m_cv.notify_all();
         }
 
     private:

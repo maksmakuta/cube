@@ -5,7 +5,7 @@
 
 namespace cube {
 
-    constexpr int RENDER_DISTANCE = 12;
+    constexpr int RENDER_DISTANCE = 24;
     constexpr int UNLOAD_DISTANCE = RENDER_DISTANCE + 2;
 
     inline glm::ivec3 getChunkPos(const glm::vec3& worldPos) {
@@ -20,7 +20,9 @@ namespace cube {
         return seed;
     }
 
-    Cube::Cube() : m_world(randomSeed()) {}
+    Cube::Cube() : m_world(randomSeed()) {
+        m_camera.move({0,200,0});
+    }
 
     Cube::~Cube() = default;
 

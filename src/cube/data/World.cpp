@@ -5,9 +5,12 @@
 #include <cube/graphics/Renderer.hpp>
 #include <cube/utils/Logger.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
+
 namespace cube {
 
-    World::World(const int seed) : m_generator(seed), m_threadPool(std::thread::hardware_concurrency()) {}
+    World::World(const int seed) : m_generator(seed), m_threadPool() {}
 
     std::shared_ptr<Chunk> World::getChunk(const glm::ivec3& chunkPos) {
         std::shared_lock lock(m_mapMutex);
@@ -70,8 +73,8 @@ namespace cube {
 
         std::ranges::sort(pending_coords,
             [&centerChunk](const glm::ivec3& a, const glm::ivec3& b) {
-                return glm::distance(glm::vec3(a), glm::vec3(centerChunk)) <
-                       glm::distance(glm::vec3(b), glm::vec3(centerChunk));
+                return glm::distance2(glm::vec3(a), glm::vec3(centerChunk)) <
+                       glm::distance2(glm::vec3(b), glm::vec3(centerChunk));
             });
 
         for (const auto& targetPos : pending_coords) {
@@ -81,6 +84,7 @@ namespace cube {
             });
         }
 
+        m_threadPool.notifyAll();
         return pending_coords;
     }
 
@@ -151,7 +155,9 @@ namespace cube {
                     chunk->setState(ChunkState::Meshing);
 
                     m_threadPool.enqueue([this, p, n] {
-                        RenderableMesh mesh = getMesh(n, p);
+                        RenderableMesh mesh = getMesh(n, p,
+                            m_generator.getTemperature(p),
+                            m_generator.getHumidity(p));
                         m_meshQueue.push(std::move(mesh));
                     });
                 }

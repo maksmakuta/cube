@@ -21,7 +21,12 @@ namespace cube {
         [[nodiscard]] Block getBlock(const glm::ivec3& pos) const;
     };
 
-    RenderableMesh getMesh(const ChunkNeighbors& n, const glm::ivec3& chunkPos);
+    RenderableMesh getMesh(
+        const ChunkNeighbors& n,
+        const glm::ivec3& chunkPos,
+        const std::array<float,256>& temp_data,
+        const std::array<float,256>& humid_data
+    );
 
 }
 

@@ -1,3 +1,4 @@
+#include <vector>
 #include <cube/data/Biome.hpp>
 
 namespace cube {
@@ -29,6 +30,22 @@ namespace cube {
             return BiomeType::Woodland;
         }
         return BiomeType::Forest;
+    }
+
+    const auto TERRAIN_DATA = std::vector<BiomeTerrain>{
+        {SnowDirt,  Dirt,   Ice,    Dirt,       Dirt      },   //Tundra,
+        {SnowDirt,  Dirt,   Ice,    Gravel,     Gravel    },   //ColdSteppe,
+        {SnowDirt,  Dirt,   Ice,    Gravel,     Gravel    },   //Taiga,
+        {GrassBlock,      Dirt,   Water,  Dirt,       Dirt      },   //Grassland,
+        {GrassBlock,      Dirt,   Water,  Sand,       Clay      },   //Woodland,
+        {GrassBlock,      Dirt,   Water,  Gravel,     Gravel    },   //Forest,
+        {Sand,      Sand,   Water,  Sand,       Sand      },   //Desert,
+        {GrassBlock,      Dirt,   Water,  Sand,       Clay      },   //Savanna,
+        {GrassBlock,      Dirt,   Water,  Gravel,     Sand      },   //Rainforest
+    };
+
+    BiomeTerrain getTerrainData(const BiomeType type) {
+        return TERRAIN_DATA[static_cast<int>(type)];
     }
 
 }
