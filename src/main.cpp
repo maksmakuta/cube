@@ -53,6 +53,7 @@ int main() {
         return -1;
     }
 
+
     cube::Log::i("Enable VSync");
     SDL_GL_SetSwapInterval(1);
     cube::Log::i("Enable relative mouse mode");

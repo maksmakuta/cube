@@ -35,4 +35,11 @@ namespace cube {
         }
     }
 
+    ChunkState Cube::getChunkState(const glm::ivec3& pos) {
+        if (!m_states.contains(pos)) {
+            m_states[pos] = ChunkState::Requested;
+        }
+        return m_states[pos];
+    }
+
 }

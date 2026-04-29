@@ -8,9 +8,11 @@ namespace cube {
 
      Camera::Camera(const glm::vec3& position)
         : m_position(position),
+          m_front(0.0f, 0.0f, -1.0f),
+          m_right(1.0f, 0.0f, 0.0f),
+          m_up(0.0f, 1.0f, 0.0f),
           m_worldUp(0.0f, 1.0f, 0.0f),
-          m_direction(-90.0f, 0.0f)
-    {
+          m_direction(-90.0f, 0.0f){
         updateCameraVectors();
     }
 
