@@ -2,7 +2,7 @@
 
 voxel engine 
 
-## author
+# Author & License
 
 Maks Makuta (C) 2026  
 [MIT License](LICENSE.md)
