@@ -9,6 +9,10 @@ find_package(OpenGL REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
+add_subdirectory(libs/glad)
+add_subdirectory(libs/libsnpg)
+add_subdirectory(libs/FastNoise2)
+
 add_executable(${PROJECT_NAME}
     include/cube/core/Block.hpp
     include/cube/core/ChunkStatus.hpp
@@ -21,9 +25,15 @@ add_executable(${PROJECT_NAME}
     src/cube/utils/Log.cpp
 
     src/main.cpp
+    include/cube/Cube.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    OpenGL::GL SDL3::SDL3 glm::glm
+    OpenGL::GL SDL3::SDL3 glm::glm glad spng FastNoise2
 )
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    include
+    libs/glad/include
+    libs/libsnpg/spng
+    libs/FastNoise2/include
+)
