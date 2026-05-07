@@ -41,16 +41,15 @@ High performance voxel rendering engine
 ## Tech Stack
 
  - C++23
- - OpenGL 3.3 Core
- - SDL3
- - glm
- - libspng (submodule)
- - glad (submodule)
- - FastNoise2 (submodule)
+ - OpenGL 4.6 Core
+ - [SDL3](https://github.com/libsdl-org/SDL)
+ - [glm](https://github.com/g-truc/glm)
+ - [libspng](https://github.com/randy408/libspng) (submodule)
+ - [glad](https://github.com/maksmakuta/glad-cmake) (submodule)
+ - [FastNoise2](https://github.com/Auburn/FastNoise2) (submodule)
 
 ---
 
 # Author & License
 
-Maks Makuta (C) 2026  
-[MIT License](LICENSE.md)
+Maks Makuta (C) 2026 | [MIT License](LICENSE.md)
