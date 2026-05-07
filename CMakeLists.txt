@@ -12,6 +12,7 @@ find_package(glm CONFIG REQUIRED)
 add_executable(${PROJECT_NAME}
 
     src/main.cpp
+    include/cube/core/Block.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
