@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     src/cube/data/Chunk.cpp
 
     src/main.cpp
+    include/cube/core/ChunkStatus.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
