@@ -19,13 +19,14 @@ add_executable(${PROJECT_NAME}
     include/cube/data/Chunk.hpp
     include/cube/data/World.hpp
     include/cube/utils/Log.hpp
+    include/cube/Cube.hpp
 
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
     src/cube/utils/Log.cpp
+    src/cube/Cube.cpp
 
     src/main.cpp
-    include/cube/Cube.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
