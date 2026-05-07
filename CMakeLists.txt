@@ -10,11 +10,15 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}
+    include/cube/core/Block.hpp
+    include/cube/data/Chunk.hpp
+
+    src/cube/data/Chunk.cpp
 
     src/main.cpp
-    include/cube/core/Block.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenGL::GL SDL3::SDL3 glm::glm
 )
+target_include_directories(${PROJECT_NAME} PRIVATE include)
