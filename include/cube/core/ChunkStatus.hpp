@@ -4,6 +4,7 @@
 namespace cube {
 
     enum class ChunkStatus {
+        Unknown,        // no chunk found
         Empty,          // new chunk, no data
         QueuedGen,      // data is generated soon
         GenerateData,   // generating

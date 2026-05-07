@@ -11,12 +11,14 @@ find_package(glm CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME}
     include/cube/core/Block.hpp
+    include/cube/core/ChunkStatus.hpp
     include/cube/data/Chunk.hpp
+    include/cube/data/World.hpp
 
     src/cube/data/Chunk.cpp
+    src/cube/data/World.cpp
 
     src/main.cpp
-    include/cube/core/ChunkStatus.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
