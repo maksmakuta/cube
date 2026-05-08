@@ -13,7 +13,7 @@ High performance voxel rendering engine
 - [ ] **Fast Voxel Traversal**: A raycasting algorithm (like Amanatides-Woo) for block selection and placement.
 
 ### Rendering Optimizations
-- [ ] **Hidden Face Culling**: Do not generate mesh data for faces obscured by adjacent solid blocks.
+- [X] **Hidden Face Culling**: Do not generate mesh data for faces obscured by adjacent solid blocks.
 - [ ] **Greedy Meshing**: Combine adjacent coplanar faces into single large quads to reduce vertex count.
 - [ ] **Vertex Packing**: Use bit-shifting to pack position, UV, and lighting data into a single `uint32` per vertex.
 - [ ] **Frustum Culling**: Skip draw calls for chunks that are behind the camera or out of view.

@@ -20,18 +20,18 @@ add_executable(${PROJECT_NAME}
     include/cube/data/World.hpp
     include/cube/graphics/Camera.hpp
     include/cube/graphics/Vertex.hpp
+    include/cube/mesh/Mesher.hpp
     include/cube/utils/Log.hpp
     include/cube/Cube.hpp
 
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
     src/cube/graphics/Camera.cpp
+    src/cube/mesh/Mesher.cpp
     src/cube/utils/Log.cpp
     src/cube/Cube.cpp
 
     src/main.cpp
-    include/cube/mesh/Mesher.hpp
-    src/cube/mesh/Mesher.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
