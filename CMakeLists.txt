@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
     include/cube/data/Chunk.hpp
     include/cube/data/World.hpp
     include/cube/graphics/Camera.hpp
+    include/cube/graphics/Shader.hpp
     include/cube/graphics/Vertex.hpp
     include/cube/mesh/Mesher.hpp
     include/cube/utils/Log.hpp
@@ -27,6 +28,7 @@ add_executable(${PROJECT_NAME}
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
     src/cube/graphics/Camera.cpp
+    src/cube/graphics/Shader.cpp
     src/cube/mesh/Mesher.cpp
     src/cube/utils/Log.cpp
     src/cube/Cube.cpp
@@ -37,9 +39,21 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenGL::GL SDL3::SDL3 glm::glm glad spng FastNoise2
 )
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     include
     libs/glad/include
     libs/libsnpg/spng
     libs/FastNoise2/include
 )
+
+set(ASSETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets/")
+
+file(TO_CMAKE_PATH "${ASSETS_PATH}" ASSETS_PATH)
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/assets_dir.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/assets_dir.hpp"
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
