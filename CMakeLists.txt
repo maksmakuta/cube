@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
     include/cube/data/Chunk.hpp
     include/cube/data/World.hpp
     include/cube/graphics/Camera.hpp
+    include/cube/graphics/Vertex.hpp
     include/cube/utils/Log.hpp
     include/cube/Cube.hpp
 
