@@ -3,6 +3,8 @@
 
 #include <SDL3/SDL_events.h>
 
+#include "data/World.hpp"
+
 namespace cube {
 
     class Cube final {
@@ -15,6 +17,7 @@ namespace cube {
 
     private:
         float m_last_tick;
+        World m_world;
     };
 
 }

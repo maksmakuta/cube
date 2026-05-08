@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
     src/cube/Cube.cpp
 
     src/main.cpp
+    include/cube/mesh/Mesher.hpp
+    src/cube/mesh/Mesher.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
