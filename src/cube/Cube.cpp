@@ -13,7 +13,7 @@ namespace cube {
     void Cube::onUpdate(const float dt) {
         m_last_tick += dt;
         if (m_last_tick >= 1.f) {
-            debug("FPS: {}", 1.0f / dt);
+            debug("FPS: {}", m_last_tick / dt);
             m_last_tick = 0.f;
         }
     }

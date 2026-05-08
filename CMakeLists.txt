@@ -18,11 +18,13 @@ add_executable(${PROJECT_NAME}
     include/cube/core/ChunkStatus.hpp
     include/cube/data/Chunk.hpp
     include/cube/data/World.hpp
+    include/cube/graphics/Camera.hpp
     include/cube/utils/Log.hpp
     include/cube/Cube.hpp
 
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
+    src/cube/graphics/Camera.cpp
     src/cube/utils/Log.cpp
     src/cube/Cube.cpp
 
