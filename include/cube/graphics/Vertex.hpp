@@ -9,8 +9,8 @@ namespace cube {
     struct Vertex final {
         glm::vec3 position;
         glm::vec3 normal;
-        glm::vec2 texture_uv;
-        float texture_id;
+        glm::vec3 tex;
+        glm::vec4 tint;
     };
 
 }

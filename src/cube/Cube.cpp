@@ -9,7 +9,7 @@ namespace cube {
         auto chunk = std::make_shared<Chunk>();
 
         for (int y = 0; y < CHUNK_SIZE; y++) {
-            Block id = Block::Air;
+            auto id = Block::Air;
 
             if (y == 0) {
                 id = Block::Bedrock;
@@ -33,7 +33,7 @@ namespace cube {
         return chunk;
     }
 
-    Cube::Cube(const int argc, char** argv): m_last_tick(0.f) {
+    Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0) {
         for (auto i = 0; i < argc; i++) {
             info("args[{}]: {}", i, argv[i]);
         }

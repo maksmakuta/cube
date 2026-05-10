@@ -49,7 +49,7 @@ namespace cube {
 
     const auto BLOCKDATA = std::map<Block,BlockData>{
          { Block::Air,      {0,0,0,0, false}},
-         { Block::Grass,    {0,3,1,2, true}},
+         { Block::Grass,    {0,3,3,2, true}},
          { Block::Dirt,     {3,3,3,0, false}},
          { Block::Stone,    {4,4,4,0, false}},
          { Block::Bedrock,  {5,5,5,0, false}},
@@ -98,8 +98,8 @@ namespace cube {
                             mesh.vertices.emplace_back(
                                 glm::vec3(block_pos + FACES[dir_id][face_vert_id]),
                                 glm::vec3(DIRECTIONS[dir_id]),
-                                TEXTURE_UV[face_vert_id],
-                                tex_id
+                                glm::vec3(TEXTURE_UV[face_vert_id],tex_id),
+                                 current_block == Block::Grass &&  dir_id == 2 ? glm::vec4(0.3f,0.86f,0.45f,1.f) : glm::vec4(1.f)
                             );
                         }
 
