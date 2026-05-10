@@ -1,4 +1,7 @@
 #include "cube/mesh/Mesher.hpp"
+
+#include <map>
+
 #include "cube/utils/Log.hpp"
 
 namespace cube {
@@ -12,20 +15,20 @@ namespace cube {
         {0, 0, -1}
     };
 
-    const auto TEXTURE_UV = std::vector<glm::vec2>{
-        {0.0f, 0.0f},
-        {0.0f, 1.0f},
-        {1.0f, 1.0f},
-        {1.0f, 0.0f}
-    };
-
     const auto FACES = std::vector<std::vector<glm::ivec3>>{
-        {{1,0,1}, {1,1,1}, {1,1,0}, {1,0,0}},
-        {{0,0,0}, {0,1,0}, {0,1,1}, {0,0,1}},
+        {{1,0,1}, {1,0,0}, {1,1,0}, {1,1,1}},
+        {{0,0,0}, {0,0,1}, {0,1,1}, {0,1,0}},
         {{0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}},
         {{0,0,0}, {1,0,0}, {1,0,1}, {0,0,1}},
         {{0,0,1}, {1,0,1}, {1,1,1}, {0,1,1}},
         {{1,0,0}, {0,0,0}, {0,1,0}, {1,1,0}}
+    };
+
+    const auto TEXTURE_UV = std::vector<glm::vec2>{
+        {0.0f, 1.0f},
+        {1.0f, 1.0f},
+        {1.0f, 0.0f},
+        {0.0f, 0.0f}
     };
 
     inline bool outOfPlane(const int val) {
@@ -35,6 +38,22 @@ namespace cube {
     inline bool isOutside(const glm::ivec3& pos) {
         return outOfPlane(pos.x) || outOfPlane(pos.y) || outOfPlane(pos.z);
     }
+
+    struct BlockData {
+        uint8_t top;
+        uint8_t bottom;
+        uint8_t side;
+        uint8_t overlay;
+        bool is_tint;
+    };
+
+    const auto BLOCKDATA = std::map<Block,BlockData>{
+         { Block::Air,      {0,0,0,0, false}},
+         { Block::Grass,    {0,3,1,2, true}},
+         { Block::Dirt,     {3,3,3,0, false}},
+         { Block::Stone,    {4,4,4,0, false}},
+         { Block::Bedrock,  {5,5,5,0, false}},
+    };
 
     ChunkMesh mesh(const glm::ivec3& chunk_pos, const World& world) {
         const auto chunk = world.getChunk(chunk_pos);
@@ -53,6 +72,8 @@ namespace cube {
 
                     if (current_block == Block::Air) continue;
 
+                    const auto&[top, bottom, side, overlay, is_tint] = BLOCKDATA.at(current_block);
+
                     for (auto dir_id = 0; dir_id < DIRECTIONS.size(); dir_id++) {
                         const auto n_block_pos = block_pos + DIRECTIONS[dir_id];
 
@@ -64,12 +85,21 @@ namespace cube {
 
                         const auto base_index = static_cast<uint32_t>(mesh.vertices.size());
 
+                        float tex_id = 0.0f;
+                        if (dir_id == 2) {
+                            tex_id = static_cast<float>(top);
+                        } else if (dir_id == 3) {
+                            tex_id = static_cast<float>(bottom);
+                        } else {
+                            tex_id = static_cast<float>(side);
+                        }
+
                         for (auto face_vert_id = 0; face_vert_id < 4; face_vert_id++) {
                             mesh.vertices.emplace_back(
                                 glm::vec3(block_pos + FACES[dir_id][face_vert_id]),
                                 glm::vec3(DIRECTIONS[dir_id]),
                                 TEXTURE_UV[face_vert_id],
-                                static_cast<float>(current_block)
+                                tex_id
                             );
                         }
 

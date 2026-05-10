@@ -8,22 +8,24 @@ namespace cube {
     ChunkPtr getFlatChunk() {
         auto chunk = std::make_shared<Chunk>();
 
-        for(int y = 0; y < CHUNK_SIZE; y++) {
+        for (int y = 0; y < CHUNK_SIZE; y++) {
+            Block id = Block::Air;
 
-            auto id = Block::Air;
-
-            if (y == 0)
+            if (y == 0) {
                 id = Block::Bedrock;
-            if (y >= 1 && y < 6)
+            } else if (y < 6) {
                 id = Block::Stone;
-            if (y >= 6 && y < 8)
+            } else if (y < 8) {
                 id = Block::Dirt;
-            if (y == 8)
+            } else if (y == 8) {
                 id = Block::Grass;
+            } else {
+                continue;
+            }
 
-            for(int x = 0; x < CHUNK_SIZE; x++) {
-                for(int z = 0; z < CHUNK_SIZE; z++) {
-                    chunk->at({x,y,z}) = id;
+            for (int x = 0; x < CHUNK_SIZE; x++) {
+                for (int z = 0; z < CHUNK_SIZE; z++) {
+                    chunk->at({x, y, z}) = id;
                 }
             }
         }

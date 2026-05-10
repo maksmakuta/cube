@@ -48,7 +48,9 @@ int main(int argc, char** argv) {
     SDL_GL_SetSwapInterval(1);
     cube::info("Environment Ready. OpenGL 4.6 Context Active.");
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     auto cube = cube::Cube(argc, argv);
     bool is_running = true;

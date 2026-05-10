@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec3 norm;
 layout(location = 2) in vec2 uv;
-layout(location = 3) in int id;
+layout(location = 3) in float id;
 
 uniform mat4 u_proj;
 uniform mat4 u_view;
