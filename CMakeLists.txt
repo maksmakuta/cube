@@ -34,6 +34,8 @@ add_executable(${PROJECT_NAME}
     src/cube/Cube.cpp
 
     src/main.cpp
+    include/cube/graphics/Renderer.hpp
+    src/cube/graphics/Renderer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
