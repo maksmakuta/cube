@@ -74,8 +74,8 @@ namespace cube {
     }
 
     void Shader::reload() {
-        const auto vertexResult = readFile(std::format("{}shaders/{}.vert",ASSETS_PATH, m_name));
-        const auto fragmentResult = readFile(std::format("{}shaders/{}.frag",ASSETS_PATH, m_name)));
+        const auto vertexResult = readFile(std::format("{}/shaders/{}.vert",ASSETS_PATH, m_name));
+        const auto fragmentResult = readFile(std::format("{}/shaders/{}.frag",ASSETS_PATH, m_name));
 
         if (!vertexResult || !fragmentResult) {
             std::cerr << std::format("FILE_ERROR: {}\n", !vertexResult ? vertexResult.error() : fragmentResult.error());

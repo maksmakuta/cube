@@ -20,8 +20,27 @@ namespace cube {
     };
 
     Renderable toRenderable(const ChunkMesh& mesh) {
-        //TODO(implement)
-        return {};
+        Renderable renderable = {};
+        renderable.count = static_cast<int>(mesh.indices.size());
+        glGenVertexArrays(1, &renderable.vao);
+        glGenBuffers(1, &renderable.vbo);
+        glGenBuffers(1, &renderable.ebo);
+        glBindVertexArray(renderable.vao);
+        glBindBuffer(GL_ARRAY_BUFFER, renderable.vbo);
+        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderable.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_uv));
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_id));
+        glBindVertexArray(0);
+
+        return renderable;
     }
 
     Renderer::Renderer() : m_textures(0), m_shader("cube") {
@@ -49,19 +68,25 @@ namespace cube {
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection) {
         m_shader.use();
 
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
+        m_shader.setInt("textures", 0);
 
         m_shader.setMat4("u_proj", projection);
         m_shader.setMat4("u_view", view);
 
         for (const auto& [pos, renderable] : m_meshes) {
-            if (renderable.count == 0) {
-                continue;
-            }
-            m_shader.setMat4("u_model", glm::translate(glm::mat4(), glm::vec3(pos * CHUNK_SIZE)));
+            if (renderable.count == 0) continue;
+
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos * CHUNK_SIZE));
+            m_shader.setMat4("u_model", model);
+
             glBindVertexArray(renderable.vao);
-            glDrawArrays(GL_TRIANGLES, 0, renderable.count);
+
+            glDrawElements(GL_TRIANGLES, renderable.count, GL_UNSIGNED_INT, nullptr);
         }
+
+        glBindVertexArray(0);
     }
 
     void Renderer::loadTextures(const glm::ivec2& tileSize) {
@@ -69,6 +94,11 @@ namespace cube {
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
 
         glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, tileSize.x, tileSize.y, LAYERS.size());
+
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         for (auto index = 0; index < LAYERS.size(); ++index) {
             const auto& layer = LAYERS[index];
@@ -92,7 +122,7 @@ namespace cube {
             free(buffer);
             spng_ctx_free(ctx);
             fclose(fp);
-            info("Layer {} loaded with index {}", layer, index);
+            debug("Layer {} loaded with index {}", layer, index);
         }
     }
 

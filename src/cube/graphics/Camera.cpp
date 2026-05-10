@@ -64,4 +64,18 @@ namespace cube {
         m_right = glm::normalize(glm::cross(m_front, {0, 1, 0}));
     }
 
+    void Camera::applyDirection(const glm::vec2& direction) {
+        m_direction += direction;
+        m_direction.y = glm::clamp(m_direction.y, -89.9f, 89.9f);
+        update();
+    }
+
+    glm::vec3 Camera::getForward() const {
+        return m_front;
+    }
+
+    glm::vec3 Camera::getRight() const {
+        return m_right;
+    }
+
 }

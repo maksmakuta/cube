@@ -43,9 +43,12 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    SDL_SetWindowRelativeMouseMode(window,true);
+
     SDL_GL_SetSwapInterval(1);
     cube::info("Environment Ready. OpenGL 4.6 Context Active.");
-    glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
+    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
 
     auto cube = cube::Cube(argc, argv);
     bool is_running = true;
@@ -61,6 +64,9 @@ int main(int argc, char** argv) {
             cube.onEvent(event);
             if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
                 is_running = false;
+            }
+            if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+                glViewport(0, 0, event.window.data1, event.window.data2);
             }
         }
 

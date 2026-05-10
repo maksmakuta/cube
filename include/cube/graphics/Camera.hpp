@@ -9,10 +9,13 @@ namespace cube {
 
     class Camera final {
     public:
-        explicit Camera(const glm::vec3& position);
+        explicit Camera(const glm::vec3& position = {0,0,0});
 
         [[nodiscard]] glm::mat4 getViewMatrix() const;
         [[nodiscard]] glm::mat4 getProjMatrix(const glm::vec2& view, float render_dist) const;
+
+        [[nodiscard]] glm::vec3 getForward() const;
+        [[nodiscard]] glm::vec3 getRight() const;
 
         [[nodiscard]] glm::vec3 getPosition() const;
         [[nodiscard]] glm::vec2 getDirection() const;
@@ -21,6 +24,8 @@ namespace cube {
         void setPosition(const glm::vec3& position);
         void setDirection(const glm::vec2& direction);
         void setFov(float fov);
+
+        void applyDirection(const glm::vec2& direction);
 
     private:
         void update();
