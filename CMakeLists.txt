@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2 FATAL_ERROR)
-project(cube VERSION 0.1.0 LANGUAGES CXX C)
+project(cube VERSION 0.2.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
     include/cube/data/Chunk.hpp
     include/cube/data/World.hpp
     include/cube/graphics/Camera.hpp
+    include/cube/graphics/Renderer.hpp
     include/cube/graphics/Shader.hpp
     include/cube/graphics/Vertex.hpp
     include/cube/mesh/Mesher.hpp
@@ -28,14 +29,13 @@ add_executable(${PROJECT_NAME}
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
     src/cube/graphics/Camera.cpp
+    src/cube/graphics/Renderer.cpp
     src/cube/graphics/Shader.cpp
     src/cube/mesh/Mesher.cpp
     src/cube/utils/Log.cpp
     src/cube/Cube.cpp
 
     src/main.cpp
-    include/cube/graphics/Renderer.hpp
-    src/cube/graphics/Renderer.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
