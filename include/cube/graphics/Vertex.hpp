@@ -9,7 +9,7 @@ namespace cube {
     struct Vertex final {
         glm::vec3 position;
         glm::vec3 normal;
-        glm::vec3 tex;
+        glm::vec4 tex;
         glm::vec4 tint;
     };
 
