@@ -4,42 +4,13 @@ namespace cube {
 
     Generator::Generator(const int seed) : m_seed(seed) {
         m_terrain = FastNoise::New<FastNoise::Perlin>();
-        m_terrain->SetScale(256.f);
-    }
-
-    void Generator::push(const glm::ivec3& chunk) {
-        m_chunk.push(chunk);
-    }
-
-    void Generator::clear() {
-        while (!m_chunk.empty()) {
-            m_chunk.pop();
-        }
-    }
-
-    ChunkPtr Generator::pop(glm::ivec3* pos) {
-        if (m_chunk.empty()) {
-            return nullptr;
-        }
-
-        const auto p = m_chunk.front();
-        m_chunk.pop();
-
-        if (pos != nullptr) {
-            *pos = p;
-        }
-
-        return generateChunk(p);
-    }
-
-    int Generator::len() const {
-        return static_cast<int>(m_chunk.size());
+        m_terrain->SetScale(64.f);
     }
 
     ChunkPtr Generator::generateChunk(const glm::ivec3 &pos) {
         auto chunk = std::make_shared<Chunk>();
 
-        if (pos.y < 0 || pos.y * CHUNK_SIZE > WORLD_LIMIT) {
+        if (pos.y < 0 || pos.y >= 16) {
             return chunk;
         }
 

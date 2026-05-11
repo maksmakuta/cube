@@ -31,7 +31,7 @@ namespace cube {
             m_camera.setPosition(m_camera.getPosition() + glm::normalize(delta_move) * dt * 25.f);
         }
 
-        constexpr auto RENDER_DIST = 4;
+        constexpr auto RENDER_DIST = 8;
         const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
         if (current_chunk != m_last_chunk) {
 
@@ -39,8 +39,8 @@ namespace cube {
                 for (int x = -RENDER_DIST; x < RENDER_DIST; x++) {
                     for (int y = -RENDER_DIST; y < RENDER_DIST; y++) {
                         const auto new_chunk_pos = current_chunk + glm::ivec3{x, y, z};
-                        if (!m_world.contains(new_chunk_pos) && new_chunk_pos.y >= 0 && new_chunk_pos.y < 16) {
-                            m_generator.push(current_chunk + glm::ivec3{x, y, z});
+                        if (!m_world.contains(new_chunk_pos)) {
+                            m_gq.push(current_chunk + glm::ivec3{x, y, z});
                         }
                     }
                 }
@@ -49,27 +49,50 @@ namespace cube {
             m_last_chunk = current_chunk;
         }
 
-        if (m_generator.len() > 0) {
-            glm::ivec3 pos;
-            const auto chunk = m_generator.pop(&pos);
-            m_world.setChunk(pos, chunk);
+        int limit = 4;
+        int count = 0;
 
-            m_mesher.push(pos);
+        while(!m_gq.empty()) {
+            const auto pos = m_gq.front();
+            m_gq.pop();
+
+            if (!m_world.contains(pos)) {
+                m_world.setChunk(pos, m_generator.generateChunk(pos));
+                m_mq.push(pos);
+            }
+            if (count >= limit) {
+                break;
+            }
+            ++count;
         }
 
-        if (!m_mesher.empty()) {
-            const auto pos = m_mesher.front();
-            m_mesher.pop();
+        count = 0;
 
-            const auto mesh_data = mesh(pos,m_world);
-            m_renderer.push(pos,mesh_data);
+        while(!m_mq.empty()) {
+            const auto pos = m_mq.front();
+            m_mq.pop();
+
+            if (pos.y < 0 || pos.y > 16 || !m_renderer.contains(pos)) {
+                if (isReadyForMesh(pos)) {
+                    const auto mesh_data = mesh(pos,m_world);
+                    m_renderer.push(pos,mesh_data);
+                } else {
+                    m_mq.push(pos);
+                }
+            }
+
+            if (count >= limit) {
+                break;
+            }
+            ++count;
         }
 
-        debug("G: {} | M: {} | W: {} | R: {}",
-            m_generator.len(),
-            m_mesher.size(),
-            m_world.clearChunks(current_chunk,RENDER_DIST),
-            m_renderer.clearChunks(current_chunk,RENDER_DIST)
+        debug("G: {} | M: {} | W: {} | R: {} | {}",
+            m_gq.size(),
+            m_mq.size(),
+            m_world.clearChunks(m_last_chunk,RENDER_DIST),
+            m_renderer.clearChunks(m_last_chunk,RENDER_DIST),
+            1.0 / dt
         );
 
     }
@@ -85,6 +108,24 @@ namespace cube {
         if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
             m_view = glm::vec2{event.window.data1, event.window.data2};
         }
+    }
+
+    const glm::ivec3 directions[6] = {
+        {1,0,0},
+        {-1,0,0},
+        {0,1,0},
+        {0,-1,0},
+        {0,0,1},
+        {0,0,-1}
+    };
+
+    bool Cube::isReadyForMesh(const glm::ivec3 &pos) const {
+        if (m_world.contains(pos)) {
+            return std::ranges::all_of(directions, [&](const glm::ivec3& direction) {
+                return m_world.contains(pos + direction);
+            });
+        }
+        return false;
     }
 
 }
