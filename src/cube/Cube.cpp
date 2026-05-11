@@ -5,49 +5,9 @@
 
 namespace cube {
 
-    ChunkPtr getFlatChunk() {
-        auto chunk = std::make_shared<Chunk>();
-
-        for (int y = 0; y < CHUNK_SIZE; y++) {
-            auto id = Block::Air;
-
-            if (y == 0) {
-                id = Block::Bedrock;
-            } else if (y < 6) {
-                id = Block::Stone;
-            } else if (y < 8) {
-                id = Block::Dirt;
-            } else if (y == 8) {
-                id = Block::Grass;
-            } else {
-                continue;
-            }
-
-            for (int x = 0; x < CHUNK_SIZE; x++) {
-                for (int z = 0; z < CHUNK_SIZE; z++) {
-                    chunk->at({x, y, z}) = id;
-                }
-            }
-        }
-
-        return chunk;
-    }
-
-    Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0) {
+    Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0), m_last_chunk(-99999999) {
         for (auto i = 0; i < argc; i++) {
             info("args[{}]: {}", i, argv[i]);
-        }
-
-        const auto chunk_pos = glm::ivec3{0};
-
-        m_world.setChunk(chunk_pos,getFlatChunk());
-        m_renderer.push(chunk_pos,mesh(chunk_pos,m_world));
-
-        if (m_world.contains(chunk_pos)) {
-            warn("Chunk is present in world");
-            if (m_renderer.contains(chunk_pos)) {
-                warn("Chunk is present in renderer");
-            }
         }
     }
 
@@ -70,6 +30,43 @@ namespace cube {
         if (glm::length(delta_move) > 0.f) {
             m_camera.setPosition(m_camera.getPosition() + glm::normalize(delta_move) * dt * 25.f);
         }
+
+        const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
+        if (current_chunk != m_last_chunk) {
+            constexpr auto RENDER_DIST = 4;
+
+            for (int z = -RENDER_DIST; z < RENDER_DIST; z++) {
+                for (int x = -RENDER_DIST; x < RENDER_DIST; x++) {
+                    for (int y = -RENDER_DIST; y < RENDER_DIST; y++) {
+                        const auto new_chunk_pos = current_chunk + glm::ivec3{x, y, z};
+                        if (!m_world.contains(new_chunk_pos)) {
+                            m_generator.push(current_chunk + glm::ivec3{x, y, z});
+                        }
+                    }
+                }
+            }
+
+            m_last_chunk = current_chunk;
+        }
+
+        if (m_generator.len() > 0) {
+            glm::ivec3 pos;
+            const auto chunk = m_generator.pop(&pos);
+            m_world.setChunk(pos, chunk);
+
+            m_mesher.push(pos);
+        }
+
+        if (!m_mesher.empty()) {
+            const auto pos = m_mesher.front();
+            m_mesher.pop();
+
+            const auto mesh_data = mesh(pos,m_world);
+            m_renderer.push(pos,mesh_data);
+        }
+
+        debug("in generation: {}", m_generator.len());
+        debug("in meshing: {}", m_mesher.size());
     }
 
     void Cube::onDraw() {

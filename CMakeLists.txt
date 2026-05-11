@@ -10,7 +10,7 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 add_subdirectory(libs/glad)
-add_subdirectory(libs/libspng)
+add_subdirectory(libs/spng)
 add_subdirectory(libs/FastNoise2)
 
 add_executable(${PROJECT_NAME}
@@ -36,6 +36,8 @@ add_executable(${PROJECT_NAME}
     src/cube/Cube.cpp
 
     src/main.cpp
+    include/cube/data/Generator.hpp
+    src/cube/data/Generator.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
