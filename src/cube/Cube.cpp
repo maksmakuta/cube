@@ -5,6 +5,8 @@
 
 namespace cube {
 
+    constexpr auto RENDER_DIST = 8;
+
     Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0), m_last_chunk(-99999999) {
         for (auto i = 0; i < argc; i++) {
             info("args[{}]: {}", i, argv[i]);
@@ -31,7 +33,6 @@ namespace cube {
             m_camera.setPosition(m_camera.getPosition() + glm::normalize(delta_move) * dt * 25.f);
         }
 
-        constexpr auto RENDER_DIST = 8;
         const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
         if (current_chunk != m_last_chunk) {
 
@@ -49,7 +50,7 @@ namespace cube {
             m_last_chunk = current_chunk;
         }
 
-        int limit = 4;
+        int limit = 16;
         int count = 0;
 
         while(!m_gq.empty()) {
@@ -98,7 +99,7 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-        m_renderer.draw(m_camera.getViewMatrix(), m_camera.getProjMatrix(m_view,128));
+        m_renderer.draw(m_camera.getViewMatrix(), m_camera.getProjMatrix(m_view, RENDER_DIST * CHUNK_SIZE));
     }
 
     void Cube::onEvent(const SDL_Event& event) {

@@ -43,6 +43,12 @@ namespace cube {
         return renderable;
     }
 
+    void clear(const Renderable& r) {
+        glDeleteVertexArrays(1, &r.vao);
+        glDeleteBuffers(1, &r.vbo);
+        glDeleteBuffers(1, &r.ebo);
+    }
+
     Renderer::Renderer() : m_textures(0), m_shader("cube") {
         loadTextures();
     }
@@ -127,18 +133,26 @@ namespace cube {
     }
 
     int Renderer::clearChunks(const glm::ivec3& pos, const int dist) {
-        const auto initialCount = m_meshes.size();
+        int clearedCount = 0;
 
-        auto isOutOfRange = [&](const auto& item) {
-            const glm::ivec3& chunkPos = item.first;
-            return std::abs(chunkPos.x - pos.x) > dist ||
-                   std::abs(chunkPos.y - pos.y) > dist ||
-                   std::abs(chunkPos.z - pos.z) > dist;
-        };
+        for (auto it = m_meshes.begin(); it != m_meshes.end(); ) {
+            const glm::ivec3& chunkPos = it->first;
 
-        std::erase_if(m_meshes, isOutOfRange);
+            const bool outOfRange = std::abs(chunkPos.x - pos.x) > dist ||
+                              std::abs(chunkPos.y - pos.y) > dist ||
+                              std::abs(chunkPos.z - pos.z) > dist;
 
-        return static_cast<int>(initialCount - m_meshes.size());
+            if (outOfRange) {
+                auto& mesh = it->second;
+                clear(mesh);
+
+                it = m_meshes.erase(it);
+                clearedCount++;
+            } else {
+                ++it;
+            }
+        }
+        return clearedCount;
     }
 
 
