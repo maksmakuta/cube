@@ -31,15 +31,15 @@ namespace cube {
             m_camera.setPosition(m_camera.getPosition() + glm::normalize(delta_move) * dt * 25.f);
         }
 
+        constexpr auto RENDER_DIST = 4;
         const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
         if (current_chunk != m_last_chunk) {
-            constexpr auto RENDER_DIST = 4;
 
             for (int z = -RENDER_DIST; z < RENDER_DIST; z++) {
                 for (int x = -RENDER_DIST; x < RENDER_DIST; x++) {
                     for (int y = -RENDER_DIST; y < RENDER_DIST; y++) {
                         const auto new_chunk_pos = current_chunk + glm::ivec3{x, y, z};
-                        if (!m_world.contains(new_chunk_pos)) {
+                        if (!m_world.contains(new_chunk_pos) && new_chunk_pos.y >= 0 && new_chunk_pos.y < 16) {
                             m_generator.push(current_chunk + glm::ivec3{x, y, z});
                         }
                     }
@@ -65,8 +65,13 @@ namespace cube {
             m_renderer.push(pos,mesh_data);
         }
 
-        debug("in generation: {}", m_generator.len());
-        debug("in meshing: {}", m_mesher.size());
+        debug("G: {} | M: {} | W: {} | R: {}",
+            m_generator.len(),
+            m_mesher.size(),
+            m_world.clearChunks(current_chunk,RENDER_DIST),
+            m_renderer.clearChunks(current_chunk,RENDER_DIST)
+        );
+
     }
 
     void Cube::onDraw() {

@@ -29,6 +29,8 @@ namespace cube {
         void push(const glm::ivec3&, const ChunkMesh&);
         void draw(const glm::mat4& view, const glm::mat4& projection);
 
+        int clearChunks(const glm::ivec3& pos, int dist);
+
     private:
         void loadTextures(const glm::ivec2& tileSize = glm::ivec2(32, 32));
 

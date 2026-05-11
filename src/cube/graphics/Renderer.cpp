@@ -126,4 +126,20 @@ namespace cube {
         }
     }
 
+    int Renderer::clearChunks(const glm::ivec3& pos, const int dist) {
+        const auto initialCount = m_meshes.size();
+
+        auto isOutOfRange = [&](const auto& item) {
+            const glm::ivec3& chunkPos = item.first;
+            return std::abs(chunkPos.x - pos.x) > dist ||
+                   std::abs(chunkPos.y - pos.y) > dist ||
+                   std::abs(chunkPos.z - pos.z) > dist;
+        };
+
+        std::erase_if(m_meshes, isOutOfRange);
+
+        return static_cast<int>(initialCount - m_meshes.size());
+    }
+
+
 }

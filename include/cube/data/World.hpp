@@ -25,6 +25,8 @@ namespace cube {
         void setStatus(const glm::ivec3& pos,ChunkStatus);
         void setChunk(const glm::ivec3& pos,ChunkPtr);
 
+        int clearChunks(const glm::ivec3& pos, int dist);
+
     private:
         std::unordered_map<glm::ivec3, ChunkStatus> m_statuses;
         std::unordered_map<glm::ivec3, ChunkPtr> m_chunks;
