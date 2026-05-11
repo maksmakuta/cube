@@ -5,7 +5,7 @@
 
 namespace cube {
 
-    constexpr auto RENDER_DIST = 8;
+    constexpr auto RENDER_DIST = 12;
 
     Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0), m_last_chunk(-99999999) {
         for (auto i = 0; i < argc; i++) {
@@ -48,12 +48,20 @@ namespace cube {
             }
 
             m_last_chunk = current_chunk;
+
+            debug("G: {} | M: {} | W: {} | R: {} | {}",
+                m_gq.size(),
+                m_mq.size(),
+                m_world.clearChunks(m_last_chunk,RENDER_DIST),
+                m_renderer.clearChunks(m_last_chunk,RENDER_DIST),
+                1.0 / dt
+            );
         }
 
-        int limit = 16;
+        int limit = 64;
         int count = 0;
 
-        while(!m_gq.empty()) {
+        while(!m_gq.empty()) { //generaion queue
             const auto pos = m_gq.front();
             m_gq.pop();
 
@@ -69,15 +77,15 @@ namespace cube {
 
         count = 0;
 
-        while(!m_mq.empty()) {
+        while(!m_mq.empty()) { //mesh queue
             const auto pos = m_mq.front();
             m_mq.pop();
 
-            if (pos.y < 0 || pos.y > 16 || !m_renderer.contains(pos)) {
-                if (isReadyForMesh(pos)) {
-                    const auto mesh_data = mesh(pos,m_world);
-                    m_renderer.push(pos,mesh_data);
-                } else {
+            if (isReadyForMesh(pos)) {
+                const auto mesh_data = mesh(pos,m_world);
+                m_renderer.push(pos,mesh_data);
+            } else {
+                if (pos.y >= 0 && pos.y < 16) {
                     m_mq.push(pos);
                 }
             }
@@ -88,18 +96,10 @@ namespace cube {
             ++count;
         }
 
-        debug("G: {} | M: {} | W: {} | R: {} | {}",
-            m_gq.size(),
-            m_mq.size(),
-            m_world.clearChunks(m_last_chunk,RENDER_DIST),
-            m_renderer.clearChunks(m_last_chunk,RENDER_DIST),
-            1.0 / dt
-        );
-
     }
 
     void Cube::onDraw() {
-        m_renderer.draw(m_camera.getViewMatrix(), m_camera.getProjMatrix(m_view, RENDER_DIST * CHUNK_SIZE));
+        m_renderer.draw(m_camera.getViewMatrix(), m_camera.getProjMatrix(m_view, (RENDER_DIST + 4) * CHUNK_SIZE));
     }
 
     void Cube::onEvent(const SDL_Event& event) {

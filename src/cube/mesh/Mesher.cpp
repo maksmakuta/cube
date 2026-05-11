@@ -69,6 +69,10 @@ namespace cube {
         data.left   = world.getChunk(pos + glm::ivec3{1,0,0});
         data.right  = world.getChunk(pos + glm::ivec3{-1,0,0});
 
+
+        if (!data.center) {
+            return {};
+        }
         ChunkMesh mesh{};
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -93,6 +97,10 @@ namespace cube {
                         if (n_block_pos.x < 0          ){ chunk = data.right;    pos_normal.x += CHUNK_SIZE; }
                         if (n_block_pos.z >= CHUNK_SIZE){ chunk = data.near;     pos_normal.z -= CHUNK_SIZE; }
                         if (n_block_pos.z < 0          ){ chunk = data.far;      pos_normal.z += CHUNK_SIZE; }
+
+                        if (!chunk) {
+                            continue;
+                        }
 
                         if (chunk->at(pos_normal) != Block::Air) continue;
 
