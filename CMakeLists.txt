@@ -10,7 +10,7 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 add_subdirectory(libs/glad)
-add_subdirectory(libs/libsnpg)
+add_subdirectory(libs/libspng)
 add_subdirectory(libs/FastNoise2)
 
 add_executable(${PROJECT_NAME}
