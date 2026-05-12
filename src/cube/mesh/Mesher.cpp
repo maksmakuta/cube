@@ -98,16 +98,12 @@ namespace cube {
                         if (n_block_pos.z >= CHUNK_SIZE){ chunk = data.near;     pos_normal.z -= CHUNK_SIZE; }
                         if (n_block_pos.z < 0          ){ chunk = data.far;      pos_normal.z += CHUNK_SIZE; }
 
-                        if (!chunk) {
-                            continue;
-                        }
-
-                        if (chunk->at(pos_normal) != Block::Air) continue;
+                        if (!chunk || chunk->at(pos_normal) != Block::Air) continue;
 
                         const auto base_index = static_cast<uint32_t>(mesh.vertices.size());
 
                         float tex_id = 0.0f;
-                        float current_overlay = -1.0f;
+                        int current_overlay = -1;
                         auto tint = glm::vec4(1.0f);
 
                         if (dir_id == 2) {
@@ -120,17 +116,26 @@ namespace cube {
                         else {
                             tex_id = static_cast<float>(side);
                             if (overlay >= 0) {
-                                current_overlay = static_cast<float>(overlay);
+                                current_overlay = static_cast<int>(static_cast<uint8_t>(overlay));
                                 if (is_tint) tint = glm::vec4(0.10f, 0.70f, 0.15f, 1.0f);
                             }
                         }
 
+
                         for (auto face_vert_id = 0; face_vert_id < 4; face_vert_id++) {
+                            const auto vpos = block_pos + FACES[dir_id][face_vert_id];
+
                             mesh.vertices.emplace_back(
-                                glm::vec3(block_pos + FACES[dir_id][face_vert_id]),
-                                glm::vec3(DIRECTIONS[dir_id]),
-                                glm::vec4(TEXTURE_UV[face_vert_id], tex_id, current_overlay),
-                                tint
+                                vpos.x, vpos.y, vpos.z,
+                                dir_id,
+                                static_cast<uint8_t>(std::round(TEXTURE_UV[face_vert_id].x * 15.f)),
+                                static_cast<uint8_t>(std::round(TEXTURE_UV[face_vert_id].y * 15.f)),
+                                tex_id, current_overlay == -1 ? 0 : current_overlay,
+                                static_cast<uint8_t>(std::round(tint.r * 255.f)),
+                                static_cast<uint8_t>(std::round(tint.g * 255.f)),
+                                static_cast<uint8_t>(std::round(tint.b * 255.f)),
+                                0,
+                                15
                             );
                         }
 

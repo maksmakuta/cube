@@ -5,7 +5,7 @@
 
 namespace cube {
 
-    constexpr auto RENDER_DIST = 12;
+    constexpr auto RENDER_DIST = 16;
 
     Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0), m_last_chunk(-99999999) {
         for (auto i = 0; i < argc; i++) {
