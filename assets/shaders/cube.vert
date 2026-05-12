@@ -4,7 +4,7 @@ layout(location = 0) in uvec2 data;
 
 uniform mat4 u_proj;
 uniform mat4 u_view;
-uniform mat4 u_model;
+uniform vec3 u_model;
 
 uniform float u_sunIntensity = 1.0;
 
@@ -48,6 +48,5 @@ void main() {
     float lightLevel = sun * u_sunIntensity * ao;
     f_tint = vec4(r * lightLevel, g * lightLevel, b * lightLevel, 1.0);
 
-    vec3 pos = vec3(x, y, z);
-    gl_Position = u_proj * u_view * u_model * vec4(pos, 1.0);
+    gl_Position = u_proj * u_view * vec4(u_model + vec3(x, y, z), 1.0);
 }

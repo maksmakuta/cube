@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     cube::info("Create Window");
-    SDL_Window* window = SDL_CreateWindow("Cube Engine", 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    SDL_Window* window = SDL_CreateWindow("Cube", 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!window) {
         cube::error("Window Creation Failed: {}", SDL_GetError());
         SDL_Quit();

@@ -2,6 +2,7 @@
 
 #include <assets_dir.hpp>
 #include <format>
+#include <ranges>
 
 #include "spng.h"
 #include "cube/data/Chunk.hpp"
@@ -20,9 +21,11 @@ namespace cube {
         "natural/bedrock.png",
     };
 
-    Renderable toRenderable(const ChunkMesh& mesh) {
+    Renderable toRenderable(const ChunkMesh& mesh, const glm::ivec3& pos) {
         Renderable renderable = {};
         renderable.count = static_cast<int>(mesh.indices.size());
+        renderable.min = glm::vec3(pos * CHUNK_SIZE);
+        renderable.max = renderable.min + glm::vec3(CHUNK_SIZE);
         glGenVertexArrays(1, &renderable.vao);
         glGenBuffers(1, &renderable.vbo);
         glGenBuffers(1, &renderable.ebo);
@@ -63,7 +66,9 @@ namespace cube {
     }
 
     void Renderer::push(const glm::ivec3& pos, const ChunkMesh& mesh) {
-        m_meshes[pos] = toRenderable(mesh);
+        if (!mesh.indices.empty()) {
+            m_meshes[pos] = toRenderable(mesh, pos);
+        }
     }
 
     struct Plane {
@@ -71,7 +76,7 @@ namespace cube {
         float distance;
 
         void normalize() {
-            float length = glm::length(normal);
+            const float length = glm::length(normal);
             normal /= length;
             distance /= length;
         }
@@ -93,17 +98,19 @@ namespace cube {
 
         [[nodiscard]] bool isBoxVisible(const glm::vec3& min, const glm::vec3& max) const {
             for (const auto&[normal, distance] : planes) {
-                glm::vec3 p = min;
-                if (normal.x >= 0) p.x = max.x;
-                if (normal.y >= 0) p.y = max.y;
-                if (normal.z >= 0) p.z = max.z;
 
-                if (glm::dot(normal, p) + distance < 0) {
+                glm::vec3 positiveCorner = min;
+                if (normal.x >= 0) positiveCorner.x = max.x;
+                if (normal.y >= 0) positiveCorner.y = max.y;
+                if (normal.z >= 0) positiveCorner.z = max.z;
+
+                if (glm::dot(normal, positiveCorner) + distance < 0) {
                     return false;
                 }
             }
             return true;
         }
+
     };
 
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection) {
@@ -119,30 +126,19 @@ namespace cube {
         m_shader.setMat4("u_proj", projection);
         m_shader.setMat4("u_view", view);
 
-        int count = 0;
-
-        for (const auto& [pos, renderable] : m_meshes) {
-            if (renderable.count == 0) continue;
-
-            const auto worldPos = glm::vec3(pos * CHUNK_SIZE);
-            const auto min = worldPos;
-            const auto max = worldPos + glm::vec3(CHUNK_SIZE);
-
-            if (!frustum.isBoxVisible(min, max)) {
+        for (const auto &renderable: m_meshes | std::views::values) {
+            if (renderable.count == 0)
                 continue;
-            }
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos * CHUNK_SIZE));
-            m_shader.setMat4("u_model", model);
+            if (!frustum.isBoxVisible(renderable.min, renderable.max))
+                continue;
 
+            m_shader.setVec3("u_model", renderable.min);
             glBindVertexArray(renderable.vao);
-
             glDrawElements(GL_TRIANGLES, renderable.count, GL_UNSIGNED_INT, nullptr);
-            ++count;
         }
 
         glBindVertexArray(0);
-        debug("rendered {} of {}", count, m_meshes.size());
     }
 
     void Renderer::loadTextures(const glm::ivec2& tileSize) {
@@ -212,6 +208,5 @@ namespace cube {
         }
         return clearedCount;
     }
-
 
 }

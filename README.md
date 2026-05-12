@@ -16,7 +16,7 @@ High performance voxel rendering engine
 - [X] **Hidden Face Culling**: Do not generate mesh data for faces obscured by adjacent solid blocks.
 - [ ] **Greedy Meshing**: Combine adjacent coplanar faces into single large quads to reduce vertex count.
 - [X] **Vertex Packing**: Use bit-shifting to pack position, UV, and lighting data into a single `uint32` per vertex.
-- [ ] **Frustum Culling**: Skip draw calls for chunks that are behind the camera or out of view.
+- [X] **Frustum Culling**: Skip draw calls for chunks that are behind the camera or out of view.
 - [ ] **LOD (Level of Detail)**: Render distant chunks as simplified meshes or low-resolution textures.
 
 ### World & Physics

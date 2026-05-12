@@ -17,6 +17,8 @@ namespace cube {
         uint32_t vbo;
         uint32_t ebo;
         int count;
+        glm::vec3 min;
+        glm::vec3 max;
     };
 
     class Renderer final {
