@@ -25,6 +25,7 @@ namespace cube {
         bool isReadyForMesh(const glm::ivec3& pos) const;
         void workerLoop();
 
+        int m_frame_count;
         float m_last_tick;
 
         glm::vec2 m_view;

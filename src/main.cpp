@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SDL3/SDL.h>
 
 #include "cube/Cube.hpp"
@@ -46,7 +47,13 @@ int main(int argc, char** argv) {
     SDL_SetWindowRelativeMouseMode(window,true);
 
     SDL_GL_SetSwapInterval(1);
-    cube::info("Environment Ready. OpenGL 4.6 Context Active.");
+
+    cube::info("Environment:");
+    std::cout << "OpenGL version:   " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL version:     " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout << "GPU Vendor:       " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "GPU Name:         " << glGetString(GL_RENDERER) << std::endl;
+
     glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
 
     glEnable(GL_DEPTH_TEST);
@@ -54,11 +61,14 @@ int main(int argc, char** argv) {
 
     auto cube = cube::Cube(argc, argv);
     bool is_running = true;
-    auto tick = SDL_GetTicks();
+    auto tick = SDL_GetPerformanceCounter();
+    const auto freq = static_cast<float>(SDL_GetPerformanceFrequency());
 
     while (is_running) {
-        const auto now = SDL_GetTicks();
-        cube.onUpdate(static_cast<float>(now - tick) / 1000.f);
+        const auto now = SDL_GetPerformanceCounter();
+        float dt = static_cast<float>(now - tick) / freq;
+        if (dt > 0.1f) dt = 0.1f;
+        cube.onUpdate(dt);
         tick = now;
 
         SDL_Event event;

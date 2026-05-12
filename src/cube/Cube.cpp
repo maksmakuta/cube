@@ -7,7 +7,12 @@ namespace cube {
 
     constexpr auto RENDER_DIST = 16;
 
-    Cube::Cube(const int argc, char** argv): m_last_tick(0.f), m_view(0), m_last_chunk(-99999999) {
+    Cube::Cube(const int argc, char** argv) :
+        m_frame_count(0),
+        m_last_tick(0.f),
+        m_view(0),
+        m_last_chunk(-99999999)
+    {
         for (auto i = 0; i < argc; i++) {
             info("args[{}]: {}", i, argv[i]);
         }
@@ -19,9 +24,16 @@ namespace cube {
 
     void Cube::onUpdate(const float dt) {
         m_last_tick += dt;
-        if (m_last_tick >= 1.f) {
-            debug("FPS: {}", m_last_tick / dt);
-            m_last_tick = 0.f;
+        m_frame_count++;
+
+        if (m_last_tick >= 1.0f) {
+            debug("FPS: {} | FrameTime: {:.3f}ms",
+                m_frame_count,
+                m_last_tick / static_cast<float>(m_frame_count) * 1000.0f
+            );
+
+            m_last_tick = 0.0f;
+            m_frame_count = 0;
         }
 
         auto delta_move = glm::vec3();
