@@ -1,10 +1,14 @@
 #ifndef CUBE_MESHER_HPP
 #define CUBE_MESHER_HPP
 
-#include "cube/data/World.hpp"
+#include <vector>
+#include <glm/vec3.hpp>
+
 #include "cube/graphics/Vertex.hpp"
 
 namespace cube {
+
+    class World;
 
     struct ChunkMesh {
         std::vector<Vertex> vertices;

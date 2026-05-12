@@ -1,13 +1,15 @@
 #ifndef CUBE_HPP
 #define CUBE_HPP
 
-#include <queue>
+#include <thread>
 #include <SDL3/SDL_events.h>
 
 #include "data/Generator.hpp"
 #include "data/World.hpp"
 #include "graphics/Camera.hpp"
 #include "graphics/Renderer.hpp"
+#include "mesh/Mesher.hpp"
+#include "utils/SafeQueue.hpp"
 
 namespace cube {
 
@@ -21,14 +23,19 @@ namespace cube {
 
     private:
         bool isReadyForMesh(const glm::ivec3& pos) const;
+        void workerLoop();
 
         float m_last_tick;
 
         glm::vec2 m_view;
         glm::ivec3 m_last_chunk;
 
-        std::queue<glm::ivec3> m_mq;
-        std::queue<glm::ivec3> m_gq;
+        SafeQueue<glm::ivec3> m_gq;
+        SafeQueue<glm::ivec3> m_mq;
+        SafeQueue<std::pair<glm::ivec3, ChunkMesh>> m_rq;
+
+        std::vector<std::jthread> m_workers;
+        std::atomic<bool> m_running{true};
 
         World m_world;
         Camera m_camera;

@@ -4,6 +4,7 @@
 #include <format>
 
 #include "spng.h"
+#include "cube/data/Chunk.hpp"
 #include "cube/mesh/Mesher.hpp"
 #include "cube/utils/Log.hpp"
 #include "glad/glad.h"

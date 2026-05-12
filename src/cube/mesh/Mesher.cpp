@@ -2,6 +2,7 @@
 
 #include <map>
 
+#include "cube/data/World.hpp"
 #include "cube/utils/Log.hpp"
 
 namespace cube {

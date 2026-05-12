@@ -38,6 +38,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     include/cube/data/Generator.hpp
     src/cube/data/Generator.cpp
+    include/cube/utils/SafeQueue.hpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

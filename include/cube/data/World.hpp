@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <shared_mutex>
 
 #include "Chunk.hpp"
 #include "cube/core/ChunkStatus.hpp"
@@ -28,6 +29,7 @@ namespace cube {
         int clearChunks(const glm::ivec3& pos, int dist);
 
     private:
+        mutable std::shared_mutex m_mutex;
         std::unordered_map<glm::ivec3, ChunkStatus> m_statuses;
         std::unordered_map<glm::ivec3, ChunkPtr> m_chunks;
     };
