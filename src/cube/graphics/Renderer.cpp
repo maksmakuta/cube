@@ -66,8 +66,51 @@ namespace cube {
         m_meshes[pos] = toRenderable(mesh);
     }
 
+    struct Plane {
+        glm::vec3 normal;
+        float distance;
+
+        void normalize() {
+            float length = glm::length(normal);
+            normal /= length;
+            distance /= length;
+        }
+    };
+
+    struct Frustum {
+        Plane planes[6];
+
+        void update(const glm::mat4& vp) {
+            planes[0] = { {vp[0][3] + vp[0][0], vp[1][3] + vp[1][0], vp[2][3] + vp[2][0]}, vp[3][3] + vp[3][0] };
+            planes[1] = { {vp[0][3] - vp[0][0], vp[1][3] - vp[1][0], vp[2][3] - vp[2][0]}, vp[3][3] - vp[3][0] };
+            planes[2] = { {vp[0][3] + vp[0][1], vp[1][3] + vp[1][1], vp[2][3] + vp[2][1]}, vp[3][3] + vp[3][1] };
+            planes[3] = { {vp[0][3] - vp[0][1], vp[1][3] - vp[1][1], vp[2][3] - vp[2][1]}, vp[3][3] - vp[3][1] };
+            planes[4] = { {vp[0][3] + vp[0][2], vp[1][3] + vp[1][2], vp[2][3] + vp[2][2]}, vp[3][3] + vp[3][2] };
+            planes[5] = { {vp[0][3] - vp[0][2], vp[1][3] - vp[1][2], vp[2][3] - vp[2][2]}, vp[3][3] - vp[3][2] };
+
+            for (auto & plane : planes) plane.normalize();
+        }
+
+        [[nodiscard]] bool isBoxVisible(const glm::vec3& min, const glm::vec3& max) const {
+            for (const auto&[normal, distance] : planes) {
+                glm::vec3 p = min;
+                if (normal.x >= 0) p.x = max.x;
+                if (normal.y >= 0) p.y = max.y;
+                if (normal.z >= 0) p.z = max.z;
+
+                if (glm::dot(normal, p) + distance < 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection) {
         m_shader.use();
+
+        Frustum frustum{};
+        frustum.update(projection * view);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
@@ -76,8 +119,18 @@ namespace cube {
         m_shader.setMat4("u_proj", projection);
         m_shader.setMat4("u_view", view);
 
+        int count = 0;
+
         for (const auto& [pos, renderable] : m_meshes) {
             if (renderable.count == 0) continue;
+
+            const auto worldPos = glm::vec3(pos * CHUNK_SIZE);
+            const auto min = worldPos;
+            const auto max = worldPos + glm::vec3(CHUNK_SIZE);
+
+            if (!frustum.isBoxVisible(min, max)) {
+                continue;
+            }
 
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos * CHUNK_SIZE));
             m_shader.setMat4("u_model", model);
@@ -85,18 +138,26 @@ namespace cube {
             glBindVertexArray(renderable.vao);
 
             glDrawElements(GL_TRIANGLES, renderable.count, GL_UNSIGNED_INT, nullptr);
+            ++count;
         }
 
         glBindVertexArray(0);
+        debug("rendered {} of {}", count, m_meshes.size());
     }
 
     void Renderer::loadTextures(const glm::ivec2& tileSize) {
         glGenTextures(1, &m_textures);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
 
-        glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, tileSize.x, tileSize.y, LAYERS.size());
+        glTexStorage3D(
+            GL_TEXTURE_2D_ARRAY,
+            1,
+            GL_RGBA8,
+            tileSize.x,
+            tileSize.y,
+            static_cast<GLsizei>(LAYERS.size()));
 
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -125,6 +186,8 @@ namespace cube {
             fclose(fp);
             debug("Layer {} loaded with index {}", layer, index);
         }
+
+        glGenerateTextureMipmap(m_textures);
     }
 
     int Renderer::clearChunks(const glm::ivec3& pos, const int dist) {
