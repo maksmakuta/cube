@@ -5,7 +5,7 @@
 #include "cube/utils/Log.hpp"
 #include "glad/glad.h"
 
-int main(int argc, char** argv) {
+int main() {
     cube::info("Load SDL3");
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         cube::error("SDL_Init Failed: {}", SDL_GetError());
@@ -59,15 +59,14 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    auto cube = cube::Cube(argc, argv);
+    auto cube = cube::Cube();
     bool is_running = true;
     auto tick = SDL_GetPerformanceCounter();
     const auto freq = static_cast<float>(SDL_GetPerformanceFrequency());
 
     while (is_running) {
         const auto now = SDL_GetPerformanceCounter();
-        float dt = static_cast<float>(now - tick) / freq;
-        if (dt > 0.1f) dt = 0.1f;
+        const auto dt = static_cast<float>(now - tick) / freq;
         cube.onUpdate(dt);
         tick = now;
 

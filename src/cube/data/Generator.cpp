@@ -58,4 +58,17 @@ namespace cube {
         return chunk;
     }
 
+    int Generator::heightAt(const glm::vec3 &pos) const {
+        const auto value = m_terrain->GenSingle2D(pos.x, pos.z,m_seed);
+        return static_cast<int>(value * 32.f) + 64;
+    }
+
+    int Generator::getSeed() const {
+        return m_seed;
+    }
+
+    void Generator::setSeed(const int seed) {
+        m_seed = seed;
+    }
+
 }

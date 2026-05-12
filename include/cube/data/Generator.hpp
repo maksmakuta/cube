@@ -11,10 +11,14 @@ namespace cube {
     class Generator final {
     public:
         explicit Generator(int seed = 0);
+
         ChunkPtr generateChunk(const glm::ivec3& pos);
+        [[nodiscard]] int heightAt(const glm::vec3& pos) const;
+
+        void setSeed(int seed);
+        [[nodiscard]] int getSeed() const;
 
     private:
-
         int m_seed;
         FastNoise::SmartNode<FastNoise::Perlin> m_terrain;
     };

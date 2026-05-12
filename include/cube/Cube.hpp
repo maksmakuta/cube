@@ -15,7 +15,7 @@ namespace cube {
 
     class Cube final {
     public:
-        Cube(int argc, char** argv);
+        Cube();
 
         void onUpdate(float dt);
         void onDraw();

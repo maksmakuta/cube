@@ -1,5 +1,7 @@
 #include "cube/Cube.hpp"
 
+#include <random>
+
 #include "cube/mesh/Mesher.hpp"
 #include "cube/utils/Log.hpp"
 
@@ -7,19 +9,19 @@ namespace cube {
 
     constexpr auto RENDER_DIST = 16;
 
-    Cube::Cube(const int argc, char** argv) :
-        m_frame_count(0),
-        m_last_tick(0.f),
-        m_view(0),
-        m_last_chunk(-99999999)
-    {
-        for (auto i = 0; i < argc; i++) {
-            info("args[{}]: {}", i, argv[i]);
-        }
-
+    Cube::Cube() : m_frame_count(0), m_last_tick(0.f), m_view(0), m_last_chunk(-99999999){
         for (unsigned int i = 0; i < std::thread::hardware_concurrency() - 1; ++i) {
             m_workers.emplace_back([this] { workerLoop(); });
         }
+
+        std::random_device rd;
+        std::default_random_engine generator(rd());
+        std::uniform_int_distribution distribution;
+        m_generator.setSeed(distribution(generator));
+
+        auto pos = m_camera.getPosition();
+        pos.y = static_cast<float>(m_generator.heightAt({0,0,0}) + 2);
+        m_camera.setPosition(pos);
     }
 
     void Cube::onUpdate(const float dt) {
@@ -115,27 +117,17 @@ namespace cube {
         while (m_running) {
             bool worked = false;
 
-            // 1. Try Generation
             if (auto pos = m_gq.pop()) {
                 if (!m_world.contains(*pos)) {
                     auto chunk = m_generator.generateChunk(*pos);
-                    {
-                        m_world.setChunk(*pos, std::move(chunk));
-                    }
+                    m_world.setChunk(*pos, std::move(chunk));
                     m_mq.push(*pos);
                 }
                 worked = true;
             }
 
-            // 2. Try Meshing
             if (auto pos = m_mq.pop()) {
-                bool ready = false;
-                {
-
-                    ready = isReadyForMesh(*pos);
-                }
-
-                if (ready) {
+                if (isReadyForMesh(*pos)) {
                     const auto mesh_data = mesh(*pos, m_world);
                     m_rq.push({*pos, mesh_data});
                 } else {
