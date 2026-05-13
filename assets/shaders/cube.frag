@@ -4,13 +4,17 @@ in vec3  fs_Normal;
 in vec3  fs_UV;
 in vec4  fs_Color;
 in float fs_Overlay;
-
-out vec4 FragColor;
+in vec3  fs_ViewPos;
 
 layout(binding = 0) uniform sampler2DArray u_textures;
 
 uniform vec3  u_sunDir;
 uniform float u_sunAngle;
+uniform vec3  u_skyColor;
+uniform float u_minFog;
+uniform float u_maxFog;
+
+out vec4 FragColor;
 
 void main() {
     vec3 noonColor   = vec3(1.0, 1.0, 0.9);
@@ -21,14 +25,11 @@ void main() {
     if(texColor.a < 0.1) discard;
 
     float sunHeight = max(u_sunDir.y, 0.0);
-
     vec3 sunColor = mix(sunsetColor, noonColor, sunHeight);
     if (u_sunDir.y < 0.0) sunColor = moonColor;
 
     float diffuse = max(dot(fs_Normal, u_sunDir), 0.0);
-
     float ambientStrength = mix(0.1, 0.4, sunHeight);
-
     float dayFactor = clamp(sunHeight * 5.0, 0.0, 1.0);
 
     vec3 light = (diffuse * sunColor * dayFactor) + (ambientStrength * noonColor);
@@ -41,11 +42,9 @@ void main() {
         finalRGB = mix(finalRGB, overlayColor.rgb * light, overlayColor.a);
     }
 
-    float dist = length(gl_FragCoord.z / gl_FragCoord.w);
-    float fogFactor = clamp((dist - 64.0) / (128.0 - 64.0), 0.0, 1.0);
-    vec3 skyColor = mix(vec3(0.02, 0.02, 0.1), vec3(0.5, 0.7, 1.0), sunHeight);
+    float dist = length(fs_ViewPos);
+    float fogFactor = clamp((dist - u_minFog) / (u_maxFog - u_minFog), 0.0, 1.0);
+    vec3 finalWithFog = mix(finalRGB, u_skyColor, fogFactor);
 
-    FragColor.rgb = mix(FragColor.rgb, skyColor, fogFactor);
-
-    FragColor = vec4(finalRGB, texColor.a);
+    FragColor = vec4(finalWithFog, texColor.a);
 }

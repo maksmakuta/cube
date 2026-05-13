@@ -22,11 +22,11 @@ namespace cube {
         void onEvent(const SDL_Event& event);
 
     private:
-        bool isReadyForMesh(const glm::ivec3& pos) const;
         void workerLoop();
 
         int m_frame_count;
         float m_last_tick;
+        float m_time;
 
         glm::vec2 m_view;
         glm::ivec3 m_last_chunk;

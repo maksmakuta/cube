@@ -11,6 +11,7 @@ out vec3 fs_Normal;
 out vec3 fs_UV;
 out vec4 fs_Color;
 out float fs_Overlay;
+out vec3 fs_ViewPos;
 
 const vec3 NORMALS[6] = vec3[](
     vec3(1,0,0), vec3(0,1,0), vec3(0,0,1),
@@ -22,7 +23,9 @@ void main() {
     uint high = a_Data.y;
 
     vec3 localPos = vec3(low & 0x1Fu, (low >> 5u) & 0x1Fu, (low >> 10u) & 0x1Fu);
-    gl_Position = u_proj * u_view * vec4(localPos + u_model, 1.0);
+    vec4 viewPos = u_view * vec4(localPos + u_model, 1.0);
+    fs_ViewPos = viewPos.xyz;
+    gl_Position = u_proj * viewPos;
 
     fs_Normal = NORMALS[(low >> 15u) & 0x07u];
 

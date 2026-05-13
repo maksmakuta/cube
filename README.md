@@ -9,7 +9,7 @@ High performance voxel rendering engine
 ### Core Systems & Memory
 - [X] **Chunking System**: Divide the world into $16^3$ segments for efficient management.
 - [ ] **Data Compression**: Implement Run-Length Encoding (RLE) or palette-based storage for inactive chunks.
-- [ ] **Threaded Task Queue**: Move world generation and mesh building to background threads to prevent frame stutters.
+- [X] **Threaded Task Queue**: Move world generation and mesh building to background threads to prevent frame stutters.
 - [ ] **Fast Voxel Traversal**: A raycasting algorithm (like Amanatides-Woo) for block selection and placement.
 
 ### Rendering Optimizations
@@ -20,15 +20,15 @@ High performance voxel rendering engine
 - [ ] **LOD (Level of Detail)**: Render distant chunks as simplified meshes or low-resolution textures.
 
 ### World & Physics
-- [ ] **Procedural Generation**: Layered Simplex or Perlin noise for heightmaps and 3D density.
+- [X] **Procedural Generation**: Layered Simplex or Perlin noise for heightmaps and 3D density.
 - [ ] **AABB Collision**: Axis-Aligned Bounding Box checks for player-to-block interaction.
-- [ ] **Infinite Terrain Logic**: Logic to dynamically load/unload chunks based on player coordinates.
+- [X] **Infinite Terrain Logic**: Logic to dynamically load/unload chunks based on player coordinates.
 - [ ] **Biomes & Caves**: Use 3D noise (Snyder/Perlin) to "carve" underground structures.
 
 ### Lighting & Visuals
 - [ ] **Flood Fill Lighting**: Propagate sunlight and point lights through the voxel grid.
-- [ ] **Ambient Occlusion**: Darken the corners where blocks meet for better depth perception.
-- [ ] **Transparency Handling**: Separate render passes for opaque and transparent (water/glass) voxels.
+- [X] **Ambient Occlusion**: Darken the corners where blocks meet for better depth perception.
+- [X] **Transparency Handling**: Separate render passes for opaque and transparent (water/glass) voxels.
 - [ ] **Post-Processing**: Implement basic shaders for fog (to hide chunk loading) and bloom.
 
 ### Interactions & Persistence

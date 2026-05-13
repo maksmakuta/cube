@@ -10,6 +10,8 @@
 
 namespace cube {
 
+    constexpr auto RENDER_DIST = 16;
+
     struct ChunkMesh;
 
     struct Renderable final {
@@ -29,7 +31,7 @@ namespace cube {
         bool contains(const glm::ivec3&) const;
         void remove(const glm::ivec3&);
         void push(const glm::ivec3&, const ChunkMesh&);
-        void draw(const glm::mat4& view, const glm::mat4& projection);
+        void draw(const glm::mat4& view, const glm::mat4& projection, float time);
 
         int clearChunks(const glm::ivec3& pos, int dist);
 

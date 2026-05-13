@@ -149,6 +149,18 @@ namespace cube {
         frustum.update(projection * view);
 
         glBindTextureUnit(0, m_textures);
+
+        float minFog = RENDER_DIST * 0.5f;
+        float maxFog = RENDER_DIST * 0.9f;
+
+        if (sunDir.y > 0.0f) {
+            minFog = 16.0f;
+            maxFog = 64.0f;
+        }
+
+        m_shader.setFloat("u_minFog", minFog);
+        m_shader.setFloat("u_maxFog", maxFog);
+
         m_shader.setInt("u_textures", 0);
         m_shader.setFloat("u_time", time);
 
@@ -157,6 +169,7 @@ namespace cube {
 
         m_shader.setVec3("u_sunDir", sunDir);
         m_shader.setFloat("u_sunAngle", sunAngle);
+        m_shader.setVec3("u_skyColor", currentSkyColor);
 
         for (const auto& renderable : m_meshes | std::views::values) {
             if (renderable.count == 0) continue;

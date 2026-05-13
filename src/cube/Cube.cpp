@@ -1,15 +1,14 @@
 #include "cube/Cube.hpp"
 
 #include <random>
+#include <glm/gtx/norm.hpp>
 
 #include "cube/mesh/Mesher.hpp"
 #include "cube/utils/Log.hpp"
 
 namespace cube {
 
-    constexpr auto RENDER_DIST = 16;
-
-    Cube::Cube() : m_frame_count(0), m_last_tick(0.f), m_view(0), m_last_chunk(-99999999){
+    Cube::Cube() : m_frame_count(0), m_last_tick(0.f), m_time(0.f), m_view(0), m_last_chunk(-99999999){
         for (unsigned int i = 0; i < std::thread::hardware_concurrency() - 1; ++i) {
             m_workers.emplace_back([this] { workerLoop(); });
         }
@@ -25,6 +24,7 @@ namespace cube {
     }
 
     void Cube::onUpdate(const float dt) {
+        m_time += dt;
         m_last_tick += dt;
         m_frame_count++;
 
@@ -60,15 +60,33 @@ namespace cube {
         const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
         if (current_chunk != m_last_chunk) {
 
+            std::vector<glm::ivec3> chunk_positions;
+            chunk_positions.reserve(static_cast<size_t>(std::pow(RENDER_DIST * 2, 3)));
+
             for (int z = -RENDER_DIST; z < RENDER_DIST; z++) {
                 for (int x = -RENDER_DIST; x < RENDER_DIST; x++) {
                     for (int y = -RENDER_DIST; y < RENDER_DIST; y++) {
-                        const auto new_chunk_pos = current_chunk + glm::ivec3{x, y, z};
+                        glm::ivec3 offset{x, y, z};
+
+                        if (glm::length(glm::vec3(offset)) > RENDER_DIST) continue;
+
+                        const auto new_chunk_pos = current_chunk + offset;
                         if (!m_world.contains(new_chunk_pos)) {
-                            m_gq.push(current_chunk + glm::ivec3{x, y, z});
+                            chunk_positions.push_back(new_chunk_pos);
                         }
                     }
                 }
+            }
+
+            std::sort(chunk_positions.begin(), chunk_positions.end(),
+            [&current_chunk](const glm::ivec3& a, const glm::ivec3& b) {
+                return glm::distance2(glm::vec3(current_chunk), glm::vec3(a)) <
+                       glm::distance2(glm::vec3(current_chunk), glm::vec3(b));
+            });
+
+            // 3. Push the sorted chunks into your generation queue
+            for (const auto& pos : chunk_positions) {
+                m_gq.push(pos);
             }
 
             m_last_chunk = current_chunk;
@@ -80,7 +98,11 @@ namespace cube {
     }
 
     void Cube::onDraw() {
-        m_renderer.draw(m_camera.getViewMatrix(), m_camera.getProjMatrix(m_view, (RENDER_DIST + 4) * CHUNK_SIZE));
+        m_renderer.draw(
+            m_camera.getViewMatrix(),
+            m_camera.getProjMatrix(m_view, (RENDER_DIST + 4) * CHUNK_SIZE),
+            m_time
+        );
     }
 
     void Cube::onEvent(const SDL_Event& event) {
@@ -93,24 +115,6 @@ namespace cube {
         if (event.type == SDL_EVENT_QUIT) {
             m_running = false;
         }
-    }
-
-    const glm::ivec3 directions[6] = {
-        {1,0,0},
-        {-1,0,0},
-        {0,1,0},
-        {0,-1,0},
-        {0,0,1},
-        {0,0,-1}
-    };
-
-    bool Cube::isReadyForMesh(const glm::ivec3 &pos) const {
-        if (m_world.contains(pos)) {
-            return std::ranges::all_of(directions, [&](const glm::ivec3& direction) {
-                return m_world.contains(pos + direction);
-            });
-        }
-        return false;
     }
 
     void Cube::workerLoop() {
@@ -127,7 +131,7 @@ namespace cube {
             }
 
             if (auto pos = m_mq.pop()) {
-                if (isReadyForMesh(*pos)) {
+                if (isReadyForMesh(*pos,m_world)) {
                     const auto mesh_data = mesh(*pos, m_world);
                     m_rq.push({*pos, mesh_data});
                 } else {
