@@ -1,154 +1,119 @@
 #include "cube/mesh/Mesher.hpp"
-
-#include <map>
-
 #include "cube/data/World.hpp"
-#include "cube/utils/Log.hpp"
 
 namespace cube {
 
-    struct BlockData {
-        int8_t top;
-        int8_t bottom;
-        int8_t side;
-        int8_t overlay;
-        bool is_tint;
+    constexpr glm::ivec3 DIRECTIONS[6] = {
+        glm::ivec3( 1, 0, 0),
+        glm::ivec3( 0, 1, 0),
+        glm::ivec3( 0, 0, 1),
+        glm::ivec3(-1, 0, 0),
+        glm::ivec3( 0,-1, 0),
+        glm::ivec3( 0, 0,-1)
     };
 
-    const auto BLOCKDATA = std::map<Block,BlockData>{
-         { Block::Air,      {-1,-1,-1,-1, false }},
-         { Block::Grass,    { 0, 3, 1, 2, true  }},
-         { Block::Dirt,     { 3, 3, 3,-1, false }},
-         { Block::Stone,    { 4, 4, 4,-1, false }},
-         { Block::Bedrock,  { 5, 5, 5,-1, false }},
+    constexpr glm::ivec3 FACES[6][4] = {
+        { {1, 0, 1}, {1, 0, 0}, {1, 1, 0}, {1, 1, 1} },
+        { {0, 1, 1}, {1, 1, 1}, {1, 1, 0}, {0, 1, 0} },
+        { {0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1} },
+        { {0, 0, 0}, {0, 0, 1}, {0, 1, 1}, {0, 1, 0} },
+        { {0, 0, 0}, {1, 0, 0}, {1, 0, 1}, {0, 0, 1} },
+        { {1, 0, 0}, {0, 0, 0}, {0, 1, 0}, {1, 1, 0} }
     };
 
-    const auto DIRECTIONS = std::vector<glm::ivec3>{
-        {1, 0, 0},
-        {-1, 0, 0},
-        {0, 1, 0},
-        {0, -1, 0},
-        {0, 0, 1},
-        {0, 0, -1}
+    constexpr glm::ivec2 TEX_COORDS[4] = {
+        glm::ivec2(0,0),
+        glm::ivec2(1,0),
+        glm::ivec2(1,1),
+        glm::ivec2(0,1)
     };
 
-    const auto FACES = std::vector<std::vector<glm::ivec3>>{
-        {{1,0,1}, {1,0,0}, {1,1,0}, {1,1,1}},
-        {{0,0,0}, {0,0,1}, {0,1,1}, {0,1,0}},
-        {{0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}},
-        {{0,0,0}, {1,0,0}, {1,0,1}, {0,0,1}},
-        {{0,0,1}, {1,0,1}, {1,1,1}, {0,1,1}},
-        {{1,0,0}, {0,0,0}, {0,1,0}, {1,1,0}}
-    };
+    bool isReadyForMesh(const glm::ivec3& pos, const World& world) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (!world.contains(pos + glm::ivec3{dx, dy, dz})) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
-    const auto TEXTURE_UV = std::vector<glm::vec2>{
-        {0.0f, 1.0f},
-        {1.0f, 1.0f},
-        {1.0f, 0.0f},
-        {0.0f, 0.0f}
-    };
+    Block getBlock(const glm::ivec3& p, const std::unordered_map<glm::ivec3, ChunkPtr>& chunks) {
+        auto index = glm::ivec3(0);
+        auto pos = p;
 
-    struct ChunkData {
-        ChunkPtr center;
+        if (pos.x < 0           ){ index.x -= 1; pos.x += CHUNK_SIZE; }
+        if (pos.x >= CHUNK_SIZE ){ index.x += 1; pos.x -= CHUNK_SIZE; }
+        if (pos.y < 0           ){ index.y -= 1; pos.y += CHUNK_SIZE; }
+        if (pos.y >= CHUNK_SIZE ){ index.y += 1; pos.y -= CHUNK_SIZE; }
+        if (pos.z < 0           ){ index.z -= 1; pos.z += CHUNK_SIZE; }
+        if (pos.z >= CHUNK_SIZE ){ index.z += 1; pos.z -= CHUNK_SIZE; }
 
-        ChunkPtr top;
-        ChunkPtr bottom;
-        ChunkPtr near;
-        ChunkPtr far;
-        ChunkPtr left;
-        ChunkPtr right;
-    };
+        return chunks.at(index) ? chunks.at(index)->at(pos) : Block::Air;
+    }
 
     ChunkMesh mesh(const glm::ivec3& pos, const World& world) {
-        ChunkData data{};
+        std::unordered_map<glm::ivec3, ChunkPtr> chunks;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    const auto delta = glm::ivec3(dx,dy,dz);
+                    chunks[delta] = world.getChunk(pos + delta);
+                }
+            }
+        }
 
-        data.center = world.getChunk(pos);
-        data.top    = world.getChunk(pos + glm::ivec3{0,1,0});
-        data.bottom = world.getChunk(pos + glm::ivec3{0,-1,0});
-        data.near   = world.getChunk(pos + glm::ivec3{0,0,1});
-        data.far    = world.getChunk(pos + glm::ivec3{0,0,-1});
-        data.left   = world.getChunk(pos + glm::ivec3{1,0,0});
-        data.right  = world.getChunk(pos + glm::ivec3{-1,0,0});
-
-
-        if (!data.center) {
+        if (!chunks[{0,0,0}]) {
             return {};
         }
-        ChunkMesh mesh{};
+
+        ChunkMesh mesh_data{};
+        mesh_data.vertices.reserve(512);
+        mesh_data.indices.reserve(1024);
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                for (int z = 0; z < CHUNK_SIZE; z++) {
-                    const auto block_pos = glm::ivec3(x, y, z);
-                    const auto current_block = data.center->at(block_pos);
+            for (int z = 0; z < CHUNK_SIZE; z++) {
+                for (int y = 0; y < CHUNK_SIZE; y++) {
+                    const auto block_pos = glm::ivec3(x,y,z);
 
-                    if (current_block == Block::Air) continue;
+                    if (chunks.at({0,0,0})->at(block_pos) == Block::Air) {
+                        continue;
+                    }
 
-                    const auto&[top, bottom, side, overlay, is_tint] = BLOCKDATA.at(current_block);
+                    for (int dir = 0; dir < 6; dir++) {
+                        const auto& dir_offset = DIRECTIONS[dir];
+                        const auto side_pos = block_pos + dir_offset;
 
-                    for (auto dir_id = 0; dir_id < DIRECTIONS.size(); dir_id++) {
-                        const auto n_block_pos = block_pos + DIRECTIONS[dir_id];
-
-                        auto chunk = data.center;
-                        auto pos_normal = n_block_pos;
-
-                        if (n_block_pos.y >= CHUNK_SIZE){ chunk = data.top;      pos_normal.y -= CHUNK_SIZE; }
-                        if (n_block_pos.y < 0          ){ chunk = data.bottom;   pos_normal.y += CHUNK_SIZE; }
-                        if (n_block_pos.x >= CHUNK_SIZE){ chunk = data.left;     pos_normal.x -= CHUNK_SIZE; }
-                        if (n_block_pos.x < 0          ){ chunk = data.right;    pos_normal.x += CHUNK_SIZE; }
-                        if (n_block_pos.z >= CHUNK_SIZE){ chunk = data.near;     pos_normal.z -= CHUNK_SIZE; }
-                        if (n_block_pos.z < 0          ){ chunk = data.far;      pos_normal.z += CHUNK_SIZE; }
-
-                        if (!chunk || chunk->at(pos_normal) != Block::Air) continue;
-
-                        const auto base_index = static_cast<uint32_t>(mesh.vertices.size());
-
-                        float tex_id = 0.0f;
-                        int current_overlay = -1;
-                        auto tint = glm::vec4(1.0f);
-
-                        if (dir_id == 2) {
-                            tex_id = static_cast<float>(top);
-                            if (is_tint) tint = glm::vec4(0.10f, 0.70f, 0.15f, 1.0f);
-                        }
-                        else if (dir_id == 3) {
-                            tex_id = static_cast<float>(bottom);
-                        }
-                        else {
-                            tex_id = static_cast<float>(side);
-                            if (overlay >= 0) {
-                                current_overlay = static_cast<int>(static_cast<uint8_t>(overlay));
-                                if (is_tint) tint = glm::vec4(0.10f, 0.70f, 0.15f, 1.0f);
-                            }
+                        if (getBlock(side_pos, chunks) != Block::Air) {
+                            continue;
                         }
 
+                        const auto index = mesh_data.vertices.size();
 
-                        for (auto face_vert_id = 0; face_vert_id < 4; face_vert_id++) {
-                            const auto vpos = block_pos + FACES[dir_id][face_vert_id];
+                        for (int i = 0; i < 4; i++) {
+                            const auto vertex_pos = block_pos + FACES[dir][i];
 
-                            mesh.vertices.emplace_back(
-                                vpos.x, vpos.y, vpos.z,
-                                dir_id,
-                                static_cast<uint8_t>(std::round(TEXTURE_UV[face_vert_id].x * 15.f)),
-                                static_cast<uint8_t>(std::round(TEXTURE_UV[face_vert_id].y * 15.f)),
-                                tex_id, current_overlay == -1 ? 0 : current_overlay,
-                                static_cast<uint8_t>(std::round(tint.r * 255.f)),
-                                static_cast<uint8_t>(std::round(tint.g * 255.f)),
-                                static_cast<uint8_t>(std::round(tint.b * 255.f)),
-                                0,
-                                15
+                            mesh_data.vertices.emplace_back(
+                                vertex_pos.x,vertex_pos.y,vertex_pos.z,
+                                dir,TEX_COORDS[i].x,TEX_COORDS[i].y,
+                                3,1,0,0,
+                                255,255,255,3
                             );
                         }
 
-                        for (const auto& offset : {0, 1, 2, 2, 3, 0}) {
-                            mesh.indices.push_back(base_index + offset);
+                        for (const auto& i : {0,1,2,2,3,0}) {
+                            mesh_data.indices.push_back(index + i);
                         }
+
                     }
                 }
             }
         }
 
-        return mesh;
+        return mesh_data;
     }
 
 }

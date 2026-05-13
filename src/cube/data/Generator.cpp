@@ -3,14 +3,21 @@
 namespace cube {
 
     Generator::Generator(const int seed) : m_seed(seed) {
-        m_terrain = FastNoise::New<FastNoise::Perlin>();
-        m_terrain->SetScale(64.f);
+        auto noise = FastNoise::New<FastNoise::Perlin>();
+        noise->SetScale(64.f);
+        noise->SetSeedOffset(-32);
+
+        m_terrain = FastNoise::New<FastNoise::FractalFBm>();
+        m_terrain->SetSource(noise);
+        m_terrain->SetOctaveCount(5);
+        m_terrain->SetLacunarity(1.44f);
+        m_terrain->SetGain(0.69f);
     }
 
     ChunkPtr Generator::generateChunk(const glm::ivec3 &pos) {
         auto chunk = std::make_shared<Chunk>();
 
-        if (pos.y < 0 || pos.y >= 16) {
+        if (pos.y < 0 || pos.y * CHUNK_SIZE > WORLD_LIMIT) {
             return chunk;
         }
 
@@ -41,7 +48,7 @@ namespace cube {
                         id = Block::Bedrock;
                     } else if (y < height - 4) {
                         id = Block::Stone;
-                    } else if (y < height) {
+                    } else if (y >= height - 4 && y < height) {
                         id = Block::Dirt;
                     } else if (y == height) {
                         id = Block::Grass;

@@ -15,6 +15,7 @@ namespace cube {
         std::vector<uint32_t> indices;
     };
 
+    bool isReadyForMesh(const glm::ivec3& pos, const World& world);
     ChunkMesh mesh(const glm::ivec3& pos, const World& world);
 
 }

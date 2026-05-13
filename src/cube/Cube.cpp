@@ -100,7 +100,7 @@ namespace cube {
     void Cube::onDraw() {
         m_renderer.draw(
             m_camera.getViewMatrix(),
-            m_camera.getProjMatrix(m_view, (RENDER_DIST + 4) * CHUNK_SIZE),
+            m_camera.getProjMatrix(m_view, (RENDER_DIST + 2) * CHUNK_SIZE),
             m_time
         );
     }

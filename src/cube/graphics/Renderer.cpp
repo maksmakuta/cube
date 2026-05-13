@@ -117,12 +117,12 @@ namespace cube {
 
     };
 
-    const float DAY_NIGHT_CYCLE_SECONDS = 60.0f;
+    constexpr float DAY_NIGHT_CYCLE_SECONDS = 60.f * 60.f * 15.f; // 15 minutes for day
 
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection, const float time) {
-        const glm::vec3 skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
-        const glm::vec3 skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
-        const glm::vec3 skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
+        constexpr auto skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
+        constexpr auto skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
+        constexpr auto skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
 
         float cycleProgress = std::fmod(time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
         float sunAngle = cycleProgress * 2.0f * 3.14159265f;

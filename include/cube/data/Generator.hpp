@@ -8,6 +8,10 @@
 
 namespace cube {
 
+    constexpr auto WATER_LEVEL = 64;
+    constexpr auto MOUNTAIN_LEVEL = 144;
+    constexpr auto WORLD_LIMIT = 256;
+
     class Generator final {
     public:
         explicit Generator(int seed = 0);
@@ -20,7 +24,7 @@ namespace cube {
 
     private:
         int m_seed;
-        FastNoise::SmartNode<FastNoise::Perlin> m_terrain;
+        FastNoise::SmartNode<FastNoise::FractalFBm> m_terrain;
     };
 
 }
