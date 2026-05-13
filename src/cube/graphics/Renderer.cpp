@@ -22,23 +22,27 @@ namespace cube {
     };
 
     Renderable toRenderable(const ChunkMesh& mesh, const glm::ivec3& pos) {
-        Renderable renderable = {};
-        renderable.count = static_cast<int>(mesh.indices.size());
-        renderable.min = glm::vec3(pos * CHUNK_SIZE);
-        renderable.max = renderable.min + glm::vec3(CHUNK_SIZE);
-        glGenVertexArrays(1, &renderable.vao);
-        glGenBuffers(1, &renderable.vbo);
-        glGenBuffers(1, &renderable.ebo);
-        glBindVertexArray(renderable.vao);
-        glBindBuffer(GL_ARRAY_BUFFER, renderable.vbo);
-        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderable.ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribIPointer(0, 2, GL_UNSIGNED_INT, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, data)));
-        glBindVertexArray(0);
+        Renderable r = {};
+        r.count = static_cast<int>(mesh.indices.size());
+        r.min = glm::vec3(pos * CHUNK_SIZE);
+        r.max = r.min + glm::vec3(CHUNK_SIZE);
 
-        return renderable;
+        glCreateBuffers(1, &r.vbo);
+        glCreateBuffers(1, &r.ebo);
+
+        glNamedBufferStorage(r.vbo, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), 0);
+        glNamedBufferStorage(r.ebo, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), 0);
+
+        glCreateVertexArrays(1, &r.vao);
+
+        glVertexArrayVertexBuffer(r.vao, 0, r.vbo, 0, sizeof(Vertex));
+        glVertexArrayElementBuffer(r.vao, r.ebo);
+
+        glEnableVertexArrayAttrib(r.vao, 0);
+        glVertexArrayAttribIFormat(r.vao, 0, 2, GL_UNSIGNED_INT, offsetof(Vertex, data));
+        glVertexArrayAttribBinding(r.vao, 0, 0);
+
+        return r;
     }
 
     void clear(const Renderable& r) {
@@ -113,32 +117,56 @@ namespace cube {
 
     };
 
-    void Renderer::draw(const glm::mat4& view, const glm::mat4& projection) {
+    const float DAY_NIGHT_CYCLE_SECONDS = 60.0f;
+
+    void Renderer::draw(const glm::mat4& view, const glm::mat4& projection, const float time) {
+        const glm::vec3 skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
+        const glm::vec3 skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
+        const glm::vec3 skyNight  = glm::vec3(0.02f, 0.02f, 0.05f);
+
+        float cycleProgress = std::fmod(time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
+        float sunAngle = cycleProgress * 2.0f * 3.14159265f;
+        glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, glm::sin(sunAngle), glm::cos(sunAngle)));
+
+        float sunHeight = sunDir.y;
+        glm::vec3 currentSkyColor;
+
+        if (sunHeight > 0.1f) {
+            float t = glm::clamp((sunHeight - 0.1f) / 0.9f, 0.0f, 1.0f);
+            currentSkyColor = glm::mix(skySunset, skyNoon, t);
+        } else if (sunHeight > -0.1f) {
+            float t = glm::clamp((sunHeight + 0.1f) / 0.2f, 0.0f, 1.0f);
+            currentSkyColor = glm::mix(skyNight, skySunset, t);
+        } else {
+            currentSkyColor = skyNight;
+        }
+
+        glClearColor(currentSkyColor.r, currentSkyColor.g, currentSkyColor.b, 1.0f);
+
         m_shader.use();
 
         Frustum frustum{};
         frustum.update(projection * view);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
-        m_shader.setInt("textures", 0);
+        glBindTextureUnit(0, m_textures);
+        m_shader.setInt("u_textures", 0);
+        m_shader.setFloat("u_time", time);
 
         m_shader.setMat4("u_proj", projection);
         m_shader.setMat4("u_view", view);
 
-        for (const auto &renderable: m_meshes | std::views::values) {
-            if (renderable.count == 0)
-                continue;
+        m_shader.setVec3("u_sunDir", sunDir);
+        m_shader.setFloat("u_sunAngle", sunAngle);
 
-            if (!frustum.isBoxVisible(renderable.min, renderable.max))
-                continue;
+        for (const auto& renderable : m_meshes | std::views::values) {
+            if (renderable.count == 0) continue;
+            if (!frustum.isBoxVisible(renderable.min, renderable.max)) continue;
 
             m_shader.setVec3("u_model", renderable.min);
+
             glBindVertexArray(renderable.vao);
             glDrawElements(GL_TRIANGLES, renderable.count, GL_UNSIGNED_INT, nullptr);
         }
-
-        glBindVertexArray(0);
     }
 
     void Renderer::loadTextures(const glm::ivec2& tileSize) {
@@ -147,7 +175,7 @@ namespace cube {
 
         glTexStorage3D(
             GL_TEXTURE_2D_ARRAY,
-            1,
+            4,
             GL_RGBA8,
             tileSize.x,
             tileSize.y,
