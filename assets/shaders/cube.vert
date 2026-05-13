@@ -1,52 +1,50 @@
 #version 460 core
 
-layout(location = 0) in uvec2 data;
+layout (location = 0) in uvec2 a_Data;
 
 uniform mat4 u_proj;
 uniform mat4 u_view;
 uniform vec3 u_model;
+uniform float u_time;
 
-uniform float u_sunIntensity = 1.0;
+out vec3 fs_Normal;
+out vec3 fs_UV;
+out vec4 fs_Color;
+out float fs_Overlay;
 
-out vec3 f_norm;
-out vec4 f_tex;
-out vec4 f_tint;
+const vec3 NORMALS[6] = vec3[](
+    vec3(1,0,0), vec3(0,1,0), vec3(0,0,1),
+    vec3(-1,0,0), vec3(0,-1,0), vec3(0,0,-1)
+);
 
 void main() {
-    uint x = data.x & 0x1Fu;
-    uint y = (data.x >> 5u) & 0x1Fu;
-    uint z = (data.x >> 10u) & 0x1Fu;
+    uint low  = a_Data.x;
+    uint high = a_Data.y;
 
-    uint normIdx = (data.x >> 15u) & 0x07u;
+    vec3 localPos = vec3(low & 0x1Fu, (low >> 5u) & 0x1Fu, (low >> 10u) & 0x1Fu);
+    gl_Position = u_proj * u_view * vec4(localPos + u_model, 1.0);
 
-    float u = float((data.x >> 18u) & 0x0Fu) / 15.0;
-    float v = float((data.x >> 22u) & 0x0Fu) / 15.0;
+    fs_Normal = NORMALS[(low >> 15u) & 0x07u];
 
-    uint texID = (data.x >> 26u) & 0x0Fu;
-    uint overlay = (data.x >> 30u) | ((data.y & 0x03u) << 2u);
+    float u = float((low >> 18u) & 0x03u);
+    float v = float((low >> 20u) & 0x03u);
+    float ao = float((low >> 22u) & 0x03u) / 3.0;
+    fs_Overlay = float((low >> 24u) & 0x0Fu);
+    float animSpeed = float((low >> 28u) & 0x07u);
 
-    float r = float((data.y >> 2u) & 0xFFu) / 255.0;
-    float g = float((data.y >> 10u) & 0xFFu) / 255.0;
-    float b = float((data.y >> 18u) & 0xFFu) / 255.0;
+    uint baseTexID = high & 0x0FFFu;
+    uint frameCount = (high >> 12u) & 0x1Fu;
 
-    float sun = float((data.y >> 26u) & 0x0Fu) / 15.0;
-    float ao = float((data.y >> 30u) & 0x03u) / 3.0;
+    float frameOffset = 0.0;
+    if (frameCount > 1u) {
+        frameOffset = floor(mod(u_time * (animSpeed + 1.0) * 5.0, float(frameCount)));
+    }
 
+    fs_UV = vec3(u, v, float(baseTexID) + frameOffset);
 
-    vec3 normals[6] = vec3[](
-        vec3( 1,  0,  0),
-        vec3(-1,  0,  0),
-        vec3( 0,  1,  0),
-        vec3( 0, -1,  0),
-        vec3( 0,  0,  1),
-        vec3( 0,  0, -1)
-    );
-    f_norm = normals[min(normIdx, 5u)];
+    float r = float((high >> 17u) & 0x1Fu) / 31.0;
+    float g = float((high >> 22u) & 0x1Fu) / 31.0;
+    float b = float((high >> 27u) & 0x1Fu) / 31.0;
 
-    f_tex = vec4(u, v, float(texID), float(overlay));
-
-    float lightLevel = sun * u_sunIntensity * ao;
-    f_tint = vec4(r * lightLevel, g * lightLevel, b * lightLevel, 1.0);
-
-    gl_Position = u_proj * u_view * vec4(u_model + vec3(x, y, z), 1.0);
+    fs_Color = vec4(r, g, b, 1.0) * ao;
 }

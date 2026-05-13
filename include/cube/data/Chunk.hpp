@@ -11,7 +11,6 @@ namespace cube {
 
     constexpr auto CHUNK_SIZE = 16;
     constexpr auto CHUNK_LEN = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
-    constexpr auto WORLD_LIMIT = 256;
 
     class Chunk final {
     public:
