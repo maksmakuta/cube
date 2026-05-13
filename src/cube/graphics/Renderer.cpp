@@ -39,7 +39,7 @@ namespace cube {
         glVertexArrayElementBuffer(r.vao, r.ebo);
 
         glEnableVertexArrayAttrib(r.vao, 0);
-        glVertexArrayAttribIFormat(r.vao, 0, 2, GL_UNSIGNED_INT, offsetof(Vertex, data));
+        glVertexArrayAttribIFormat(r.vao, 0, 2, GL_UNSIGNED_INT, 0);
         glVertexArrayAttribBinding(r.vao, 0, 0);
 
         return r;
@@ -122,7 +122,7 @@ namespace cube {
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection, const float time) {
         const glm::vec3 skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
         const glm::vec3 skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
-        const glm::vec3 skyNight  = glm::vec3(0.02f, 0.02f, 0.05f);
+        const glm::vec3 skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
 
         float cycleProgress = std::fmod(time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
         float sunAngle = cycleProgress * 2.0f * 3.14159265f;
@@ -150,12 +150,12 @@ namespace cube {
 
         glBindTextureUnit(0, m_textures);
 
-        float minFog = RENDER_DIST * 0.5f;
-        float maxFog = RENDER_DIST * 0.9f;
+        float minFog = RENDER_DIST * CHUNK_SIZE * 0.75f;
+        float maxFog = RENDER_DIST * CHUNK_SIZE * 0.9f;
 
-        if (sunDir.y > 0.0f) {
-            minFog = 16.0f;
-            maxFog = 64.0f;
+        if (sunDir.y < 0.0f) {
+            minFog = CHUNK_SIZE;
+            maxFog = CHUNK_SIZE * 3.75f;
         }
 
         m_shader.setFloat("u_minFog", minFog);

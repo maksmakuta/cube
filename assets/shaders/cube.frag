@@ -17,29 +17,28 @@ uniform float u_maxFog;
 out vec4 FragColor;
 
 void main() {
-    vec3 noonColor   = vec3(1.0, 1.0, 0.9);
-    vec3 sunsetColor = vec3(1.0, 0.5, 0.2);
-    vec3 moonColor   = vec3(0.2, 0.3, 0.5);
+    vec3 nightAmbientColor = vec3(0.1, 0.15, 0.3);
+    vec3 dayAmbientColor   = vec3(0.4, 0.4, 0.45);
 
     vec4 texColor = texture(u_textures, fs_UV);
     if(texColor.a < 0.1) discard;
 
-    float sunHeight = max(u_sunDir.y, 0.0);
-    vec3 sunColor = mix(sunsetColor, noonColor, sunHeight);
-    if (u_sunDir.y < 0.0) sunColor = moonColor;
+    float sunHeight = u_sunDir.y;
+    float daySmooth = smoothstep(-0.2, 0.2, sunHeight);
+    float minAmbient = 0.085;
 
-    float diffuse = max(dot(fs_Normal, u_sunDir), 0.0);
-    float ambientStrength = mix(0.1, 0.4, sunHeight);
-    float dayFactor = clamp(sunHeight * 5.0, 0.0, 1.0);
-
-    vec3 light = (diffuse * sunColor * dayFactor) + (ambientStrength * noonColor);
-    light *= fs_Color.a;
-
-    vec3 finalRGB = texColor.rgb * fs_Color.rgb * light;
+    vec3 ambient = mix(nightAmbientColor, dayAmbientColor, daySmooth);
+    float sunDiff = max(dot(fs_Normal, u_sunDir), 0.0);
+    vec3 sunColor = vec3(1.0, 0.9, 0.8) * sunDiff * daySmooth;
+    float moonDiff = max(dot(fs_Normal, -u_sunDir), 0.0);
+    vec3 moonColor = vec3(0.3, 0.4, 0.7) * moonDiff * (1.0 - daySmooth);
+    vec3 totalLight = (sunColor + moonColor + ambient) + minAmbient;
+    totalLight *= fs_Color.a;
+    vec3 finalRGB = texColor.rgb * fs_Color.rgb * totalLight;
 
     if (fs_Overlay > 0.0) {
         vec4 overlayColor = texture(u_textures, vec3(fs_UV.xy, fs_Overlay));
-        finalRGB = mix(finalRGB, overlayColor.rgb * light, overlayColor.a);
+        finalRGB = mix(finalRGB, overlayColor.rgb * totalLight, overlayColor.a);
     }
 
     float dist = length(fs_ViewPos);
