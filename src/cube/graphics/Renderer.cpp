@@ -12,13 +12,45 @@
 
 namespace cube {
 
+
+
+
+
     const auto LAYERS = std::vector<std::string>{
-        "natural/grass_block_top.png",
         "natural/grass_block_side.png",
         "natural/grass_block_side_overlay.png",
-        "natural/dirt.png",
-        "natural/stone.png",
+        "natural/grass_block_snow.png",
+        "natural/grass_block_top.png",
+        "natural/amethyst_block.png",
+        "natural/andesite.png",
+        "natural/basalt_side.png",
+        "natural/basalt_top.png",
         "natural/bedrock.png",
+        "natural/blackstone.png",
+        "natural/blackstone_top.png",
+        "natural/blue_ice.png",
+        "natural/calcite.png",
+        "natural/clay.png",
+        "natural/coarse_dirt.png",
+        "natural/cobblestone.png",
+        "natural/deepslate.png",
+        "natural/deepslate_top.png",
+        "natural/diorite.png",
+        "natural/dirt.png",
+        "natural/dripstone_block.png",
+        "natural/granite.png",
+        "natural/gravel.png",
+        "natural/ice.png",
+        "natural/mud.png",
+        "natural/packed_ice.png",
+        "natural/red_sand.png",
+        "natural/red_sandstone.png",
+        "natural/sand.png",
+        "natural/sandstone.png",
+        "natural/stone.png",
+        "natural/tuff.png",
+        "lava_still.png",
+        "water_still.png",
     };
 
     Renderable toRenderable(const ChunkMesh& mesh, const glm::ivec3& pos) {
@@ -51,7 +83,7 @@ namespace cube {
         glDeleteBuffers(1, &r.ebo);
     }
 
-    Renderer::Renderer() : m_textures(0), m_shader("cube"), m_skyShader("celestial") {
+    Renderer::Renderer() : m_shader("cube"), m_skyShader("celestial") {
         loadTextures();
         initSkyVAO();
 
@@ -169,46 +201,63 @@ namespace cube {
     }
 
     void Renderer::loadTextures(const glm::ivec2& tileSize) {
-        glGenTextures(1, &m_textures);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_textures);
+        int totalLayers = 0;
+        std::vector<std::vector<unsigned char>> pixelData;
 
-        glTexStorage3D(
-            GL_TEXTURE_2D_ARRAY,
-            4,
-            GL_RGBA8,
-            tileSize.x,
-            tileSize.y,
-            static_cast<GLsizei>(LAYERS.size()));
+        for (const auto& layerName : LAYERS) {
+            std::string path = std::format("{}/textures/{}", ASSETS_PATH, layerName);
+            FILE* fp = fopen(path.c_str(), "rb");
+            if (!fp) continue;
 
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        for (auto index = 0; index < LAYERS.size(); ++index) {
-            const auto& layer = LAYERS[index];
-            FILE *fp = fopen(std::format("{}/textures/{}", ASSETS_PATH, layer).c_str(), "rb");
-            if(!fp) {
-                warn("Cannot load layer {} at index {}", layer, index);
-                return;
-            }
-
-            spng_ctx *ctx = spng_ctx_new(0);
+            spng_ctx* ctx = spng_ctx_new(0);
             spng_set_png_file(ctx, fp);
+
+            spng_ihdr ihdr{};
+            spng_get_ihdr(ctx, &ihdr);
 
             size_t out_size;
             spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
-            auto *buffer = static_cast<unsigned char *>(malloc(out_size));
+            std::vector<unsigned char> buffer(out_size);
+            spng_decode_image(ctx, buffer.data(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
 
-            spng_decode_image(ctx, buffer, out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+            const int framesInThisFile = static_cast<int>(ihdr.height) / tileSize.y;
+            totalLayers += framesInThisFile;
 
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, index, tileSize.x, tileSize.y, 1, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+            pixelData.push_back(std::move(buffer));
 
-            free(buffer);
             spng_ctx_free(ctx);
             fclose(fp);
-            debug("Layer {} loaded with index {}", layer, index);
+
+            info("Texture {} have {} frames", path,  framesInThisFile);
         }
+
+        glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_textures);
+
+        const auto levels = static_cast<int>(std::floor(std::log2(std::max(tileSize.x, tileSize.y)))) + 1;
+
+        glTextureStorage3D(m_textures, levels, GL_RGBA8, tileSize.x, tileSize.y, totalLayers);
+
+        int currentLayerIndex = 0;
+        for (auto & i : pixelData) {
+            const int frames = static_cast<int>(i.size()) / (tileSize.x * 4) / tileSize.y;
+
+            for (int f = 0; f < frames; ++f) {
+                const void* framePtr = i.data() + (f * tileSize.x * tileSize.y * 4);
+
+                glTextureSubImage3D(m_textures, 0, 0, 0, currentLayerIndex,
+                                    tileSize.x, tileSize.y, 1,
+                                    GL_RGBA, GL_UNSIGNED_BYTE, framePtr);
+
+                currentLayerIndex++;
+            }
+        }
+
+        glTextureParameteri(m_textures, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        glTextureParameteri(m_textures, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        float maxAnisotropy;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAnisotropy);
+        glTextureParameterf(m_textures, GL_TEXTURE_MAX_ANISOTROPY, maxAnisotropy);
 
         glGenerateTextureMipmap(m_textures);
     }
@@ -271,21 +320,21 @@ namespace cube {
     void Renderer::drawSkyElements(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& sunDir) {
         m_skyShader.use();
 
-        glm::mat4 staticView = glm::mat4(glm::mat3(view));
+        const auto staticView = glm::mat4(glm::mat3(view));
         m_skyShader.setMat4("u_view", staticView);
         m_skyShader.setMat4("u_proj", projection);
 
         glBindVertexArray(m_skyVAO);
 
-        float sunDist = 50.0f;
-        float sunSize = 4.0f;
+        constexpr float sunDist = 50.0f;
+        constexpr float sunSize = 4.0f;
         m_skyShader.setVec3("u_pos", sunDir * sunDist);
         m_skyShader.setFloat("u_size", sunSize);
         m_skyShader.setVec3("u_color", glm::vec3(1.0f, 1.0f, 0.8f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        float moonDist = 50.0f;
-        float moonSize = 3.0f;
+        constexpr float moonDist = 50.0f;
+        constexpr float moonSize = 3.0f;
         m_skyShader.setVec3("u_pos", -sunDir * moonDist);
         m_skyShader.setFloat("u_size", moonSize);
         m_skyShader.setVec3("u_color", glm::vec3(0.9f, 0.9f, 1.0f));
