@@ -9,7 +9,7 @@
 namespace cube {
 
     constexpr auto WATER_LEVEL = 64;
-    constexpr auto MOUNTAIN_LEVEL = 144;
+    constexpr auto MOUNTAIN_LEVEL = 196;
     constexpr auto WORLD_LIMIT = 256;
 
     class Generator final {
@@ -23,8 +23,13 @@ namespace cube {
         [[nodiscard]] int getSeed() const;
 
     private:
+
         int m_seed;
-        FastNoise::SmartNode<FastNoise::FractalFBm> m_terrain;
+        FastNoise::SmartNode<> m_terrain_data;
+        FastNoise::SmartNode<> m_terrain;
+        FastNoise::SmartNode<> m_temperature;
+        FastNoise::SmartNode<> m_humidity;
+        FastNoise::SmartNode<> m_caveNoise;
     };
 
 }

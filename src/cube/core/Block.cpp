@@ -27,8 +27,8 @@ namespace cube {
         { 23, 23, 23, 0,  1, 0, false, BlockType::Cube      }, // Ice,
         { 11, 11, 11, 0,  1, 0, false, BlockType::Cube      }, // BlueIce,
         { 25, 25, 25, 0,  1, 0, false, BlockType::Cube      }, // PackedIce,
-        { 64, 64, 64, 0, 31, 4, true, BlockType::Flowing   }, // Water,
-        { 32, 32, 32, 0, 31, 4, false, BlockType::Flowing   }, // Lava,
+        { 64, 64, 64, 0, 31, 2, true, BlockType::Flowing    }, // Water,
+        { 32, 32, 32, 0, 31, 3, false, BlockType::Flowing   }, // Lava,
         {  8,  8,  8, 0,  1, 0, false, BlockType::Cube      }, // Bedrock
     };
 
