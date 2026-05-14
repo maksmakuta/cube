@@ -11,6 +11,7 @@ out vec3 fs_Normal;
 out vec3 fs_UV;
 out vec4 fs_Color;
 out float fs_Overlay;
+out float fs_AO;
 out vec3 fs_ViewPos;
 
 const vec3 NORMALS[6] = vec3[](
@@ -31,7 +32,7 @@ void main() {
 
     float u = float((low >> 18u) & 0x03u);
     float v = float((low >> 20u) & 0x03u);
-    float ao = float((low >> 22u) & 0x03u) / 3.0;
+    uint ao = (low >> 22u) & 0x03u;
     fs_Overlay = float((low >> 24u) & 0x0Fu);
     float animSpeed = float((low >> 28u) & 0x07u);
 
@@ -49,5 +50,6 @@ void main() {
     float g = float((high >> 22u) & 0x1Fu) / 31.0;
     float b = float((high >> 27u) & 0x1Fu) / 31.0;
 
-    fs_Color = vec4(r, g, b, 1.0) * ao;
+    fs_Color = vec4(r, g, b, 1.0);
+    fs_AO = float(ao);
 }

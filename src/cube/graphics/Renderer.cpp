@@ -12,10 +12,6 @@
 
 namespace cube {
 
-
-
-
-
     const auto LAYERS = std::vector<std::string>{
         "natural/grass_block_side.png",
         "natural/grass_block_side_overlay.png",

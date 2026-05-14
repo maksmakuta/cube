@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2 FATAL_ERROR)
-project(cube VERSION 0.3.0 LANGUAGES CXX C)
+project(cube VERSION 0.4.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}
     include/cube/utils/SafeQueue.hpp
     include/cube/Cube.hpp
 
+    src/cube/core/Block.cpp
     src/cube/data/Chunk.cpp
     src/cube/data/World.cpp
     src/cube/data/Generator.cpp
