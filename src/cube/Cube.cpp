@@ -5,10 +5,13 @@
 
 #include "cube/mesh/Mesher.hpp"
 #include "cube/utils/Log.hpp"
+#include "glad/glad.h"
 
 namespace cube {
 
-    Cube::Cube() : m_frame_count(0), m_last_tick(0.f), m_time(0.f), m_view(0), m_last_chunk(-99999999){
+    constexpr float DAY_NIGHT_CYCLE_SECONDS = 1200.f;
+
+    Cube::Cube() : m_frame_count(0), m_last_tick(0.f), m_time(DAY_NIGHT_CYCLE_SECONDS / 4.f), m_view(0), m_last_chunk(-99999999){
         for (unsigned int i = 0; i < std::thread::hardware_concurrency() - 1; ++i) {
             m_workers.emplace_back([this] { workerLoop(); });
         }
@@ -94,7 +97,7 @@ namespace cube {
             m_world.clearChunks(m_last_chunk,RENDER_DIST);
             m_renderer.clearChunks(m_last_chunk,RENDER_DIST);
         }
-
+        calcTime();
     }
 
     void Cube::onDraw() {
@@ -145,6 +148,35 @@ namespace cube {
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
             }
         }
+    }
+
+    void Cube::calcTime() {
+        constexpr auto skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
+        constexpr auto skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
+        constexpr auto skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
+
+        const float cycleProgress = std::fmod(m_time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
+        const float sunAngle = cycleProgress * 2.0f * 3.14159265f;
+        const glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, glm::sin(sunAngle), glm::cos(sunAngle)));
+
+        m_renderer.setSun(sunDir, sunAngle);
+
+        const float sunHeight = sunDir.y;
+        glm::vec3 currentSkyColor;
+
+        if (sunHeight > 0.1f) {
+            float t = glm::clamp((sunHeight - 0.1f) / 0.9f, 0.0f, 1.0f);
+            currentSkyColor = glm::mix(skySunset, skyNoon, t);
+        } else if (sunHeight > -0.1f) {
+            float t = glm::clamp((sunHeight + 0.1f) / 0.2f, 0.0f, 1.0f);
+            currentSkyColor = glm::mix(skyNight, skySunset, t);
+        } else {
+            currentSkyColor = skyNight;
+        }
+
+        m_renderer.setSkyColor(currentSkyColor);
+
+        glClearColor(currentSkyColor.r, currentSkyColor.g, currentSkyColor.b, 1.0f);
     }
 
 }

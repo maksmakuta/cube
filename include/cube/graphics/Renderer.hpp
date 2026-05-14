@@ -35,11 +35,20 @@ namespace cube {
 
         int clearChunks(const glm::ivec3& pos, int dist);
 
+        void setSun(const glm::vec3& direction,float angle);
+        void setSkyColor(const glm::vec3&);
+
+        void initSkyVAO();
+        void drawSkyElements(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& sunDir);
+
     private:
         void loadTextures(const glm::ivec2& tileSize = glm::ivec2(32, 32));
 
-        uint32_t m_textures;
+        uint32_t m_textures{0};
+        uint32_t m_skyVAO{0}, m_skyVBO{0};
+        glm::vec3 m_sunDir{0};
         Shader m_shader;
+        Shader m_skyShader;
         std::unordered_map<glm::ivec3, Renderable> m_meshes;
     };
 

@@ -23,6 +23,7 @@ namespace cube {
 
     private:
         void workerLoop();
+        void calcTime();
 
         int m_frame_count;
         float m_last_tick;

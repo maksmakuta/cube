@@ -30,8 +30,8 @@ namespace cube {
         glCreateBuffers(1, &r.vbo);
         glCreateBuffers(1, &r.ebo);
 
-        glNamedBufferStorage(r.vbo, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), 0);
-        glNamedBufferStorage(r.ebo, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), 0);
+        glNamedBufferStorage(r.vbo, static_cast<GLsizeiptr>(mesh.vertices.size() * sizeof(Vertex)), mesh.vertices.data(), 0);
+        glNamedBufferStorage(r.ebo, static_cast<GLsizeiptr>(mesh.indices.size() * sizeof(uint32_t)), mesh.indices.data(), 0);
 
         glCreateVertexArrays(1, &r.vao);
 
@@ -51,8 +51,13 @@ namespace cube {
         glDeleteBuffers(1, &r.ebo);
     }
 
-    Renderer::Renderer() : m_textures(0), m_shader("cube") {
+    Renderer::Renderer() : m_textures(0), m_shader("cube"), m_skyShader("celestial") {
         loadTextures();
+        initSkyVAO();
+
+        m_shader.use();
+        m_shader.setFloat("u_minFog", RENDER_DIST * CHUNK_SIZE * 0.75f);
+        m_shader.setFloat("u_maxFog", RENDER_DIST * CHUNK_SIZE * 0.9f);
     }
 
     Renderer::~Renderer() {
@@ -117,31 +122,27 @@ namespace cube {
 
     };
 
-    constexpr float DAY_NIGHT_CYCLE_SECONDS = 60.f * 60.f * 15.f; // 15 minutes for day
+    void Renderer::setSun(const glm::vec3& direction, const float angle) {
+        m_shader.setVec3("u_sunDir", direction);
+        m_shader.setFloat("u_sunAngle", angle);
+        m_sunDir = direction;
+    }
+
+    void Renderer::setSkyColor(const glm::vec3& skyColor) {
+        m_shader.setVec3("u_skyColor", skyColor);
+    }
 
     void Renderer::draw(const glm::mat4& view, const glm::mat4& projection, const float time) {
-        constexpr auto skyNoon   = glm::vec3(0.45f, 0.7f, 1.0f);
-        constexpr auto skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
-        constexpr auto skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        float cycleProgress = std::fmod(time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
-        float sunAngle = cycleProgress * 2.0f * 3.14159265f;
-        glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, glm::sin(sunAngle), glm::cos(sunAngle)));
+        drawSkyElements(projection, view, m_sunDir);
 
-        float sunHeight = sunDir.y;
-        glm::vec3 currentSkyColor;
-
-        if (sunHeight > 0.1f) {
-            float t = glm::clamp((sunHeight - 0.1f) / 0.9f, 0.0f, 1.0f);
-            currentSkyColor = glm::mix(skySunset, skyNoon, t);
-        } else if (sunHeight > -0.1f) {
-            float t = glm::clamp((sunHeight + 0.1f) / 0.2f, 0.0f, 1.0f);
-            currentSkyColor = glm::mix(skyNight, skySunset, t);
-        } else {
-            currentSkyColor = skyNight;
-        }
-
-        glClearColor(currentSkyColor.r, currentSkyColor.g, currentSkyColor.b, 1.0f);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glDisable(GL_BLEND);
 
         m_shader.use();
 
@@ -150,26 +151,11 @@ namespace cube {
 
         glBindTextureUnit(0, m_textures);
 
-        float minFog = RENDER_DIST * CHUNK_SIZE * 0.75f;
-        float maxFog = RENDER_DIST * CHUNK_SIZE * 0.9f;
-
-        if (sunDir.y < 0.0f) {
-            minFog = CHUNK_SIZE;
-            maxFog = CHUNK_SIZE * 3.75f;
-        }
-
-        m_shader.setFloat("u_minFog", minFog);
-        m_shader.setFloat("u_maxFog", maxFog);
-
         m_shader.setInt("u_textures", 0);
         m_shader.setFloat("u_time", time);
 
         m_shader.setMat4("u_proj", projection);
         m_shader.setMat4("u_view", view);
-
-        m_shader.setVec3("u_sunDir", sunDir);
-        m_shader.setFloat("u_sunAngle", sunAngle);
-        m_shader.setVec3("u_skyColor", currentSkyColor);
 
         for (const auto& renderable : m_meshes | std::views::values) {
             if (renderable.count == 0) continue;
@@ -248,6 +234,62 @@ namespace cube {
             }
         }
         return clearedCount;
+    }
+
+    struct SkyVertex {
+        float x, y, z;
+        float u, v;
+    };
+
+    SkyVertex skyVertices[] = {
+        {-1.0f, -1.0f, 0.0f,  0.0f, 0.0f},
+        { 1.0f, -1.0f, 0.0f,  1.0f, 0.0f},
+        { 1.0f,  1.0f, 0.0f,  1.0f, 1.0f},
+
+        {-1.0f, -1.0f, 0.0f,  0.0f, 0.0f},
+        { 1.0f,  1.0f, 0.0f,  1.0f, 1.0f},
+        {-1.0f,  1.0f, 0.0f,  0.0f, 1.0f}
+    };
+
+    void Renderer::initSkyVAO() {
+        glCreateVertexArrays(1, &m_skyVAO);
+        glCreateBuffers(1, &m_skyVBO);
+
+        glNamedBufferStorage(m_skyVBO, sizeof(skyVertices), skyVertices, 0);
+
+        glEnableVertexArrayAttrib(m_skyVAO, 0);
+        glVertexArrayAttribFormat(m_skyVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(SkyVertex, x));
+        glVertexArrayAttribBinding(m_skyVAO, 0, 0);
+
+        glEnableVertexArrayAttrib(m_skyVAO, 1);
+        glVertexArrayAttribFormat(m_skyVAO, 1, 2, GL_FLOAT, GL_FALSE, offsetof(SkyVertex, u));
+        glVertexArrayAttribBinding(m_skyVAO, 1, 0);
+
+        glVertexArrayVertexBuffer(m_skyVAO, 0, m_skyVBO, 0, sizeof(SkyVertex));
+    }
+
+    void Renderer::drawSkyElements(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& sunDir) {
+        m_skyShader.use();
+
+        glm::mat4 staticView = glm::mat4(glm::mat3(view));
+        m_skyShader.setMat4("u_view", staticView);
+        m_skyShader.setMat4("u_proj", projection);
+
+        glBindVertexArray(m_skyVAO);
+
+        float sunDist = 50.0f;
+        float sunSize = 4.0f;
+        m_skyShader.setVec3("u_pos", sunDir * sunDist);
+        m_skyShader.setFloat("u_size", sunSize);
+        m_skyShader.setVec3("u_color", glm::vec3(1.0f, 1.0f, 0.8f));
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        float moonDist = 50.0f;
+        float moonSize = 3.0f;
+        m_skyShader.setVec3("u_pos", -sunDir * moonDist);
+        m_skyShader.setFloat("u_size", moonSize);
+        m_skyShader.setVec3("u_color", glm::vec3(0.9f, 0.9f, 1.0f));
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
 }
