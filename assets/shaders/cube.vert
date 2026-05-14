@@ -39,11 +39,7 @@ void main() {
     uint baseTexID = high & 0x0FFFu;
     uint frameCount = (high >> 12u) & 0x1Fu;
 
-    float frameOffset = 0.0;
-    if (frameCount > 1u) {
-        frameOffset = floor(mod(u_time * (animSpeed + 1.0) * 5.0, float(frameCount)));
-    }
-
+    float frameOffset = float(uint(u_time * (animSpeed * 4u)) % frameCount);
     fs_UV = vec3(u, v, float(baseTexID) + frameOffset);
 
     float r = float((high >> 17u) & 0x1Fu) / 31.0;

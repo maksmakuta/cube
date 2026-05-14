@@ -52,6 +52,8 @@ namespace cube {
                         id = Block::Dirt;
                     } else if (y == height) {
                         id = Block::Grass;
+                    } else if (y <= WATER_LEVEL) {
+                        id = Block::Water;
                     } else {
                         continue;
                     }

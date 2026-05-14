@@ -138,12 +138,13 @@ namespace cube {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     const auto block_pos = glm::ivec3(x,y,z);
+                    const auto block = chunks.at({0,0,0})->at(block_pos);
 
-                    if (chunks.at({0,0,0})->at(block_pos) == Block::Air) {
+                    if (block == Block::Air) {
                         continue;
                     }
 
-                    BlockInfo info = getInfo(chunks.at({0,0,0})->at(block_pos));
+                    BlockInfo info = getInfo(block);
 
                     for (int dir = 0; dir < 6; dir++) {
                         const auto& dir_offset = DIRECTIONS[dir];
@@ -162,7 +163,11 @@ namespace cube {
                         if (dir == 1) {
                             texId = info.texture_top;
                             if (info.is_tint) {
-                                tint = glm::vec3(0.64f, 1.0f, 0.56f);
+                                if (block == Block::Grass) {
+                                    tint = glm::vec3(0.64f, 1.0f, 0.56f);
+                                }else if (block == Block::Water) {
+                                    tint = glm::vec3(0.12f, 0.38f, 0.73f);
+                                }
                             }
                         } else if (dir == 4) {
                             texId = info.texture_bottom;

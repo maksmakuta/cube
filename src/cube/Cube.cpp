@@ -28,6 +28,9 @@ namespace cube {
 
     void Cube::onUpdate(const float dt) {
         m_time += dt;
+        if (m_time > DAY_NIGHT_CYCLE_SECONDS) {
+            m_time = 0.f;
+        }
         m_last_tick += dt;
         m_frame_count++;
 
@@ -60,8 +63,7 @@ namespace cube {
             if (++uploads > 16) break;
         }
 
-        const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE)));
-        if (current_chunk != m_last_chunk) {
+        if (const auto current_chunk = glm::ivec3(glm::floor(m_camera.getPosition() / static_cast<float>(CHUNK_SIZE))); current_chunk != m_last_chunk) {
 
             std::vector<glm::ivec3> chunk_positions;
             chunk_positions.reserve(static_cast<size_t>(std::pow(RENDER_DIST * 2, 3)));
@@ -73,21 +75,19 @@ namespace cube {
 
                         if (glm::length(glm::vec3(offset)) > RENDER_DIST) continue;
 
-                        const auto new_chunk_pos = current_chunk + offset;
-                        if (!m_world.contains(new_chunk_pos)) {
+                        if (const auto new_chunk_pos = current_chunk + offset; !m_world.contains(new_chunk_pos)) {
                             chunk_positions.push_back(new_chunk_pos);
                         }
                     }
                 }
             }
 
-            std::sort(chunk_positions.begin(), chunk_positions.end(),
+            std::ranges::sort(chunk_positions,
             [&current_chunk](const glm::ivec3& a, const glm::ivec3& b) {
                 return glm::distance2(glm::vec3(current_chunk), glm::vec3(a)) <
                        glm::distance2(glm::vec3(current_chunk), glm::vec3(b));
             });
 
-            // 3. Push the sorted chunks into your generation queue
             for (const auto& pos : chunk_positions) {
                 m_gq.push(pos);
             }
@@ -155,7 +155,7 @@ namespace cube {
         constexpr auto skySunset = glm::vec3(1.0f, 0.4f, 0.2f);
         constexpr auto skyNight = glm::vec3(0.02f, 0.02f, 0.08f);
 
-        const float cycleProgress = std::fmod(m_time, DAY_NIGHT_CYCLE_SECONDS) / DAY_NIGHT_CYCLE_SECONDS;
+        const float cycleProgress = m_time / DAY_NIGHT_CYCLE_SECONDS;
         const float sunAngle = cycleProgress * 2.0f * 3.14159265f;
         const glm::vec3 sunDir = glm::normalize(glm::vec3(0.0f, glm::sin(sunAngle), glm::cos(sunAngle)));
 
@@ -165,10 +165,10 @@ namespace cube {
         glm::vec3 currentSkyColor;
 
         if (sunHeight > 0.1f) {
-            float t = glm::clamp((sunHeight - 0.1f) / 0.9f, 0.0f, 1.0f);
+            const float t = glm::clamp((sunHeight - 0.1f) / 0.9f, 0.0f, 1.0f);
             currentSkyColor = glm::mix(skySunset, skyNoon, t);
         } else if (sunHeight > -0.1f) {
-            float t = glm::clamp((sunHeight + 0.1f) / 0.2f, 0.0f, 1.0f);
+            const float t = glm::clamp((sunHeight + 0.1f) / 0.2f, 0.0f, 1.0f);
             currentSkyColor = glm::mix(skyNight, skySunset, t);
         } else {
             currentSkyColor = skyNight;
