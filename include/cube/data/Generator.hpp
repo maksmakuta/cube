@@ -8,30 +8,24 @@
 
 namespace cube {
 
-    constexpr auto WATER_LEVEL = 64;
-    constexpr auto MOUNTAIN_LEVEL = 196;
-    constexpr auto WORLD_LIMIT = 256;
-
     class Generator final {
     public:
         explicit Generator(int seed = 0);
 
         ChunkPtr generateChunk(const glm::ivec3& pos);
-        [[nodiscard]] int heightAt(const glm::vec3& pos) const;
-
         void setSeed(int seed);
+
         [[nodiscard]] int getSeed() const;
+        [[nodiscard]] int heightAt(const glm::vec3& pos) const;
 
     private:
 
-        int m_seed;
-        FastNoise::SmartNode<> m_terrain_data;
+        int m_seed {};
+
         FastNoise::SmartNode<> m_terrain;
-        FastNoise::SmartNode<> m_temperature;
-        FastNoise::SmartNode<> m_humidity;
-        FastNoise::SmartNode<> m_caveNoise;
+        FastNoise::SmartNode<> m_caves;
     };
 
 }
 
-#endif //CUBE_GENERATOR_HPP
+#endif
