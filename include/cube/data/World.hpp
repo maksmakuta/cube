@@ -9,7 +9,6 @@
 #include <shared_mutex>
 
 #include "Chunk.hpp"
-#include "cube/core/ChunkStatus.hpp"
 
 namespace cube {
 
@@ -20,17 +19,12 @@ namespace cube {
         World();
 
         bool contains(const glm::ivec3& pos) const;
-        ChunkStatus getStatus(const glm::ivec3& pos) const;
         ChunkPtr getChunk(const glm::ivec3& pos) const;
-
-        void setStatus(const glm::ivec3& pos,ChunkStatus);
         void setChunk(const glm::ivec3& pos,ChunkPtr);
-
         int clearChunks(const glm::ivec3& pos, int dist);
 
     private:
         mutable std::shared_mutex m_mutex;
-        std::unordered_map<glm::ivec3, ChunkStatus> m_statuses;
         std::unordered_map<glm::ivec3, ChunkPtr> m_chunks;
     };
 
