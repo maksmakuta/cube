@@ -3,16 +3,25 @@
 
 #include <vector>
 
+#include <glm/vec3.hpp>
+
 #include "cube/graphics/Vertex.hpp"
 
 namespace cube {
 
-    struct Mesh final {
+    class World;
+
+    struct MeshData {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
-        std::vector<Vertex> tvertices;
-        std::vector<uint32_t> tindices;
     };
+
+    struct Mesh final {
+        MeshData solid;
+        MeshData transparent;
+    };
+
+    Mesh generateMesh(const glm::ivec3& pos, const World& world);
 
 }
 

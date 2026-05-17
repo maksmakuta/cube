@@ -38,40 +38,40 @@ namespace cube {
 
         GLObject newObj{};
 
-        if (!mesh.vertices.empty()) {
+        if (!mesh.solid.vertices.empty()) {
             glGenVertexArrays(1, &newObj.solid_vao);
             glGenBuffers(1, &newObj.solid_vbo);
             glGenBuffers(1, &newObj.solid_ebo);
 
             glBindVertexArray(newObj.solid_vao);
             glBindBuffer(GL_ARRAY_BUFFER, newObj.solid_vbo);
-            glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, mesh.solid.vertices.size() * sizeof(Vertex), mesh.solid.vertices.data(), GL_STATIC_DRAW);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newObj.solid_ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(uint32_t), mesh.indices.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.solid.indices.size() * sizeof(uint32_t), mesh.solid.indices.data(), GL_STATIC_DRAW);
 
             glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
             glEnableVertexAttribArray(0);
 
-            newObj.solid_count = static_cast<uint32_t>(mesh.indices.size());
+            newObj.solid_count = static_cast<uint32_t>(mesh.solid.indices.size());
         }
 
-        if (!mesh.tvertices.empty()) {
+        if (!mesh.transparent.vertices.empty()) {
             glGenVertexArrays(1, &newObj.blend_vao);
             glGenBuffers(1, &newObj.blend_vbo);
             glGenBuffers(1, &newObj.blend_ebo);
 
             glBindVertexArray(newObj.blend_vao);
             glBindBuffer(GL_ARRAY_BUFFER, newObj.blend_vbo);
-            glBufferData(GL_ARRAY_BUFFER, mesh.tvertices.size() * sizeof(Vertex), mesh.tvertices.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, mesh.transparent.vertices.size() * sizeof(Vertex), mesh.transparent.vertices.data(), GL_STATIC_DRAW);
 
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newObj.blend_ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.tindices.size() * sizeof(uint32_t), mesh.tindices.data(), GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.transparent.indices.size() * sizeof(uint32_t), mesh.transparent.indices.data(), GL_STATIC_DRAW);
 
             glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
             glEnableVertexAttribArray(0);
 
-            newObj.blend_count = static_cast<uint32_t>(mesh.tindices.size());
+            newObj.blend_count = static_cast<uint32_t>(mesh.transparent.indices.size());
         }
 
         m_objects[pos] = newObj;

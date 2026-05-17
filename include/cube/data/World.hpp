@@ -17,7 +17,7 @@ namespace cube {
         Status getStatus(const glm::ivec3&);
         void setStatus(const glm::ivec3&,Status);
 
-        std::shared_ptr<Chunk> getChunk(const glm::ivec3&);
+        std::shared_ptr<Chunk> getChunk(const glm::ivec3&) const;
         void setChunk(const glm::ivec3&,std::shared_ptr<Chunk>);
 
     private:

@@ -8,7 +8,8 @@ namespace cube {
         const uint8_t z,
         const uint8_t u,
         const uint8_t v,
-        const uint8_t t
+        const uint8_t t,
+        const uint8_t a
     ) {
         Vertex compressed = 0;
 
@@ -17,7 +18,8 @@ namespace cube {
         compressed |= (static_cast<Vertex>(z) & 0x1F) << 10;
         compressed |= (static_cast<Vertex>(u) & 0x1F) << 15;
         compressed |= (static_cast<Vertex>(v) & 0x1F) << 20;
-        compressed |= (static_cast<Vertex>(t) & 0x7F) << 25;
+        compressed |= (static_cast<Vertex>(t) & 0x1F) << 25;
+        compressed |= (static_cast<Vertex>(a) & 0x03) << 30;
 
         return compressed;
     }

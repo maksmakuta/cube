@@ -15,8 +15,8 @@ namespace cube {
         m_statuses[pos] = status;
     }
 
-    std::shared_ptr<Chunk> World::getChunk(const glm::ivec3& pos) {
-        return m_chunks.contains(pos) ? m_chunks[pos] : nullptr;
+    std::shared_ptr<Chunk> World::getChunk(const glm::ivec3& pos) const {
+        return m_chunks.contains(pos) ? m_chunks.at(pos) : nullptr;
     }
 
     void World::setChunk(const glm::ivec3& pos, std::shared_ptr<Chunk> chunk) {

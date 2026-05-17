@@ -4,6 +4,8 @@
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
+#include "cube/Cube.hpp"
+
 int main() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::println(std::cerr,"Cannot init SDL3: {}", SDL_GetError());
@@ -34,20 +36,30 @@ int main() {
         return 0;
     }
 
-    bool running = true;
+    SDL_SetWindowRelativeMouseMode(window, true);
 
+    bool running = true;
+    cube::Cube engine;
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+    Uint64 lastTime = SDL_GetTicksNS();
+
     while (running) {
+        const Uint64 currentTime = SDL_GetTicksNS();
+        const float deltaTime = static_cast<float>(currentTime - lastTime) / 1000000000.0f;
+        lastTime = currentTime;
+        engine.onUpdate(deltaTime);
+
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
+            engine.onEvent(event);
         }
 
         glClear(GL_COLOR_BUFFER_BIT);
-
+        engine.onRender();
         SDL_GL_SwapWindow(window);
     }
 

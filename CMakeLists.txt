@@ -13,20 +13,16 @@ add_subdirectory(libs/glad)
 
 add_executable(${PROJECT_NAME}
     src/cube/data/Chunk.cpp
+    src/cube/data/Generator.cpp
+    src/cube/data/World.cpp
+    src/cube/graphics/Camera.cpp
+    src/cube/graphics/Renderer.cpp
+    src/cube/graphics/Shader.cpp
+    src/cube/graphics/Vertex.cpp
+    src/cube/Cube.cpp
 
     src/main.cpp
-    src/cube/graphics/Vertex.cpp
-    include/cube/graphics/Camera.hpp
-    src/cube/graphics/Camera.cpp
-    include/cube/graphics/Renderer.hpp
-    include/cube/graphics/Shader.hpp
-    src/cube/graphics/Shader.cpp
-    include/cube/data/Mesh.hpp
-    src/cube/graphics/Renderer.cpp
-    include/cube/Cube.hpp
-    include/cube/data/World.hpp
-    src/cube/data/World.cpp
-    src/cube/Cube.cpp
+    src/cube/data/Mesh.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include libs/glad/include)

@@ -20,7 +20,8 @@ namespace cube {
      */
     Vertex compress(
         uint8_t x ,uint8_t y, uint8_t z,
-        uint8_t u, uint8_t v, uint8_t t
+        uint8_t u, uint8_t v, uint8_t t,
+        uint8_t a
     );
 
 }
