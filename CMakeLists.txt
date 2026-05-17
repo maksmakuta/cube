@@ -12,7 +12,9 @@ find_package(glm REQUIRED)
 add_subdirectory(libs/glad)
 
 add_executable(${PROJECT_NAME}
+
     src/main.cpp
+    include/cube/data/Chunk.hpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include libs/glad/include)
