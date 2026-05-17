@@ -1,9 +1,0 @@
-[submodule "libs/glad"]
-	path = libs/glad
-	url = git@github.com:maksmakuta/glad-cmake.git
-[submodule "libs/FastNoise2"]
-	path = libs/FastNoise2
-	url = git@github.com:Auburn/FastNoise2.git
-[submodule "libs/spng"]
-	path = libs/spng
-	url = https://github.com/randy408/libspng.git
