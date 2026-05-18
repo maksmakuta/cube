@@ -7,8 +7,15 @@
 #include "data/World.hpp"
 #include "graphics/Camera.hpp"
 #include "graphics/Renderer.hpp"
+#include "utils/ConcurrentQueue.hpp"
+#include "utils/ThreadPool.hpp"
 
 namespace cube {
+
+    struct MeshResult {
+        glm::ivec3 pos;
+        Mesh mesh;
+    };
 
     class Cube final {
     public:
@@ -23,6 +30,9 @@ namespace cube {
         Camera m_camera;
         Renderer m_renderer;
         Generator m_generator;
+        ThreadPool m_gen_pool;
+        ThreadPool m_mesh_pool;
+        ConcurrentQueue<MeshResult> m_meshQueue;
     };
 
 }

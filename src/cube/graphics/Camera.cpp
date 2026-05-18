@@ -27,7 +27,6 @@ namespace cube {
     glm::vec3 Camera::getPosition() const { return m_position; }
     glm::vec3 Camera::getFront() const    { return m_front; }
     glm::vec3 Camera::getRight() const    { return m_right; }
-    glm::vec3 Camera::getUp() const       { return m_up; }
     glm::vec2 Camera::getDirection() const{ return m_direction; }
 
     void Camera::rotate(const glm::vec2& delta) {

@@ -42,7 +42,9 @@ namespace cube {
 
     private:
         void loadShaders();
+        void loadTextures(const glm::ivec2& tile_size = {32,32});
 
+        uint32_t m_texture;
         Shader m_shader;
         std::vector<glm::ivec3> m_list;
         std::unordered_map<glm::ivec3, GLObject> m_objects;

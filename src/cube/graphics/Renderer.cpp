@@ -1,18 +1,28 @@
 #include "cube/graphics/Renderer.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <fstream>
+#include <iostream>
 #include <ranges>
 #include <sstream>
 
 #include <glad/glad.h>
 
+#include "spng.h"
 #include "cube/core/Config.hpp"
+
+#ifndef ASSETS_DIR
+#error "ASSETS_DIR not defined"
+#endif
 
 namespace cube {
 
+    const auto ASSETS = std::string(ASSETS_DIR);
+
     Renderer::Renderer() {
         loadShaders();
+        loadTextures();
     }
 
     Renderer::~Renderer() {
@@ -115,6 +125,9 @@ namespace cube {
 
         glm::vec3 cameraPos = camera.getPosition();
 
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_texture);
+        glActiveTexture(GL_TEXTURE0);
+
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
@@ -125,7 +138,7 @@ namespace cube {
                 m_shader.setMat4("u_Model", model);
 
                 glBindVertexArray(obj.solid_vao);
-                glDrawElements(GL_TRIANGLES, obj.solid_count, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(obj.solid_count), GL_UNSIGNED_INT, nullptr);
             }
         }
 
@@ -145,7 +158,7 @@ namespace cube {
                 m_shader.setMat4("u_Model", model);
 
                 glBindVertexArray(obj.blend_vao);
-                glDrawElements(GL_TRIANGLES, obj.blend_count, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(obj.blend_count), GL_UNSIGNED_INT, nullptr);
             }
         }
 
@@ -160,8 +173,121 @@ namespace cube {
     }
 
     void Renderer::loadShaders() {
-        const auto vert = readFile("../assets/shaders/voxel.vert");
-        const auto frag = readFile("../assets/shaders/voxel.frag");
+        const auto vert = readFile(ASSETS + "/shaders/voxel.vert");
+        const auto frag = readFile(ASSETS + "/shaders/voxel.frag");
         m_shader.compile(vert, frag);
     }
+
+    enum TextureType {
+        Static      = 0x0,
+        Animated    = 0x1,
+        Tinted      = 0x2,
+    };
+
+    struct TextureInfo {
+        std::string path;
+        int flags;
+        int frames;
+    };
+
+    const auto textures = std::vector<TextureInfo>{
+        {"textures/natural/grass_block_side_overlay.png",   Tinted,1},
+        {"textures/natural/grass_block_top.png",            Tinted,1},
+        {"textures/natural/grass_block_side.png",           0,1},
+        {"textures/natural/dirt.png",                       0,1},
+        {"textures/natural/stone.png",                      0,1},
+        {"textures/natural/deepslate.png",                  0,1},
+        {"textures/natural/deepslate_top.png",              0,1},
+        {"textures/natural/bedrock.png",                    0,1},
+    };
+
+    void Renderer::loadTextures(const glm::ivec2& tile_size) {
+        int layers = 0;
+
+        for (const TextureInfo& info : textures) {
+            layers += info.frames;
+        }
+
+        glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_texture);
+        const int mipLevels = 1 + static_cast<int>(std::floor(std::log2(tile_size.x)));
+        glTextureStorage3D(m_texture, mipLevels, GL_RGBA8, tile_size.x, tile_size.y, layers);
+
+        int layer = 0;
+        for (const auto&[path, flags, frames] : textures) {
+            const auto filepath = ASSETS + '/' + path;
+            std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+            if (!file.is_open()) {
+                std::cerr << "Failed to open asset path: " << filepath << "\n";
+                continue;
+            }
+
+            size_t fileSize = file.tellg();
+            file.seekg(0, std::ios::beg);
+            std::vector<char> buffer(fileSize);
+            file.read(buffer.data(), fileSize);
+
+            spng_ctx* ctx = spng_ctx_new(0);
+            if (!ctx) {
+                continue;
+            }
+
+            if (spng_set_png_buffer(ctx, buffer.data(), fileSize)) {
+                spng_ctx_free(ctx);
+                continue;
+            }
+
+            size_t outSize;
+            if (spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &outSize)) {
+                spng_ctx_free(ctx);
+                continue;
+            }
+
+            spng_ihdr ihdr{};
+            spng_get_ihdr(ctx, &ihdr);
+
+            std::vector<uint8_t> pixels(outSize);
+            if (spng_decode_image(ctx, pixels.data(), outSize, SPNG_FMT_RGBA8, 0)) {
+                std::cerr << "Failed to decode PNG format context for: " << path << "\n";
+                spng_ctx_free(ctx);
+                continue;
+            }
+
+            std::cout << "Loaded: " << path
+                      << " | Base Layer: " << layer
+                      << " | Frames: " << frames
+                      << " | Flags: 0x" << std::hex << flags << std::dec << "\n";
+
+            if (frames <= 1) {
+                glTextureSubImage3D(m_texture, 0, 0, 0, layer, tile_size.x, tile_size.y, 1,
+                                    GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+                layer++;
+            } else {
+                const int strideBytes = tile_size.x * 4;
+                const size_t frameSizeBytes = tile_size.y * strideBytes;
+                std::vector<uint8_t> frameBuffer(frameSizeBytes);
+
+                for (int f = 0; f < frames; ++f) {
+                    size_t frameOffsetBytes = f * frameSizeBytes;
+
+                    if (frameOffsetBytes + frameSizeBytes <= pixels.size()) {
+                        std::memcpy(frameBuffer.data(), pixels.data() + frameOffsetBytes, frameSizeBytes);
+
+                        glTextureSubImage3D(m_texture, 0, 0, 0, layer, tile_size.x, tile_size.y, 1,
+                                            GL_RGBA, GL_UNSIGNED_BYTE, frameBuffer.data());
+                        layer++;
+                    }
+                }
+            }
+
+            spng_ctx_free(ctx);
+        }
+
+        glTextureParameteri(m_texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        glTextureParameteri(m_texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(m_texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(m_texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glGenerateTextureMipmap(m_texture);
+    }
+
 }

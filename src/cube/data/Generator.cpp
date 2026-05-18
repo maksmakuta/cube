@@ -18,14 +18,16 @@ namespace cube {
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     const auto world_y = pos.y * CHUNK_SIZE + y;
                     auto voxel = Air;
-                    if (world_y <= 8) {
-                        voxel = HardStone;
-                    } else if (world_y <= 28) {
+                    if (world_y == 0) {
+                        voxel = Bedrock;
+                    } else if (world_y < 8) {
+                        voxel = Deepslate;
+                    } else if (world_y < 28) {
                         voxel = Stone;
-                    } else if (world_y <= 31) {
+                    } else if (world_y < 32) {
                         voxel = Dirt;
                     } else if (world_y == 32) {
-                        voxel = Grass;
+                        voxel = GrassBlock;
                     } else {
                         continue;
                     }

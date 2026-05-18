@@ -17,7 +17,31 @@ namespace cube {
         Far
     };
 
-    uint8_t getTexture(BlockID block, Face face) {
+    uint8_t getTexture(const BlockID block, const Face face) {
+        if (block == GrassBlock) {
+            if (face == Top) {
+                return 1;
+            }
+            if (face == Bottom) {
+                return 3;
+            }
+            return 2;
+        }
+        if (block == Dirt) {
+            return 3;
+        }
+        if (block == Stone) {
+            return 4;
+        }
+        if (block == Deepslate) {
+            if (face == Top || face == Bottom) {
+                return 6;
+            }
+            return 5;
+        }
+        if (block == Bedrock) {
+            return 7;
+        }
         return 0;
     }
 
@@ -40,7 +64,7 @@ namespace cube {
         return static_cast<BlockID>(targetChunk->at(targetLocalPos) & 0xFF);
     }
 
-    bool isTransparent(BlockID id) {
+    bool isTransparent(const BlockID id) {
         return id == BlockID::Water || id == BlockID::Lava;
     }
 

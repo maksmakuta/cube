@@ -17,7 +17,6 @@ namespace cube {
         [[nodiscard]] glm::vec3 getPosition() const;
         [[nodiscard]] glm::vec3 getFront() const;
         [[nodiscard]] glm::vec3 getRight() const;
-        [[nodiscard]] glm::vec3 getUp() const;
 
         [[nodiscard]] glm::vec2 getDirection() const;
 
