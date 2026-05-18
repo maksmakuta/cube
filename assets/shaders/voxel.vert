@@ -1,6 +1,6 @@
 #version 460 core
 
-layout (location = 0) in uint a_PackedData;
+layout (location = 0) in uvec2 a_PackedData;
 
 out vec2 v_TexCoords;
 flat out uint v_TexLayer;
@@ -11,17 +11,19 @@ uniform mat4 u_View;
 uniform mat4 u_Projection;
 
 void main() {
-    uint posX = (a_PackedData >> 0u)  & 0x1Fu;
-    uint posY = (a_PackedData >> 5u)  & 0x1Fu;
-    uint posZ = (a_PackedData >> 10u) & 0x1Fu;
+    // Extract everything safely from the first 32-bit word (a_PackedData.x)
+    uint posX = (a_PackedData.x >> 0u)  & 0x1Fu;
+    uint posY = (a_PackedData.x >> 5u)  & 0x1Fu;
+    uint posZ = (a_PackedData.x >> 10u) & 0x1Fu;
 
-    uint texU = (a_PackedData >> 15u) & 0x1Fu;
-    uint texV = (a_PackedData >> 20u) & 0x1Fu;
+    uint texU = (a_PackedData.x >> 15u) & 0x1Fu;
+    uint texV = (a_PackedData.x >> 20u) & 0x1Fu;
 
-    v_TexLayer = (a_PackedData >> 25u) & 0x1Fu;
+    // Extract everything safely from the second 32-bit word (a_PackedData.y)
+    v_TexLayer = (a_PackedData.y >> 0u) & 0xFFu;
+    uint aoInt  = (a_PackedData.y >> 8u) & 0x03u;
 
-    uint aoInt = (a_PackedData >> 30u) & 0x03u;
-
+    // Conversions
     vec3 localPos = vec3(float(posX), float(posY), float(posZ));
     v_TexCoords   = vec2(float(texU), float(texV));
 

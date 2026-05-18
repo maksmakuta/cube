@@ -6,7 +6,7 @@
 namespace cube {
 
     // vertex can store multiple data in very tiny and optimized format
-    using Vertex = uint32_t;
+    using Vertex = uint64_t;
 
     /**
      * compress vertex with default data
@@ -16,6 +16,7 @@ namespace cube {
      * @param u U texcoord
      * @param v V texcoord
      * @param t texture layer
+     * @param a ambient occlusion value
      * @return Compressed Vertex
      */
     Vertex compress(

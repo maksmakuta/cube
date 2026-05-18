@@ -32,6 +32,7 @@ namespace cube {
         Generator m_generator;
         ThreadPool m_gen_pool;
         ThreadPool m_mesh_pool;
+        std::vector<glm::ivec3> m_chunkOffsets;
         ConcurrentQueue<MeshResult> m_meshQueue;
     };
 

@@ -11,17 +11,18 @@ namespace cube {
         const uint8_t t,
         const uint8_t a
     ) {
-        Vertex compressed = 0;
+        uint32_t lowBits = 0;
+        lowBits |=  static_cast<uint32_t>(x) & 0x1F;
+        lowBits |= (static_cast<uint32_t>(y) & 0x1F) << 5;
+        lowBits |= (static_cast<uint32_t>(z) & 0x1F) << 10;
+        lowBits |= (static_cast<uint32_t>(u) & 0x1F) << 15;
+        lowBits |= (static_cast<uint32_t>(v) & 0x1F) << 20;
 
-        compressed |=  static_cast<Vertex>(x) & 0x1F;
-        compressed |= (static_cast<Vertex>(y) & 0x1F) << 5;
-        compressed |= (static_cast<Vertex>(z) & 0x1F) << 10;
-        compressed |= (static_cast<Vertex>(u) & 0x1F) << 15;
-        compressed |= (static_cast<Vertex>(v) & 0x1F) << 20;
-        compressed |= (static_cast<Vertex>(t) & 0x1F) << 25;
-        compressed |= (static_cast<Vertex>(a) & 0x03) << 30;
+        uint32_t highBits = 0;
+        highBits |=  static_cast<uint32_t>(t) & 0xFF;
+        highBits |= (static_cast<uint32_t>(a) & 0x03) << 8;
 
-        return compressed;
+        return (static_cast<uint64_t>(highBits) << 32) | lowBits;
     }
 
 }

@@ -62,7 +62,7 @@ namespace cube {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newObj.solid_ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.solid.indices.size() * sizeof(uint32_t), mesh.solid.indices.data(), GL_STATIC_DRAW);
 
-            glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
+            glVertexAttribIPointer(0, 2, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
             glEnableVertexAttribArray(0);
 
             newObj.solid_count = static_cast<uint32_t>(mesh.solid.indices.size());
@@ -80,7 +80,7 @@ namespace cube {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newObj.blend_ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.transparent.indices.size() * sizeof(uint32_t), mesh.transparent.indices.data(), GL_STATIC_DRAW);
 
-            glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
+            glVertexAttribIPointer(0, 2, GL_UNSIGNED_INT, 0, static_cast<void *>(nullptr));
             glEnableVertexAttribArray(0);
 
             newObj.blend_count = static_cast<uint32_t>(mesh.transparent.indices.size());
@@ -178,28 +178,180 @@ namespace cube {
         m_shader.compile(vert, frag);
     }
 
-    enum TextureType {
-        Static      = 0x0,
-        Animated    = 0x1,
-        Tinted      = 0x2,
-    };
-
     struct TextureInfo {
         std::string path;
-        int flags;
         int frames;
     };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     const auto textures = std::vector<TextureInfo>{
-        {"textures/natural/grass_block_side_overlay.png",   Tinted,1},
-        {"textures/natural/grass_block_top.png",            Tinted,1},
-        {"textures/natural/grass_block_side.png",           0,1},
-        {"textures/natural/dirt.png",                       0,1},
-        {"textures/natural/stone.png",                      0,1},
-        {"textures/natural/deepslate.png",                  0,1},
-        {"textures/natural/deepslate_top.png",              0,1},
-        {"textures/natural/bedrock.png",                    0,1},
-    };
+        {"textures/brown_mushroom.png",                             1   },
+        {"textures/melon_side.png",                                 1   },
+        {"textures/melon_top.png",                                  1   },
+        {"textures/pumpkin_side.png",                               1   },
+        {"textures/pumpkin_top.png",                                1   },
+        {"textures/red_mushroom.png",                               1   },
+        {"textures/cactus/cactus_bottom.png",                       1   },
+        {"textures/cactus/cactus_flower.png",                       1   },
+        {"textures/cactus/cactus_side.png",                         1   },
+        {"textures/cactus/cactus_top.png",                          1   },
+        {"textures/coral/block/brain_coral_block.png",              1   },
+        {"textures/coral/block/bubble_coral_block.png",             1   },
+        {"textures/coral/block/dead_brain_coral_block.png",         1   },
+        {"textures/coral/block/dead_bubble_coral_block.png",        1   },
+        {"textures/coral/block/dead_fire_coral_block.png",          1   },
+        {"textures/coral/block/dead_horn_coral_block.png",          1   },
+        {"textures/coral/block/dead_tube_coral_block.png",          1   },
+        {"textures/coral/block/fire_coral_block.png",               1   },
+        {"textures/coral/block/horn_coral_block.png",               1   },
+        {"textures/coral/block/tube_coral_block.png",               1   },
+        {"textures/coral/brain_coral.png",                          1   },
+        {"textures/coral/bubble_coral.png",                         1   },
+        {"textures/coral/dead_brain_coral.png",                     1   },
+        {"textures/coral/dead_bubble_coral.png",                    1   },
+        {"textures/coral/dead_fire_coral.png",                      1   },
+        {"textures/coral/dead_horn_coral.png",                      1   },
+        {"textures/coral/dead_tube_coral.png",                      1   },
+        {"textures/coral/fan/brain_coral_fan.png",                  1   },
+        {"textures/coral/fan/bubble_coral_fan.png",                 1   },
+        {"textures/coral/fan/dead_brain_coral_fan.png",             1   },
+        {"textures/coral/fan/dead_bubble_coral_fan.png",            1   },
+        {"textures/coral/fan/dead_fire_coral_fan.png",              1   },
+        {"textures/coral/fan/dead_horn_coral_fan.png",              1   },
+        {"textures/coral/fan/dead_tube_coral_fan.png",              1   },
+        {"textures/coral/fan/fire_coral_fan.png",                   1   },
+        {"textures/coral/fan/horn_coral_fan.png",                   1   },
+        {"textures/coral/fan/tube_coral_fan.png",                   1   },
+        {"textures/coral/fire_coral.png",                           1   },
+        {"textures/coral/horn_coral.png",                           1   },
+        {"textures/coral/tube_coral.png",                           1   },
+        {"textures/decorations/bush.png",                           1   },
+        {"textures/decorations/cave_vines_lit.png",                 1   },
+        {"textures/decorations/cave_vines_plant_lit.png",           1   },
+        {"textures/decorations/cave_vines_plant.png",               1   },
+        {"textures/decorations/cave_vines.png",                     1   },
+        {"textures/decorations/dead_bush.png",                      1   },
+        {"textures/decorations/fern.png",                           1   },
+        {"textures/decorations/firefly_bush.png",                   1   },
+        {"textures/decorations/grass.png",                          1   },
+        {"textures/decorations/hanging_roots.png",                  1   },
+        {"textures/decorations/short_dry_grass.png",                1   },
+        {"textures/decorations/short_grass.png",                    1   },
+        {"textures/decorations/sugar_cane.png",                     1   },
+        {"textures/decorations/sweet_berry_bush_stage0.png",        1   },
+        {"textures/decorations/sweet_berry_bush_stage1.png",        1   },
+        {"textures/decorations/sweet_berry_bush_stage2.png",        1   },
+        {"textures/decorations/sweet_berry_bush_stage3.png",        1   },
+        {"textures/decorations/tall_dry_grass.png",                 1   },
+        {"textures/flowers/allium.png",                             1   },
+        {"textures/flowers/azure_bluet.png",                        1   },
+        {"textures/flowers/blue_orchid.png",                        1   },
+        {"textures/flowers/cornflower.png",                         1   },
+        {"textures/flowers/dandelion.png",                          1   },
+        {"textures/flowers/orange_tulip.png",                       1   },
+        {"textures/flowers/oxeye_daisy.png",                        1   },
+        {"textures/flowers/pink_tulip.png",                         1   },
+        {"textures/flowers/poppy.png",                              1   },
+        {"textures/flowers/red_tulip.png",                          1   },
+        {"textures/flowers/white_tulip.png",                        1   },
+        {"textures/leaves/acacia_leaves.png",                       1   },
+        {"textures/leaves/azalea_leaves.png",                       1   },
+        {"textures/leaves/birch_leaves.png",                        1   },
+        {"textures/leaves/cherry_leaves.png",                       1   },
+        {"textures/leaves/dark_oak_leaves.png",                     1   },
+        {"textures/leaves/jungle_leaves.png",                       1   },
+        {"textures/leaves/oak_leaves.png",                          1   },
+        {"textures/leaves/pale_oak_leaves.png",                     1   },
+        {"textures/leaves/spruce_leaves.png",                       1   },
+        {"textures/logs/acacia_log.png",                            1   },
+        {"textures/logs/acacia_log_top.png",                        1   },
+        {"textures/logs/birch_log.png",                             1   },
+        {"textures/logs/birch_log_top.png",                         1   },
+        {"textures/logs/cherry_log.png",                            1   },
+        {"textures/logs/cherry_log_top.png",                        1   },
+        {"textures/logs/dark_oak_log.png",                          1   },
+        {"textures/logs/dark_oak_log_top.png",                      1   },
+        {"textures/logs/jungle_log.png",                            1   },
+        {"textures/logs/jungle_log_top.png",                        1   },
+        {"textures/logs/oak_log.png",                               1   },
+        {"textures/logs/oak_log_top.png",                           1   },
+        {"textures/logs/pale_oak_log.png",                          1   },
+        {"textures/logs/pale_oak_log_top.png",                      1   },
+        {"textures/logs/spruce_log.png",                            1   },
+        {"textures/logs/spruce_log_top.png",                        1   },
+        {"textures/natural/amethyst_block.png",                     1   },
+        {"textures/natural/andesite.png",                           1   },
+        {"textures/natural/basalt_side.png",                        1   },
+        {"textures/natural/basalt_top.png",                         1   },
+        {"textures/natural/bedrock.png",                            1   },
+        {"textures/natural/blackstone.png",                         1   },
+        {"textures/natural/blackstone_top.png",                     1   },
+        {"textures/natural/blue_ice.png",                           1   },
+        {"textures/natural/calcite.png",                            1   },
+        {"textures/natural/clay.png",                               1   },
+        {"textures/natural/coarse_dirt.png",                        1   },
+        {"textures/natural/cobblestone.png",                        1   },
+        {"textures/natural/deepslate.png",                          1   },
+        {"textures/natural/deepslate_top.png",                      1   },
+        {"textures/natural/diorite.png",                            1   },
+        {"textures/natural/dirt.png",                               1   },
+        {"textures/natural/dripstone_block.png",                    1   },
+        {"textures/natural/granite.png",                            1   },
+        {"textures/natural/grass_block_side_overlay.png",           1   },
+        {"textures/natural/grass_block_side.png",                   1   },
+        {"textures/natural/grass_block_snow.png",                   1   },
+        {"textures/natural/grass_block_top.png",                    1   },
+        {"textures/natural/gravel.png",                             1   },
+        {"textures/natural/ice.png",                                1   },
+        {"textures/natural/mud.png",                                1   },
+        {"textures/natural/packed_ice.png",                         1   },
+        {"textures/natural/red_sand.png",                           1   },
+        {"textures/natural/red_sandstone.png",                      1   },
+        {"textures/natural/sand.png",                               1   },
+        {"textures/natural/sandstone.png",                          1   },
+        {"textures/natural/stone.png",                              1   },
+        {"textures/natural/tuff.png",                               1   },
+        {"textures/sapling/acacia_sapling.png",                     1   },
+        {"textures/sapling/azalea_plant.png",                       1   },
+        {"textures/sapling/azalea_side.png",                        1   },
+        {"textures/sapling/azalea_top.png",                         1   },
+        {"textures/sapling/birch_sapling.png",                      1   },
+        {"textures/sapling/cherry_sapling.png",                     1   },
+        {"textures/sapling/dark_oak_sapling.png",                   1   },
+        {"textures/sapling/flowering_azalea_leaves.png",            1   },
+        {"textures/sapling/flowering_azalea_side.png",              1   },
+        {"textures/sapling/flowering_azalea_top.png",               1   },
+        {"textures/sapling/jungle_sapling.png",                     1   },
+        {"textures/sapling/oak_sapling.png",                        1   },
+        {"textures/sapling/pale_oak_sapling.png",                   1   },
+        {"textures/sapling/spruce_sapling.png",                     1   },
+        {"textures/tall/large_fern_bottom.png",                     1   },
+        {"textures/tall/large_fern_top.png",                        1   },
+        {"textures/tall/peony_bottom.png",                          1   },
+        {"textures/tall/peony_top.png",                             1   },
+        {"textures/tall/rose_bush_bottom.png",                      1   },
+        {"textures/tall/rose_bush_top.png",                         1   },
+        {"textures/tall/tall_grass_bottom.png",                     1   },
+        {"textures/tall/tall_grass_top.png",                        1   },
+        {"textures/tall/tall_seagrass_bottom.png",                  18  },
+        {"textures/tall/tall_seagrass_top.png",                     18  },
+        {"textures/kelp_plant.png",                                 32  },
+        {"textures/lava_still.png",                                 32  },
+        {"textures/seagrass.png",                                   32  },
+        {"textures/water_still.png",                                32  },
+};
 
     void Renderer::loadTextures(const glm::ivec2& tile_size) {
         int layers = 0;
@@ -213,8 +365,8 @@ namespace cube {
         glTextureStorage3D(m_texture, mipLevels, GL_RGBA8, tile_size.x, tile_size.y, layers);
 
         int layer = 0;
-        for (const auto&[path, flags, frames] : textures) {
-            const auto filepath = ASSETS + '/' + path;
+        for (const auto&[path, frames] : textures) {
+            const auto filepath = ASSETS + "/" += path;
             std::ifstream file(filepath, std::ios::binary | std::ios::ate);
             if (!file.is_open()) {
                 std::cerr << "Failed to open asset path: " << filepath << "\n";
@@ -254,8 +406,7 @@ namespace cube {
 
             std::cout << "Loaded: " << path
                       << " | Base Layer: " << layer
-                      << " | Frames: " << frames
-                      << " | Flags: 0x" << std::hex << flags << std::dec << "\n";
+                      << " | Frames: " << frames << "\n";
 
             if (frames <= 1) {
                 glTextureSubImage3D(m_texture, 0, 0, 0, layer, tile_size.x, tile_size.y, 1,
@@ -291,3 +442,4 @@ namespace cube {
     }
 
 }
+
