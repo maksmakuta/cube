@@ -3,7 +3,7 @@
 namespace cube {
 
     Cube::Cube() {
-        const auto pos = glm::ivec3{0};
+        constexpr auto pos = glm::ivec3{0};
         const auto chunk = m_generator.generate(pos);
         m_world.setChunk(pos, chunk);
         const auto mesh = generateMesh(pos,m_world);
