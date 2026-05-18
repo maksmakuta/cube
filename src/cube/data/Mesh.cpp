@@ -34,7 +34,7 @@ namespace cube {
         {  0,  0,  0 }, //Gravel,
         {  0,  0,  0 }, //Clay,
         {109,109,109 }, //Dirt,
-        {  0,  0,  0 }, //Sand,
+        {122,122,122 }, //Sand,
         {  0,  0,  0 }, //Mud,
         {  0,  0,  0 }, //Amethyst,
         {  0,  0,  0 }, //Andesite,
@@ -153,8 +153,7 @@ namespace cube {
         {  0,  0,  0 }, //Kelp,
         {  0,  0,  0 }, //Seagrass,
         {  0,  0,  0 }, //Water,
-        {  0,  0,  0 }, //Lava,
-        {  0,  0,  0 }, //COUNT
+        {  0,  0,  0 }, //Lava
     };
 
     constexpr bool TRANSPARENT[] = {
@@ -186,15 +185,15 @@ namespace cube {
         false, //Ice,
         false, //BlueIce,
         false, //PackedIce,
-        false, //AcaciaLeaves,
-        false, //AzaleaLeaves,
-        false, //BirchLeaves,
-        false, //CherryLeaves,
-        false, //DarkOakLeaves,
-        false, //JungleLeaves,
-        false, //OakLeaves,
-        false, //PaleOakLeaves,
-        false, //SpruceLeaves,
+        true , //AcaciaLeaves,
+        true , //AzaleaLeaves,
+        true , //BirchLeaves,
+        true , //CherryLeaves,
+        true , //DarkOakLeaves,
+        true , //JungleLeaves,
+        true , //OakLeaves,
+        true , //PaleOakLeaves,
+        true , //SpruceLeaves,
         false, //AcaciaLog,
         false, //AzaleaLog,
         false, //BirchLog,
@@ -204,26 +203,26 @@ namespace cube {
         false, //OakLog,
         false, //PaleOakLog,
         false, //SpruceLog,
-        false, //AcaciaSapling,
-        false, //AzaleaSapling,
-        false, //BirchSapling,
-        false, //CherrySapling,
-        false, //DarkOakSapling,
-        false, //JungleSapling,
-        false, //OakSapling,
-        false, //PaleOakSapling,
-        false, //SpruceSapling,
-        false, //Allium,
-        false, //AzureBluet,
-        false, //BlueOrchid,
-        false, //CornFlower,
-        false, //Dandelion,
-        false, //OrangeTulip,
-        false, //OxeyeDaisy,
-        false, //PinkTulip,
-        false, //Poppy,
-        false, //RedTulip,
-        false, //WhiteTulip,
+        true , //AcaciaSapling,
+        true , //AzaleaSapling,
+        true , //BirchSapling,
+        true , //CherrySapling,
+        true , //DarkOakSapling,
+        true , //JungleSapling,
+        true , //OakSapling,
+        true , //PaleOakSapling,
+        true , //SpruceSapling,
+        true , //Allium,
+        true , //AzureBluet,
+        true , //BlueOrchid,
+        true , //CornFlower,
+        true , //Dandelion,
+        true , //OrangeTulip,
+        true , //OxeyeDaisy,
+        true , //PinkTulip,
+        true , //Poppy,
+        true , //RedTulip,
+        true , //WhiteTulip,
         false, //BrainCoralBlock,
         false, //BubbleCoralBlock,
         false, //FireCoralBlock,
@@ -234,74 +233,73 @@ namespace cube {
         false, //DeadFireCoralBlock,
         false, //DeadHornCoralBlock,
         false, //DeadTubeCoralBlock,
-        false, //BrainCoralFan,
-        false, //BubbleCoralFan,
-        false, //FireCoralFan,
-        false, //HornCoralFan,
-        false, //TubeCoralFan,
-        false, //BrainCoral,
-        false, //BubbleCoral,
-        false, //FireCoral,
-        false, //HornCoral,
-        false, //TubeCoral,
-        false, //DeadBrainCoral,
-        false, //DeadBubbleCoral,
-        false, //DeadFireCoral,
-        false, //DeadHornCoral,
-        false, //DeadTubeCoral,
-        false, //Bush,
-        false, //DeadBush,
-        false, //Fern,
-        false, //Grass,
-        false, //HangingRoots,
-        false, //ShortDryGrass,
-        false, //ShortGrass,
-        false, //TallDryGrass,
-        false, //SugarCane,
-        false, //SweetBerry0,
-        false, //SweetBerry1,
-        false, //SweetBerry2,
-        false, //SweetBerry3,
-        false, //CaveVines,
-        false, //CaveVinesLit,
-        false, //CavePlant,
-        false, //CavePlantLit,
+        true , //BrainCoralFan,
+        true , //BubbleCoralFan,
+        true , //FireCoralFan,
+        true , //HornCoralFan,
+        true , //TubeCoralFan,
+        true , //BrainCoral,
+        true , //BubbleCoral,
+        true , //FireCoral,
+        true , //HornCoral,
+        true , //TubeCoral,
+        true , //DeadBrainCoral,
+        true , //DeadBubbleCoral,
+        true , //DeadFireCoral,
+        true , //DeadHornCoral,
+        true , //DeadTubeCoral,
+        true , //Bush,
+        true , //DeadBush,
+        true , //Fern,
+        true , //Grass,
+        true , //HangingRoots,
+        true , //ShortDryGrass,
+        true , //ShortGrass,
+        true , //TallDryGrass,
+        true , //SugarCane,
+        true , //SweetBerry0,
+        true , //SweetBerry1,
+        true , //SweetBerry2,
+        true , //SweetBerry3,
+        true , //CaveVines,
+        true , //CaveVinesLit,
+        true , //CavePlant,
+        true , //CavePlantLit,
         false, //Cactus,
         false, //CactusFlower,
-        false, //BrownMushroom,
-        false, //RedMushroom,
+        true , //BrownMushroom,
+        true , //RedMushroom,
         false, //Pumpkin,
         false, //Melon,
-        false, //LargeFern,
-        false, //LargeFernTop,
-        false, //Peony,
-        false, //PeonyTop,
-        false, //RoseBush,
-        false, //RoseBushTop,
-        false, //TallGrass,
-        false, //TallGrassTop,
-        false, //TallSeaGrass,
-        false, //TallSeaGrassTop,
-        false, //Kelp,
-        false, //Seagrass,
-        false, //Water,
-        false, //Lava,
-        false, //COUNT
+        true , //LargeFern,
+        true , //LargeFernTop,
+        true , //Peony,
+        true , //PeonyTop,
+        true , //RoseBush,
+        true , //RoseBushTop,
+        true , //TallGrass,
+        true , //TallGrassTop,
+        true , //TallSeaGrass,
+        true , //TallSeaGrassTop,
+        true , //Kelp,
+        true , //Seagrass,
+        true , //Water,
+        true , //Lava
     };
 
     [[nodiscard]]
     inline uint8_t getTexture(const BlockID id, const Face face) noexcept {
-        const auto& t = TEXTURES[static_cast<uint8_t>(id)];
+        const auto&[top, side, bottom] = TEXTURES[static_cast<uint8_t>(id)];
 
         switch (face) {
             case Top:
-                return t.top;
+                return top;
 
             case Bottom:
-                return t.bottom;
+                return bottom;
 
             default:
-                return t.side;
+                return side;
         }
     }
 
@@ -333,7 +331,7 @@ namespace cube {
         Chunk* chunk = cache.chunks[cx + 1][cy + 1][cz + 1];
 
         if (!chunk) {
-            return BlockID::Air;
+            return Air;
         }
 
         return static_cast<BlockID>(
@@ -342,7 +340,7 @@ namespace cube {
     }
 
     struct FaceInfo final {
-        BlockID id = BlockID::Air;
+        BlockID id = Air;
         uint8_t texture = 0;
         uint8_t ao = 0;
 
@@ -362,10 +360,10 @@ namespace cube {
         const uint8_t a3
     ) noexcept {
 
-        return (a0) |
-            (a1 << 2) |
-            (a2 << 4) |
-            (a3 << 6);
+        return a0 |
+            a1 << 2 |
+            a2 << 4 |
+            a3 << 6;
     }
 
     [[nodiscard]]
@@ -373,8 +371,7 @@ namespace cube {
         const uint8_t ao,
         const int index
     ) noexcept {
-
-        return (ao >> (index * 2)) & 0x3;
+        return ao >> (index * 2) & 0x3;
     }
 
     [[nodiscard]]
@@ -394,11 +391,11 @@ namespace cube {
     Mesh generateMesh(const glm::ivec3& pos, const World& world) {
         Mesh mesh;
 
-        mesh.solid.vertices.reserve(32768);
-        mesh.solid.indices.reserve(49152);
+        mesh.solid.vertices.reserve(2048);
+        mesh.solid.indices.reserve(4096);
 
-        mesh.transparent.vertices.reserve(4096);
-        mesh.transparent.indices.reserve(6144);
+        mesh.transparent.vertices.reserve(2048);
+        mesh.transparent.indices.reserve(4096);
 
         ChunkCache cache;
 
@@ -533,7 +530,7 @@ namespace cube {
                             isTransparent(neighbor);
 
                         const bool visible =
-                            neighbor == BlockID::Air ||
+                            neighbor == Air ||
                             (neiTrans && !curTrans) ||
                             (curTrans && neiTrans && current != neighbor);
 
@@ -614,7 +611,7 @@ namespace cube {
                         while (j + h < CHUNK_SIZE && !done) {
 
                             for (int k = 0; k < w; ++k) {
-                                if (!(mask[n + k + h * CHUNK_SIZE] == current)) {
+                                if (mask[n + k + h * CHUNK_SIZE] != current) {
                                     done = true;
                                     break;
                                 }
@@ -680,28 +677,32 @@ namespace cube {
                             v0.x, v0.y, v0.z,
                             0, 0,
                             current.texture,
-                            unpackAO(current.ao, 0)
+                            unpackAO(current.ao, 0),
+                            packRGB565(255,255,255)
                         ));
 
                         verts.push_back(compress(
                             v1.x, v1.y, v1.z,
                             w, 0,
                             current.texture,
-                            unpackAO(current.ao, 1)
+                            unpackAO(current.ao, 1),
+                            packRGB565(255,255,255)
                         ));
 
                         verts.push_back(compress(
                             v2.x, v2.y, v2.z,
                             0, h,
                             current.texture,
-                            unpackAO(current.ao, 2)
+                            unpackAO(current.ao, 2),
+                            packRGB565(255,255,255)
                         ));
 
                         verts.push_back(compress(
                             v3.x, v3.y, v3.z,
                             w, h,
                             current.texture,
-                            unpackAO(current.ao, 3)
+                            unpackAO(current.ao, 3),
+                            packRGB565(255,255,255)
                         ));
 
                         const uint8_t a0 = unpackAO(current.ao, 0);

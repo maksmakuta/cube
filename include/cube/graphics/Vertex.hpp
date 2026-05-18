@@ -17,13 +17,22 @@ namespace cube {
      * @param v V texcoord
      * @param t texture layer
      * @param a ambient occlusion value
+     * @param tint - tint color encoded as R5G6B5
      * @return Compressed Vertex
      */
     Vertex compress(
         uint8_t x ,uint8_t y, uint8_t z,
         uint8_t u, uint8_t v, uint8_t t,
-        uint8_t a
+        uint8_t a, uint16_t tint
     );
+
+    constexpr uint16_t packRGB565(
+        const uint8_t r,
+        const uint8_t g,
+        const uint8_t b
+    ) {
+        return (r >> 3) << 11 | (g >> 2) << 5 | b >> 3;
+    }
 
 }
 

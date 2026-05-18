@@ -6,7 +6,8 @@ namespace cube {
         return glm::floor(worldPos / static_cast<float>(CHUNK_SIZE));
     }
 
-    Cube::Cube() : m_gen_pool(std::thread::hardware_concurrency() / 2), m_mesh_pool(std::thread::hardware_concurrency() / 2) {
+    Cube::Cube() : m_gen_pool(std::thread::hardware_concurrency() / 2),
+                   m_mesh_pool(std::thread::hardware_concurrency() / 2) {
         for (int x = -RENDER_DIST; x <= RENDER_DIST; ++x) {
             for (int z = -RENDER_DIST; z <= RENDER_DIST; ++z) {
                 for (int y = -RENDER_DIST; y <= RENDER_DIST; ++y) {
@@ -64,7 +65,7 @@ namespace cube {
                     m_world.setStatus(target_pos, Status::Empty);
                     generation_dispatched++;
 
-                    m_gen_pool.enqueue([this, target_pos] {
+                    m_gen_pool.enqueue_detached([this, target_pos] {
                         auto chunk = m_generator.generate(target_pos);
                         m_world.setChunk(target_pos, std::move(chunk));
                         m_world.setStatus(target_pos, Status::Present);
@@ -78,7 +79,7 @@ namespace cube {
                     m_world.setStatus(target_pos, Status::Meshed);
                     meshing_dispatched++;
 
-                    m_mesh_pool.enqueue([this, target_pos] {
+                    m_mesh_pool.enqueue_detached([this, target_pos] {
                         auto mesh = generateMesh(target_pos, m_world);
                         m_meshQueue.push(MeshResult{target_pos, std::move(mesh)});
                     });
