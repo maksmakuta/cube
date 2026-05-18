@@ -41,6 +41,8 @@ namespace cube {
         void render(const Camera& camera);
 
     private:
+        void loadShaders();
+
         Shader m_shader;
         std::vector<glm::ivec3> m_list;
         std::unordered_map<glm::ivec3, GLObject> m_objects;

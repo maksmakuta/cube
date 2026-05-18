@@ -31,10 +31,9 @@ namespace cube {
     glm::vec2 Camera::getDirection() const{ return m_direction; }
 
     void Camera::rotate(const glm::vec2& delta) {
-        m_direction.x += delta.x;
-        m_direction.y += delta.y;
+        m_direction += delta;
 
-        m_direction = glm::clamp(m_direction, -89.0f, 89.0f);
+        m_direction.y = glm::clamp(m_direction.y, -89.0f, 89.0f);
 
         update();
     }
@@ -55,7 +54,7 @@ namespace cube {
 
         m_front = glm::normalize(front);
 
-        constexpr glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        constexpr auto worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
         m_right = glm::normalize(glm::cross(m_front, worldUp));
         m_up    = glm::normalize(glm::cross(m_right, m_front));
     }

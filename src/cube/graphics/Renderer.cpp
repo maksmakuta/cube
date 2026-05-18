@@ -1,7 +1,9 @@
 #include "cube/graphics/Renderer.hpp"
 
 #include <algorithm>
+#include <fstream>
 #include <ranges>
+#include <sstream>
 
 #include <glad/glad.h>
 
@@ -10,7 +12,7 @@
 namespace cube {
 
     Renderer::Renderer() {
-
+        loadShaders();
     }
 
     Renderer::~Renderer() {
@@ -150,4 +152,16 @@ namespace cube {
         glDepthMask(GL_TRUE);
     }
 
+    std::string readFile(const std::string& path) {
+        if (std::ifstream ifs(path); ifs.is_open()) {
+            return (std::stringstream() << ifs.rdbuf()).str();
+        }
+        return "";
+    }
+
+    void Renderer::loadShaders() {
+        const auto vert = readFile("../assets/shaders/voxel.vert");
+        const auto frag = readFile("../assets/shaders/voxel.frag");
+        m_shader.compile(vert, frag);
+    }
 }

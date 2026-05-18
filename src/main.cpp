@@ -41,6 +41,9 @@ int main() {
     bool running = true;
     cube::Cube engine;
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
 
     Uint64 lastTime = SDL_GetTicksNS();
 
@@ -55,10 +58,13 @@ int main() {
             if (event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
+            if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+                glViewport(0, 0, event.window.data1, event.window.data2);
+            }
             engine.onEvent(event);
         }
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         engine.onRender();
         SDL_GL_SwapWindow(window);
     }

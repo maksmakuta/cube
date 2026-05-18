@@ -3,6 +3,7 @@
 
 #include <SDL3/SDL_events.h>
 
+#include "data/Generator.hpp"
 #include "data/World.hpp"
 #include "graphics/Camera.hpp"
 #include "graphics/Renderer.hpp"
@@ -18,9 +19,10 @@ namespace cube {
         void onEvent(const SDL_Event& event);
 
     private:
-        Camera m_camera;
         World m_world;
+        Camera m_camera;
         Renderer m_renderer;
+        Generator m_generator;
     };
 
 }
