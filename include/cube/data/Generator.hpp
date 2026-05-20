@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "cube/data/Chunk.hpp"
+#include "FastNoise/FastNoise.h"
 
 namespace cube {
 
@@ -16,6 +17,7 @@ namespace cube {
 
     private:
         int m_seed;
+        FastNoise::SmartNode<> m_terrain;
     };
 
 }

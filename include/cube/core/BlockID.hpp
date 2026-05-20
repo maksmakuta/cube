@@ -5,6 +5,13 @@
 
 namespace cube {
 
+    enum class MeshType {
+        Cube,
+        Cross,
+        Panel,
+        Custom
+    };
+
     enum BlockID : uint8_t {
         Air,
 
@@ -158,6 +165,17 @@ namespace cube {
 
         COUNT
     };
+
+    struct BlockInfo {
+        uint8_t top;
+        uint8_t side;
+        uint8_t bottom;
+        uint8_t frames;
+        MeshType type;
+        bool transparent;
+    };
+
+    BlockInfo getBlockInfo(BlockID);
 
 }
 
