@@ -1,6 +1,6 @@
 #include "cube/data/Mesh.hpp"
 
-#include <array>
+#include <memory>
 
 #include "cube/core/BlockID.hpp"
 #include "cube/data/Chunk.hpp"
@@ -8,739 +8,437 @@
 
 namespace cube {
 
-    constexpr int MASK_SIZE  = CHUNK_SIZE * CHUNK_SIZE;
+    using ChunkData = std::array<std::shared_ptr<Chunk>, 27>;
 
-    enum Face : uint8_t {
-        Top,
-        Bottom,
-        Left,
-        Right,
-        Near,
-        Far
-    };
-
-    struct TextureSet {
-        uint8_t top;
-        uint8_t side;
-        uint8_t bottom;
-    };
-
-    constexpr TextureSet TEXTURES[] = {
-        {  0,  0,  0 }, //Air,
-        {  0,  0,  0 }, //SnowGrassBlock,
-        {115,113,109 }, //GrassBlock,
-        {  0,  0,  0 }, //CoarseDirt,
-        {  0,  0,  0 }, //RedSand,
-        {  0,  0,  0 }, //Gravel,
-        {  0,  0,  0 }, //Clay,
-        {109,109,109 }, //Dirt,
-        {122,122,122 }, //Sand,
-        {  0,  0,  0 }, //Mud,
-        {  0,  0,  0 }, //Amethyst,
-        {  0,  0,  0 }, //Andesite,
-        {  0,  0,  0 }, //Basalt,
-        { 98, 98, 98 }, //Bedrock,
-        {  0,  0,  0 }, //BlackStone,
-        {  0,  0,  0 }, //Calcite,
-        {  0,  0,  0 }, //CobbleStone,
-        {  0,  0,  0 }, //Deepslate,
-        {  0,  0,  0 }, //Diorite,
-        {  0,  0,  0 }, //Dripstone,
-        {  0,  0,  0 }, //Granite,
-        {  0,  0,  0 }, //RedSandStone,
-        {  0,  0,  0 }, //SandStone,
-        {  0,  0,  0 }, //Stone,
-        {  0,  0,  0 }, //Tuff,
-        {  0,  0,  0 }, //Ice,
-        {  0,  0,  0 }, //BlueIce,
-        {  0,  0,  0 }, //PackedIce,
-        {  0,  0,  0 }, //AcaciaLeaves,
-        {  0,  0,  0 }, //AzaleaLeaves,
-        {  0,  0,  0 }, //BirchLeaves,
-        {  0,  0,  0 }, //CherryLeaves,
-        {  0,  0,  0 }, //DarkOakLeaves,
-        {  0,  0,  0 }, //JungleLeaves,
-        {  0,  0,  0 }, //OakLeaves,
-        {  0,  0,  0 }, //PaleOakLeaves,
-        {  0,  0,  0 }, //SpruceLeaves,
-        {  0,  0,  0 }, //AcaciaLog,
-        {  0,  0,  0 }, //AzaleaLog,
-        {  0,  0,  0 }, //BirchLog,
-        {  0,  0,  0 }, //CherryLog,
-        {  0,  0,  0 }, //DarkOakLog,
-        {  0,  0,  0 }, //JungleLog,
-        {  0,  0,  0 }, //OakLog,
-        {  0,  0,  0 }, //PaleOakLog,
-        {  0,  0,  0 }, //SpruceLog,
-        {  0,  0,  0 }, //AcaciaSapling,
-        {  0,  0,  0 }, //AzaleaSapling,
-        {  0,  0,  0 }, //BirchSapling,
-        {  0,  0,  0 }, //CherrySapling,
-        {  0,  0,  0 }, //DarkOakSapling,
-        {  0,  0,  0 }, //JungleSapling,
-        {  0,  0,  0 }, //OakSapling,
-        {  0,  0,  0 }, //PaleOakSapling,
-        {  0,  0,  0 }, //SpruceSapling,
-        {  0,  0,  0 }, //Allium,
-        {  0,  0,  0 }, //AzureBluet,
-        {  0,  0,  0 }, //BlueOrchid,
-        {  0,  0,  0 }, //CornFlower,
-        {  0,  0,  0 }, //Dandelion,
-        {  0,  0,  0 }, //OrangeTulip,
-        {  0,  0,  0 }, //OxeyeDaisy,
-        {  0,  0,  0 }, //PinkTulip,
-        {  0,  0,  0 }, //Poppy,
-        {  0,  0,  0 }, //RedTulip,
-        {  0,  0,  0 }, //WhiteTulip,
-        {  0,  0,  0 }, //BrainCoralBlock,
-        {  0,  0,  0 }, //BubbleCoralBlock,
-        {  0,  0,  0 }, //FireCoralBlock,
-        {  0,  0,  0 }, //HornCoralBlock,
-        {  0,  0,  0 }, //TubeCoralBlock,
-        {  0,  0,  0 }, //DeadBrainCoralBlock,
-        {  0,  0,  0 }, //DeadBubbleCoralBlock,
-        {  0,  0,  0 }, //DeadFireCoralBlock,
-        {  0,  0,  0 }, //DeadHornCoralBlock,
-        {  0,  0,  0 }, //DeadTubeCoralBlock,
-        {  0,  0,  0 }, //BrainCoralFan,
-        {  0,  0,  0 }, //BubbleCoralFan,
-        {  0,  0,  0 }, //FireCoralFan,
-        {  0,  0,  0 }, //HornCoralFan,
-        {  0,  0,  0 }, //TubeCoralFan,
-        {  0,  0,  0 }, //BrainCoral,
-        {  0,  0,  0 }, //BubbleCoral,
-        {  0,  0,  0 }, //FireCoral,
-        {  0,  0,  0 }, //HornCoral,
-        {  0,  0,  0 }, //TubeCoral,
-        {  0,  0,  0 }, //DeadBrainCoral,
-        {  0,  0,  0 }, //DeadBubbleCoral,
-        {  0,  0,  0 }, //DeadFireCoral,
-        {  0,  0,  0 }, //DeadHornCoral,
-        {  0,  0,  0 }, //DeadTubeCoral,
-        {  0,  0,  0 }, //Bush,
-        {  0,  0,  0 }, //DeadBush,
-        {  0,  0,  0 }, //Fern,
-        {  0,  0,  0 }, //Grass,
-        {  0,  0,  0 }, //HangingRoots,
-        {  0,  0,  0 }, //ShortDryGrass,
-        {  0,  0,  0 }, //ShortGrass,
-        {  0,  0,  0 }, //TallDryGrass,
-        {  0,  0,  0 }, //SugarCane,
-        {  0,  0,  0 }, //SweetBerry0,
-        {  0,  0,  0 }, //SweetBerry1,
-        {  0,  0,  0 }, //SweetBerry2,
-        {  0,  0,  0 }, //SweetBerry3,
-        {  0,  0,  0 }, //CaveVines,
-        {  0,  0,  0 }, //CaveVinesLit,
-        {  0,  0,  0 }, //CavePlant,
-        {  0,  0,  0 }, //CavePlantLit,
-        {  0,  0,  0 }, //Cactus,
-        {  0,  0,  0 }, //CactusFlower,
-        {  0,  0,  0 }, //BrownMushroom,
-        {  0,  0,  0 }, //RedMushroom,
-        {  0,  0,  0 }, //Pumpkin,
-        {  0,  0,  0 }, //Melon,
-        {  0,  0,  0 }, //LargeFern,
-        {  0,  0,  0 }, //LargeFernTop,
-        {  0,  0,  0 }, //Peony,
-        {  0,  0,  0 }, //PeonyTop,
-        {  0,  0,  0 }, //RoseBush,
-        {  0,  0,  0 }, //RoseBushTop,
-        {  0,  0,  0 }, //TallGrass,
-        {  0,  0,  0 }, //TallGrassTop,
-        {  0,  0,  0 }, //TallSeaGrass,
-        {  0,  0,  0 }, //TallSeaGrassTop,
-        {  0,  0,  0 }, //Kelp,
-        {  0,  0,  0 }, //Seagrass,
-        {  0,  0,  0 }, //Water,
-        {  0,  0,  0 }, //Lava
-    };
-
-    constexpr bool TRANSPARENT[] = {
-        true,  //Air,
-        false, //SnowGrassBlock,
-        false, //GrassBlock,
-        false, //CoarseDirt,
-        false, //RedSand,
-        false, //Gravel,
-        false, //Clay,
-        false, //Dirt,
-        false, //Sand,
-        false, //Mud,
-        false, //Amethyst,
-        false, //Andesite,
-        false, //Basalt,
-        false, //Bedrock,
-        false, //BlackStone,
-        false, //Calcite,
-        false, //CobbleStone,
-        false, //Deepslate,
-        false, //Diorite,
-        false, //Dripstone,
-        false, //Granite,
-        false, //RedSandStone,
-        false, //SandStone,
-        false, //Stone,
-        false, //Tuff,
-        false, //Ice,
-        false, //BlueIce,
-        false, //PackedIce,
-        true , //AcaciaLeaves,
-        true , //AzaleaLeaves,
-        true , //BirchLeaves,
-        true , //CherryLeaves,
-        true , //DarkOakLeaves,
-        true , //JungleLeaves,
-        true , //OakLeaves,
-        true , //PaleOakLeaves,
-        true , //SpruceLeaves,
-        false, //AcaciaLog,
-        false, //AzaleaLog,
-        false, //BirchLog,
-        false, //CherryLog,
-        false, //DarkOakLog,
-        false, //JungleLog,
-        false, //OakLog,
-        false, //PaleOakLog,
-        false, //SpruceLog,
-        true , //AcaciaSapling,
-        true , //AzaleaSapling,
-        true , //BirchSapling,
-        true , //CherrySapling,
-        true , //DarkOakSapling,
-        true , //JungleSapling,
-        true , //OakSapling,
-        true , //PaleOakSapling,
-        true , //SpruceSapling,
-        true , //Allium,
-        true , //AzureBluet,
-        true , //BlueOrchid,
-        true , //CornFlower,
-        true , //Dandelion,
-        true , //OrangeTulip,
-        true , //OxeyeDaisy,
-        true , //PinkTulip,
-        true , //Poppy,
-        true , //RedTulip,
-        true , //WhiteTulip,
-        false, //BrainCoralBlock,
-        false, //BubbleCoralBlock,
-        false, //FireCoralBlock,
-        false, //HornCoralBlock,
-        false, //TubeCoralBlock,
-        false, //DeadBrainCoralBlock,
-        false, //DeadBubbleCoralBlock,
-        false, //DeadFireCoralBlock,
-        false, //DeadHornCoralBlock,
-        false, //DeadTubeCoralBlock,
-        true , //BrainCoralFan,
-        true , //BubbleCoralFan,
-        true , //FireCoralFan,
-        true , //HornCoralFan,
-        true , //TubeCoralFan,
-        true , //BrainCoral,
-        true , //BubbleCoral,
-        true , //FireCoral,
-        true , //HornCoral,
-        true , //TubeCoral,
-        true , //DeadBrainCoral,
-        true , //DeadBubbleCoral,
-        true , //DeadFireCoral,
-        true , //DeadHornCoral,
-        true , //DeadTubeCoral,
-        true , //Bush,
-        true , //DeadBush,
-        true , //Fern,
-        true , //Grass,
-        true , //HangingRoots,
-        true , //ShortDryGrass,
-        true , //ShortGrass,
-        true , //TallDryGrass,
-        true , //SugarCane,
-        true , //SweetBerry0,
-        true , //SweetBerry1,
-        true , //SweetBerry2,
-        true , //SweetBerry3,
-        true , //CaveVines,
-        true , //CaveVinesLit,
-        true , //CavePlant,
-        true , //CavePlantLit,
-        false, //Cactus,
-        false, //CactusFlower,
-        true , //BrownMushroom,
-        true , //RedMushroom,
-        false, //Pumpkin,
-        false, //Melon,
-        true , //LargeFern,
-        true , //LargeFernTop,
-        true , //Peony,
-        true , //PeonyTop,
-        true , //RoseBush,
-        true , //RoseBushTop,
-        true , //TallGrass,
-        true , //TallGrassTop,
-        true , //TallSeaGrass,
-        true , //TallSeaGrassTop,
-        true , //Kelp,
-        true , //Seagrass,
-        true , //Water,
-        true , //Lava
-    };
-
-    [[nodiscard]]
-    inline uint8_t getTexture(const BlockID id, const Face face) noexcept {
-        const auto&[top, side, bottom] = TEXTURES[static_cast<uint8_t>(id)];
-
-        switch (face) {
-            case Top:
-                return top;
-
-            case Bottom:
-                return bottom;
-
-            default:
-                return side;
-        }
+    [[nodiscard]] inline int chunkIndex(const int dx, const int dy, const int dz) noexcept {
+        return (dz + 1) * 9 + (dy + 1) * 3 + (dx + 1);
     }
 
-    [[nodiscard]]
-    inline bool isTransparent(const BlockID id) noexcept {
-        return TRANSPARENT[static_cast<uint8_t>(id)];
-    }
+    ChunkData getChunkData(const glm::ivec3& pos, const World& world) {
+        ChunkData data{};
 
-    struct ChunkCache final {
-        Chunk* chunks[3][3][3] = {};
-    };
+        for (int dz = -1; dz <= 1; ++dz) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    const int index = chunkIndex(dx, dy, dz);
 
-    [[nodiscard]]
-    inline BlockID voxel(
-        const ChunkCache& cache,
-        const int x,
-        const int y,
-        const int z
-    ) noexcept {
-
-        const int cx = x >> 4;
-        const int cy = y >> 4;
-        const int cz = z >> 4;
-
-        const int lx = x & 15;
-        const int ly = y & 15;
-        const int lz = z & 15;
-
-        Chunk* chunk = cache.chunks[cx + 1][cy + 1][cz + 1];
-
-        if (!chunk) {
-            return Air;
-        }
-
-        return static_cast<BlockID>(
-            chunk->at({lx, ly, lz}) & 0xFF
-        );
-    }
-
-    struct FaceInfo final {
-        BlockID id = Air;
-        uint8_t texture = 0;
-        uint8_t ao = 0;
-
-        [[nodiscard]]
-        bool operator==(const FaceInfo& other) const noexcept {
-            return id == other.id &&
-                   texture == other.texture &&
-                   ao == other.ao;
-        }
-    };
-
-    [[nodiscard]]
-    inline uint8_t packAO(
-        const uint8_t a0,
-        const uint8_t a1,
-        const uint8_t a2,
-        const uint8_t a3
-    ) noexcept {
-
-        return a0 |
-            a1 << 2 |
-            a2 << 4 |
-            a3 << 6;
-    }
-
-    [[nodiscard]]
-    inline uint8_t unpackAO(
-        const uint8_t ao,
-        const int index
-    ) noexcept {
-        return ao >> (index * 2) & 0x3;
-    }
-
-    [[nodiscard]]
-    inline uint8_t computeAO(
-        const bool s1,
-        const bool s2,
-        const bool c
-    ) noexcept {
-
-        if (s1 && s2) {
-            return 0;
-        }
-
-        return 3 - (s1 + s2 + c);
-    }
-
-    Mesh generateMesh(const glm::ivec3& pos, const World& world) {
-        Mesh mesh;
-
-        mesh.solid.vertices.reserve(2048);
-        mesh.solid.indices.reserve(4096);
-
-        mesh.transparent.vertices.reserve(2048);
-        mesh.transparent.indices.reserve(4096);
-
-        ChunkCache cache;
-
-        for (int z = -1; z <= 1; ++z) {
-            for (int y = -1; y <= 1; ++y) {
-                for (int x = -1; x <= 1; ++x) {
-
-                    auto ptr = world.getChunk(
-                        pos + glm::ivec3(x, y, z)
+                    data[index] = world.getChunk(
+                        pos + glm::ivec3(dx, dy, dz)
                     );
-
-                    cache.chunks[x + 1][y + 1][z + 1] = ptr.get();
                 }
             }
         }
 
-        constexpr int normals[6][3] = {
-            { 0,  1,  0},
-            { 0, -1,  0},
-            {-1,  0,  0},
-            { 1,  0,  0},
-            { 0,  0,  1},
-            { 0,  0, -1}
+        return data;
+    }
+Mesh generateMesh(const glm::ivec3& pos, const World& world) {
+        Mesh mesh;
+
+        ChunkData chunks = getChunkData(pos, world);
+
+        constexpr glm::ivec3 normals[6] = {
+            { 0,  1,  0}, // top
+            { 0, -1,  0}, // bottom
+            {-1,  0,  0}, // left
+            { 1,  0,  0}, // right
+            { 0,  0, -1}, // front
+            { 0,  0,  1}  // back
         };
 
-        constexpr int axisU[6] = {2, 2, 2, 2, 0, 0};
-        constexpr int axisV[6] = {0, 0, 1, 1, 1, 1};
-        constexpr int axisD[6] = {1, 1, 0, 0, 2, 2};
+        struct MaskCell {
+            BlockID block = BlockID::Air;
 
-        constexpr int aoOffsets[6][4][3][3] = {
+            uint8_t texture = 0;
 
-            // Top
-            {
-                {{ 0, 0,-1}, {-1, 0, 0}, {-1, 0,-1}},
-                {{ 0, 0,-1}, { 1, 0, 0}, { 1, 0,-1}},
-                {{ 0, 0, 1}, {-1, 0, 0}, {-1, 0, 1}},
-                {{ 0, 0, 1}, { 1, 0, 0}, { 1, 0, 1}}
-            },
+            uint8_t ao[4]{};
 
-            // Bottom
-            {
-                {{ 0, 0,-1}, {-1, 0, 0}, {-1, 0,-1}},
-                {{ 0, 0,-1}, { 1, 0, 0}, { 1, 0,-1}},
-                {{ 0, 0, 1}, {-1, 0, 0}, {-1, 0, 1}},
-                {{ 0, 0, 1}, { 1, 0, 0}, { 1, 0, 1}}
-            },
+            uint16_t tint = 0;
 
-            // Left
-            {
-                {{ 0, 0,-1}, { 0,-1, 0}, { 0,-1,-1}},
-                {{ 0, 0,-1}, { 0, 1, 0}, { 0, 1,-1}},
-                {{ 0, 0, 1}, { 0,-1, 0}, { 0,-1, 1}},
-                {{ 0, 0, 1}, { 0, 1, 0}, { 0, 1, 1}}
-            },
+            bool transparent = false;
+            bool flip = false;
+            bool valid = false;
+        };
 
-            // Right
-            {
-                {{ 0, 0,-1}, { 0,-1, 0}, { 0,-1,-1}},
-                {{ 0, 0,-1}, { 0, 1, 0}, { 0, 1,-1}},
-                {{ 0, 0, 1}, { 0,-1, 0}, { 0,-1, 1}},
-                {{ 0, 0, 1}, { 0, 1, 0}, { 0, 1, 1}}
-            },
+        auto getBlock = [&](int x, int y, int z) -> BlockID {
+            int cx = 0;
+            int cy = 0;
+            int cz = 0;
 
-            // Near
-            {
-                {{-1, 0, 0}, { 0,-1, 0}, {-1,-1, 0}},
-                {{-1, 0, 0}, { 0, 1, 0}, {-1, 1, 0}},
-                {{ 1, 0, 0}, { 0,-1, 0}, { 1,-1, 0}},
-                {{ 1, 0, 0}, { 0, 1, 0}, { 1, 1, 0}}
-            },
+            if (x < 0) {
+                cx = -1;
+                x += CHUNK_SIZE;
+            }
+            else if (x >= CHUNK_SIZE) {
+                cx = 1;
+                x -= CHUNK_SIZE;
+            }
 
-            // Far
-            {
-                {{-1, 0, 0}, { 0,-1, 0}, {-1,-1, 0}},
-                {{-1, 0, 0}, { 0, 1, 0}, {-1, 1, 0}},
-                {{ 1, 0, 0}, { 0,-1, 0}, { 1,-1, 0}},
-                {{ 1, 0, 0}, { 0, 1, 0}, { 1, 1, 0}}
+            if (y < 0) {
+                cy = -1;
+                y += CHUNK_SIZE;
+            }
+            else if (y >= CHUNK_SIZE) {
+                cy = 1;
+                y -= CHUNK_SIZE;
+            }
+
+            if (z < 0) {
+                cz = -1;
+                z += CHUNK_SIZE;
+            }
+            else if (z >= CHUNK_SIZE) {
+                cz = 1;
+                z -= CHUNK_SIZE;
+            }
+
+            const auto& chunk = chunks[chunkIndex(cx, cy, cz)];
+
+            if (!chunk)
+                return BlockID::Air;
+
+            return static_cast<BlockID>(chunk->at({x, y, z}));
+        };
+
+        auto solid = [&](BlockID id) {
+            return id != BlockID::Air &&
+                   !getBlockInfo(id).transparent;
+        };
+
+        auto visible = [&](BlockID a, BlockID b) {
+            if (b == BlockID::Air)
+                return true;
+
+            const auto& infoA = getBlockInfo(a);
+            const auto& infoB = getBlockInfo(b);
+
+            if (infoB.transparent && a != b)
+                return true;
+
+            return false;
+        };
+
+        auto vertexAO = [](bool s1, bool s2, bool c) -> uint8_t {
+            if (s1 && s2)
+                return 3;
+
+            return s1 + s2 + c;
+        };
+
+        auto calcAO = [&](int face, int x, int y, int z, uint8_t out[4]) {
+
+            auto occ = [&](int ox, int oy, int oz) {
+                return solid(getBlock(x + ox, y + oy, z + oz));
+            };
+
+            switch (face) {
+
+                // TOP
+                case 0: {
+                    out[0] = vertexAO(
+                        occ(-1, 1, 0),
+                        occ(0, 1,-1),
+                        occ(-1,1,-1)
+                    );
+
+                    out[1] = vertexAO(
+                        occ(1,1,0),
+                        occ(0,1,-1),
+                        occ(1,1,-1)
+                    );
+
+                    out[2] = vertexAO(
+                        occ(1,1,0),
+                        occ(0,1,1),
+                        occ(1,1,1)
+                    );
+
+                    out[3] = vertexAO(
+                        occ(-1,1,0),
+                        occ(0,1,1),
+                        occ(-1,1,1)
+                    );
+                    break;
+                }
+
+                    // BOTTOM
+                case 1: {
+                    out[0] = vertexAO(
+                        occ(-1,-1,0),
+                        occ(0,-1,-1),
+                        occ(-1,-1,-1)
+                    );
+
+                    out[1] = vertexAO(
+                        occ(1,-1,0),
+                        occ(0,-1,-1),
+                        occ(1,-1,-1)
+                    );
+
+                    out[2] = vertexAO(
+                        occ(1,-1,0),
+                        occ(0,-1,1),
+                        occ(1,-1,1)
+                    );
+
+                    out[3] = vertexAO(
+                        occ(-1,-1,0),
+                        occ(0,-1,1),
+                        occ(-1,-1,1)
+                    );
+                    break;
+                }
+
+                default:
+                    out[0] = out[1] = out[2] = out[3] = 0;
+                    break;
             }
         };
 
-        std::array<FaceInfo, MASK_SIZE> mask {};
+        auto sameMask = [](const MaskCell& a, const MaskCell& b) {
+            if (!a.valid || !b.valid)
+                return false;
 
-        uint32_t solidOffset = 0;
-        uint32_t blendOffset = 0;
+            if (a.block != b.block)
+                return false;
 
-        int x[3] {};
+            if (a.texture != b.texture)
+                return false;
 
-        for (int f = 0; f < 6; ++f) {
+            if (a.tint != b.tint)
+                return false;
 
-            const Face face = static_cast<Face>(f);
+            if (a.flip != b.flip)
+                return false;
 
-            const int nx = normals[f][0];
-            const int ny = normals[f][1];
-            const int nz = normals[f][2];
+            for (int i = 0; i < 4; ++i) {
+                if (a.ao[i] != b.ao[i])
+                    return false;
+            }
 
-            const int u = axisU[f];
-            const int v = axisV[f];
-            const int d = axisD[f];
+            return true;
+        };
 
-            for (x[d] = 0; x[d] < CHUNK_SIZE; ++x[d]) {
+        auto emitQuad = [&](MeshData& dst,
+                            int face,
+                            glm::ivec3 p,
+                            int w,
+                            int h,
+                            const MaskCell& m)
+        {
+            const uint32_t index =
+                static_cast<uint32_t>(dst.vertices.size());
 
-                mask.fill({});
+            auto push = [&](int x, int y, int z,
+                            int u, int v,
+                            uint8_t ao)
+            {
+                dst.vertices.push_back(
+                    compress(
+                        x, y, z,
+                        u, v,
+                        m.texture,
+                        ao,
+                        m.tint
+                    )
+                );
+            };
 
-                int n = 0;
+            switch (face) {
 
-                for (x[v] = 0; x[v] < CHUNK_SIZE; ++x[v]) {
-                    for (x[u] = 0; x[u] < CHUNK_SIZE; ++x[u], ++n) {
+                // TOP
+                case 0:
+                    push(p.x,     p.y+1, p.z,     0, 0, m.ao[0]);
+                    push(p.x+w,   p.y+1, p.z,     w, 0, m.ao[1]);
+                    push(p.x+w,   p.y+1, p.z+h,   w, h, m.ao[2]);
+                    push(p.x,     p.y+1, p.z+h,   0, h, m.ao[3]);
+                    break;
 
-                        const int vx = x[0];
-                        const int vy = x[1];
-                        const int vz = x[2];
+                    // BOTTOM
+                case 1:
+                    push(p.x,     p.y, p.z,     0, 0, m.ao[0]);
+                    push(p.x+w,   p.y, p.z,     w, 0, m.ao[1]);
+                    push(p.x+w,   p.y, p.z+h,   w, h, m.ao[2]);
+                    push(p.x,     p.y, p.z+h,   0, h, m.ao[3]);
+                    break;
 
-                        const BlockID current =
-                            voxel(cache, vx, vy, vz);
+                default:
+                    return;
+            }
 
-                        if (current == BlockID::Air) {
+            if (!m.flip) {
+                dst.indices.insert(dst.indices.end(), {
+                    index + 0,
+                    index + 1,
+                    index + 2,
+
+                    index + 0,
+                    index + 2,
+                    index + 3
+                });
+            }
+            else {
+                dst.indices.insert(dst.indices.end(), {
+                    index + 0,
+                    index + 1,
+                    index + 3,
+
+                    index + 1,
+                    index + 2,
+                    index + 3
+                });
+            }
+        };
+
+        std::array<MaskCell, CHUNK_SIZE * CHUNK_SIZE> mask;
+
+        for (int face = 0; face < 2; ++face) {
+
+            for (int layer = 0; layer < CHUNK_SIZE; ++layer) {
+
+                // BUILD MASK
+
+                for (int z = 0; z < CHUNK_SIZE; ++z) {
+                    for (int x = 0; x < CHUNK_SIZE; ++x) {
+
+                        const int idx = z * CHUNK_SIZE + x;
+
+                        int bx = x;
+                        int by = layer;
+                        int bz = z;
+
+                        if (face == 1)
+                            by = layer;
+
+                        const BlockID self =
+                            getBlock(bx, by, bz);
+
+                        if (self == BlockID::Air) {
+                            mask[idx].valid = false;
                             continue;
                         }
+
+                        const auto& info =
+                            getBlockInfo(self);
+
+                        if (info.type != MeshType::Cube) {
+                            mask[idx].valid = false;
+                            continue;
+                        }
+
+                        const glm::ivec3 n =
+                            normals[face];
 
                         const BlockID neighbor =
-                            voxel(
-                                cache,
-                                vx + nx,
-                                vy + ny,
-                                vz + nz
+                            getBlock(
+                                bx + n.x,
+                                by + n.y,
+                                bz + n.z
                             );
 
-                        const bool curTrans =
-                            isTransparent(current);
-
-                        const bool neiTrans =
-                            isTransparent(neighbor);
-
-                        const bool visible =
-                            neighbor == Air ||
-                            (neiTrans && !curTrans) ||
-                            (curTrans && neiTrans && current != neighbor);
-
-                        if (!visible) {
+                        if (!visible(self, neighbor)) {
+                            mask[idx].valid = false;
                             continue;
                         }
 
-                        FaceInfo& faceInfo = mask[n];
+                        auto& cell = mask[idx];
 
-                        faceInfo.id = current;
-                        faceInfo.texture = getTexture(current, face);
+                        cell.valid = true;
+                        cell.block = self;
+                        cell.transparent = info.transparent;
 
-                        uint8_t ao[4];
+                        switch (face) {
+                            case 0:
+                                cell.texture = info.top;
+                                break;
 
-                        for (int i = 0; i < 4; ++i) {
+                            case 1:
+                                cell.texture = info.bottom;
+                                break;
 
-                            const auto& side1 = aoOffsets[f][i][0];
-                            const auto& side2 = aoOffsets[f][i][1];
-                            const auto& corner = aoOffsets[f][i][2];
-
-                            const bool s1 =
-                                voxel(
-                                    cache,
-                                    vx + nx + side1[0],
-                                    vy + ny + side1[1],
-                                    vz + nz + side1[2]
-                                ) != BlockID::Air;
-
-                            const bool s2 =
-                                voxel(
-                                    cache,
-                                    vx + nx + side2[0],
-                                    vy + ny + side2[1],
-                                    vz + nz + side2[2]
-                                ) != BlockID::Air;
-
-                            const bool c =
-                                voxel(
-                                    cache,
-                                    vx + nx + corner[0],
-                                    vy + ny + corner[1],
-                                    vz + nz + corner[2]
-                                ) != BlockID::Air;
-
-                            ao[i] = computeAO(s1, s2, c);
+                            default:
+                                cell.texture = info.side;
+                                break;
                         }
 
-                        faceInfo.ao =
-                            packAO(ao[0], ao[1], ao[2], ao[3]);
+                        cell.tint = packRGB565(255,255,255);
+
+                        calcAO(face, bx, by, bz, cell.ao);
+
+                        cell.flip =
+                            (cell.ao[0] + cell.ao[2]) >
+                            (cell.ao[1] + cell.ao[3]);
                     }
                 }
 
-                n = 0;
+                // GREEDY MERGE
 
-                for (int j = 0; j < CHUNK_SIZE; ++j) {
-                    for (int i = 0; i < CHUNK_SIZE;) {
+                for (int z = 0; z < CHUNK_SIZE; ++z) {
+                    for (int x = 0; x < CHUNK_SIZE;) {
 
-                        const FaceInfo current = mask[n];
+                        const int idx =
+                            z * CHUNK_SIZE + x;
 
-                        if (current.id == BlockID::Air) {
-                            ++i;
-                            ++n;
+                        auto& cell = mask[idx];
+
+                        if (!cell.valid) {
+                            ++x;
                             continue;
                         }
 
-                        int w = 1;
+                        int width = 1;
 
-                        while (
-                            i + w < CHUNK_SIZE &&
-                            mask[n + w] == current
-                        ) {
-                            ++w;
+                        while (x + width < CHUNK_SIZE) {
+
+                            const auto& next =
+                                mask[z * CHUNK_SIZE + x + width];
+
+                            if (!sameMask(cell, next))
+                                break;
+
+                            ++width;
                         }
 
-                        int h = 1;
+                        int height = 1;
                         bool done = false;
 
-                        while (j + h < CHUNK_SIZE && !done) {
+                        while (z + height < CHUNK_SIZE && !done) {
 
-                            for (int k = 0; k < w; ++k) {
-                                if (mask[n + k + h * CHUNK_SIZE] != current) {
+                            for (int k = 0; k < width; ++k) {
+
+                                const auto& next =
+                                    mask[(z + height) * CHUNK_SIZE + x + k];
+
+                                if (!sameMask(cell, next)) {
                                     done = true;
                                     break;
                                 }
                             }
 
-                            if (!done) {
-                                ++h;
+                            if (!done)
+                                ++height;
+                        }
+
+                        MeshData& dst =
+                            cell.transparent
+                            ? mesh.transparent
+                            : mesh.solid;
+
+                        emitQuad(
+                            dst,
+                            face,
+                            {x, layer, z},
+                            width,
+                            height,
+                            cell
+                        );
+
+                        for (int dz = 0; dz < height; ++dz) {
+                            for (int dx = 0; dx < width; ++dx) {
+                                mask[(z + dz) * CHUNK_SIZE + x + dx].valid = false;
                             }
                         }
 
-                        x[u] = i;
-                        x[v] = j;
-
-                        int du[3] {};
-                        int dv[3] {};
-
-                        du[u] = w;
-                        dv[v] = h;
-
-                        glm::ivec3 v0;
-                        glm::ivec3 v1;
-                        glm::ivec3 v2;
-                        glm::ivec3 v3;
-
-                        if (f == Top || f == Right || f == Near) {
-
-                            v0 = {x[0] + nx,               x[1] + ny,               x[2] + nz};
-                            v1 = {x[0] + nx + du[0],       x[1] + ny + du[1],       x[2] + nz + du[2]};
-                            v2 = {x[0] + nx + dv[0],       x[1] + ny + dv[1],       x[2] + nz + dv[2]};
-                            v3 = {x[0] + nx + du[0] + dv[0],
-                                  x[1] + ny + du[1] + dv[1],
-                                  x[2] + nz + du[2] + dv[2]};
-
-                        } else {
-
-                            v0 = {x[0] + du[0],            x[1] + du[1],            x[2] + du[2]};
-                            v1 = {x[0],                    x[1],                    x[2]};
-                            v2 = {x[0] + du[0] + dv[0],
-                                  x[1] + du[1] + dv[1],
-                                  x[2] + du[2] + dv[2]};
-                            v3 = {x[0] + dv[0],            x[1] + dv[1],            x[2] + dv[2]};
-                        }
-
-                        const bool transparent =
-                            isTransparent(current.id);
-
-                        auto& verts =
-                            transparent
-                                ? mesh.transparent.vertices
-                                : mesh.solid.vertices;
-
-                        auto& inds =
-                            transparent
-                                ? mesh.transparent.indices
-                                : mesh.solid.indices;
-
-                        uint32_t& offset =
-                            transparent
-                                ? blendOffset
-                                : solidOffset;
-
-                        verts.push_back(compress(
-                            v0.x, v0.y, v0.z,
-                            0, 0,
-                            current.texture,
-                            unpackAO(current.ao, 0),
-                            packRGB565(255,255,255)
-                        ));
-
-                        verts.push_back(compress(
-                            v1.x, v1.y, v1.z,
-                            w, 0,
-                            current.texture,
-                            unpackAO(current.ao, 1),
-                            packRGB565(255,255,255)
-                        ));
-
-                        verts.push_back(compress(
-                            v2.x, v2.y, v2.z,
-                            0, h,
-                            current.texture,
-                            unpackAO(current.ao, 2),
-                            packRGB565(255,255,255)
-                        ));
-
-                        verts.push_back(compress(
-                            v3.x, v3.y, v3.z,
-                            w, h,
-                            current.texture,
-                            unpackAO(current.ao, 3),
-                            packRGB565(255,255,255)
-                        ));
-
-                        const uint8_t a0 = unpackAO(current.ao, 0);
-                        const uint8_t a1 = unpackAO(current.ao, 1);
-                        const uint8_t a2 = unpackAO(current.ao, 2);
-                        const uint8_t a3 = unpackAO(current.ao, 3);
-
-                        if (a0 + a3 > a1 + a2) {
-
-                            inds.push_back(offset + 0);
-                            inds.push_back(offset + 1);
-                            inds.push_back(offset + 3);
-
-                            inds.push_back(offset + 0);
-                            inds.push_back(offset + 3);
-                            inds.push_back(offset + 2);
-
-                        } else {
-
-                            inds.push_back(offset + 0);
-                            inds.push_back(offset + 1);
-                            inds.push_back(offset + 2);
-
-                            inds.push_back(offset + 1);
-                            inds.push_back(offset + 3);
-                            inds.push_back(offset + 2);
-                        }
-
-                        offset += 4;
-
-                        for (int l = 0; l < h; ++l) {
-                            for (int k = 0; k < w; ++k) {
-                                mask[n + k + l * CHUNK_SIZE] = {};
-                            }
-                        }
-
-                        i += w;
-                        n += w;
+                        x += width;
                     }
                 }
             }

@@ -46,7 +46,6 @@ namespace cube {
         PackedIce,
 
         AcaciaLeaves,
-        AzaleaLeaves,
         BirchLeaves,
         CherryLeaves,
         DarkOakLeaves,
@@ -56,7 +55,6 @@ namespace cube {
         SpruceLeaves,
 
         AcaciaLog,
-        AzaleaLog,
         BirchLog,
         CherryLog,
         DarkOakLog,
@@ -66,7 +64,6 @@ namespace cube {
         SpruceLog,
 
         AcaciaSapling,
-        AzaleaSapling,
         BirchSapling,
         CherrySapling,
         DarkOakSapling,
@@ -99,12 +96,6 @@ namespace cube {
         DeadHornCoralBlock,
         DeadTubeCoralBlock,
 
-        BrainCoralFan,
-        BubbleCoralFan,
-        FireCoralFan,
-        HornCoralFan,
-        TubeCoralFan,
-
         BrainCoral,
         BubbleCoral,
         FireCoral,
@@ -121,16 +112,11 @@ namespace cube {
         DeadBush,
         Fern,
         Grass,
-        HangingRoots,
         ShortDryGrass,
         ShortGrass,
         TallDryGrass,
-
         SugarCane,
-        SweetBerry0,
-        SweetBerry1,
-        SweetBerry2,
-        SweetBerry3,
+        SweetBerry,
 
         CaveVines,
         CaveVinesLit,

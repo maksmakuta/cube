@@ -31,4 +31,4 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE include libs/glad/include libs/spng/spng libs/FastNoise2/include)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 glm::glm OpenGL::GL glad spng FastNoise2)
-target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
